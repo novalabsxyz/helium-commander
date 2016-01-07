@@ -30,7 +30,7 @@ def datasource_history(api_key, datasource_id):
     # get the first page, which has no `before` parameter
     req = requests.get(url, headers=headers)
     res = req.json()
-
+    print("Writing file...")
     while len(res) > 1:
         history+= res
         res = []
