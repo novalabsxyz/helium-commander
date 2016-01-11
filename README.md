@@ -12,7 +12,8 @@ Usage:
 $ export HELIUM_API_KEY="YOUR_API_KEY"
 $ # second argument is a datasource id, from:
 $ # ex: https://my.helium.com/datasource/4XlUNRMSTVasLpehlybrGQ
-$ ./temperature-history.py $HELIUM_API_KEY '4XlUNRMSTVasLpehlybrGQ'
+$ ./temperature-history.py -k $HELIUM_API_KEY -d '4XlUNRMSTVasLpehlybrGQ'
+$ # optionally pass -j to get temp.json raw json output
 $ head temp.csv
 timestamp-utc,temperature-celsius
 2016-01-07T18:21:16Z,22.7143

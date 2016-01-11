@@ -21,17 +21,20 @@ def sensor(api_key):
     req = requests.get(url, headers=headers)
     print req.content
 
-def datasource_history(api_key, datasource_id):
+def datasource_history(api_key, datasource_id, use_json):
     history = []
+    history_json = ""
 
     url = BASE_URL + 'datasource/' + datasource_id + '/history?count=1000'
     headers = {'Authorization': api_key}
 
     # get the first page, which has no `before` parameter
+    print("Getting data from Helium...")
     req = requests.get(url, headers=headers)
+    if use_json:
+        history_json += req.text
     res = req.json()
     history+= res
-    print("Writing file...")
     while len(res) > 1:
         res = []
         last_date = history[-1]['date']
@@ -40,20 +43,55 @@ def datasource_history(api_key, datasource_id):
         req = requests.get(new_url, headers=headers)
         res = req.json()
         history+= res
+        if use_json:
+            history_json += req.text
+
+    if use_json:
+        history = history_json
 
     return history
 
 if __name__ == "__main__":
-    import sys
-    import csv
-    (api_key, datasource_id) = sys.argv[1:]
-    temp_history = datasource_history(api_key, datasource_id)
+    import sys, getopt, csv
+    api_key = ""
+    datasource_id = ""
+    use_json = False
 
-    with open('temp.csv', 'w') as csvfile:
-        fieldnames = ['timestamp-utc', 'temperature-celsius']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "jk:d:")
+    except getopt.GetoptError:
+        print 'usage: temperature-history.py -k <api_key> -d <datasource_id>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-k"):
+            api_key = arg
+        elif opt in ("-d"):
+            datasource_id = arg
+        elif opt in ("-j"):
+            use_json = True
+        else:
+            print 'usage: temperature-history.py -k <api_key> -d <datasource_id>'
+            sys.exit(2)
+    if api_key == "":
+        print 'Missing API Key'
+        sys.exit(2)
+    elif datasource_id == "":
+        print 'Missing Datasource ID'
+        sys.exit(2)
 
-        writer.writeheader()
-        for reading in temp_history:
-            row = {'timestamp-utc': reading['date'], 'temperature-celsius': reading['value']}
-            writer.writerow(row)
+    temp_history = datasource_history(api_key, datasource_id, use_json)
+
+    if use_json:
+        print("Writing temp.json...")
+        with open('temp.json', 'w') as jsonfile:            
+            jsonfile.write(temp_history)
+    else:
+        print("Writing temp.csv...")
+        with open('temp.csv', 'w') as csvfile:
+            fieldnames = ['timestamp-utc', 'temperature-celsius']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for reading in temp_history:
+                row = {'timestamp-utc': reading['date'], 'temperature-celsius': reading['value']}
+                writer.writerow(row)
