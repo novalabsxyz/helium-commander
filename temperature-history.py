@@ -21,9 +21,8 @@ def sensor(api_key):
     req = requests.get(url, headers=headers)
     print req.content
 
-def datasource_history(api_key, datasource_id, use_json):
+def datasource_history(api_key, datasource_id):
     history = []
-    history_json = ""
 
     url = BASE_URL + 'datasource/' + datasource_id + '/history?count=1000'
     headers = {'Authorization': api_key}
@@ -31,8 +30,6 @@ def datasource_history(api_key, datasource_id, use_json):
     # get the first page, which has no `before` parameter
     print("Getting data from Helium...")
     req = requests.get(url, headers=headers)
-    if use_json:
-        history_json += req.text
     res = req.json()
     history+= res
     while len(res) > 1:
@@ -43,16 +40,11 @@ def datasource_history(api_key, datasource_id, use_json):
         req = requests.get(new_url, headers=headers)
         res = req.json()
         history+= res
-        if use_json:
-            history_json += req.text
-
-    if use_json:
-        history = history_json
 
     return history
 
 if __name__ == "__main__":
-    import sys, getopt, csv
+    import sys, getopt, csv, json
     api_key = ""
     datasource_id = ""
     use_json = False
@@ -79,12 +71,12 @@ if __name__ == "__main__":
         print 'Missing Datasource ID'
         sys.exit(2)
 
-    temp_history = datasource_history(api_key, datasource_id, use_json)
+    temp_history = datasource_history(api_key, datasource_id)
 
     if use_json:
         print("Writing temp.json...")
         with open('temp.json', 'w') as jsonfile:            
-            jsonfile.write(temp_history)
+            jsonfile.write(json.dumps(temp_history))
     else:
         print("Writing temp.csv...")
         with open('temp.csv', 'w') as csvfile:
