@@ -80,3 +80,6 @@ target/
 
 # CSV files
 *.csv
+
+# json files
+*.json
