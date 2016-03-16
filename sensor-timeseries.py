@@ -4,15 +4,10 @@ import pytz
 import datetime
 import dateutil.parser
 import requests
-import sys
 
 BASE_URL = "https://api.helium.com/v1/"
 
 session = requests.Session()
-
-def _print(str):
-    sys.stdout.write(str)
-    sys.stdout.flush()
 
 def get_json_path(json, path):
     try: # try to get the value
@@ -27,9 +22,7 @@ def sensor_timeseries(opts, writer):
     json_data = lambda json: json['data']
 
     # get the first page, which has no `before` parameter
-    _print("Getting data from Helium ")
     req = session.get(url, headers=headers)
-    _print('.')
     res = req.json()
 
     writer(json_data(res), False)
@@ -37,11 +30,9 @@ def sensor_timeseries(opts, writer):
     while prev_url != None:
         res = []
         req = session.get(prev_url, headers=headers)
-        _print('.')
         res = req.json()
         prev_url = json_prev_url(res)
         writer(json_data(res), False)
-    _print('\n')
     writer([], True)
 
 
@@ -55,17 +46,16 @@ if __name__ == "__main__":
                         help='The page size for each page')
     parser.add_argument('-p', '--port', nargs='+',
                         help='The ports to filter readings on')
+    parser.add_argument('-o', '--output', nargs='?',
+                        type=argparse.FileType('w'), default=sys.stdout,
+                        help='The output to write to (default stdout)')
     parser.add_argument('-k', '--api-key',  required=True,
                         help='Your Helium API key')
     parser.add_argument('sensor_id',
                         help='The sensor id to get timeseries data for')
     opts = parser.parse_args()
 
-    output_file = opts.sensor_id + '.' + opts.format
-    print("Writing to " +  output_file)
-
-
-    with open(output_file, 'w') as file:
+    with opts.output as file:
         ports = opts.port
         if ports == None:
             def port_filter(reading): return True
