@@ -1,21 +1,10 @@
 #!/usr/bin/env python
 
-import pytz
-import datetime
-import dateutil.parser
-import requests
+import helium.service as helium
 
-BASE_URL = "https://api.helium.com/v1/"
-
-session = requests.Session()
-
-def sensor(api_key,  writer):
-    url = BASE_URL + 'sensor'
-    headers = {'Authorization': api_key}
+def sensor(service,  writer):
     json_data = lambda json: json['data']
-
-    req = session.get(url, headers=headers)
-    res = req.json()
+    res = service.get_sensors()
     writer(json_data(res))
 
 if __name__ == "__main__":
@@ -30,6 +19,8 @@ if __name__ == "__main__":
     parser.add_argument('-k', '--api-key',  required=True,
                         help='Your Helium API key')
     opts = parser.parse_args()
+
+    service = helium.Service(opts.api_key)
 
     with opts.output as file:
 
@@ -49,4 +40,4 @@ if __name__ == "__main__":
                     }
                     writer.writerow(row)
 
-        sensor(opts.api_key, write_values)
+        sensor(service, write_values)

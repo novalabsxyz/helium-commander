@@ -1,40 +1,55 @@
 #!/usr/bin/env python
 
-import pytz
-import datetime
-import dateutil.parser
-import requests
+import helium.service as helium
 
-BASE_URL = "https://api.helium.com/v1/"
+def sensor_timeseries(service, sensor_id, writer, **kwargs):
+    json_data = lambda json: json['data'] if json else None
 
-session = requests.Session()
+    # Get the first page
+    res = service.get_sensor_timeseries(sensor_id, **kwargs)
+    writer(json_data(res))
+    while res != None:
+        res = service.get_prev_page(res)
+        writer(json_data(res))
 
-def get_json_path(json, path):
-    try: # try to get the value
-        return reduce(dict.__getitem__, path, json)
-    except KeyError:
-        return None
+def reading_port_filter(ports):
+    if ports == None:
+        def port_filter(reading): return True
+    else:
+        def port_filter(reading):
+            return reading['meta']['port'] in ports
+    return port_filter
 
-def sensor_timeseries(opts, writer):
-    url = BASE_URL + 'sensor/' + opts.sensor_id + '/timeseries?page[size]=' + str(opts.page_size)
-    headers = {'Authorization': opts.api_key}
-    json_prev_url = lambda json: get_json_path(json, ["links", "prev"])
-    json_data = lambda json: json['data']
+def json_writer(file, port_filter):
+    first_reading = [True] # Storing in an array to avoid non local errors in 2.7
+    file.write('[')
+    def writer(readings):
+        if readings is None:
+            file.write(']')
+        else:
+            for reading in filter(port_filter, readings):
+                if first_reading[0]:
+                    first_reading[0] = False
+                else:
+                    file.write(',')
+                    file.write(json.dumps(reading))
+    return writer
 
-    # get the first page, which has no `before` parameter
-    req = session.get(url, headers=headers)
-    res = req.json()
-
-    writer(json_data(res), False)
-    prev_url = json_prev_url(res)
-    while prev_url != None:
-        res = []
-        req = session.get(prev_url, headers=headers)
-        res = req.json()
-        prev_url = json_prev_url(res)
-        writer(json_data(res), False)
-    writer([], True)
-
+def csv_writer(file, port_filter):
+    fieldnames = ['sensor-id', 'reading-id', 'timestamp-utc', 'port', 'value']
+    csv_writer = csv.DictWriter(file, fieldnames=fieldnames)
+    csv_writer.writeheader()
+    def writer(readings):
+        if readings is None: return None
+        for reading in filter(port_filter, readings):
+            row = { 'reading-id': reading['id'],
+                    'sensor-id': reading['relationships']['sensor']['data']['id'],
+                    'timestamp-utc': reading['meta']['timestamp'],
+                    'port': reading['meta']['port'],
+                    'value': reading['meta']['value']
+            }
+            csv_writer.writerow(row)
+    return writer
 
 if __name__ == "__main__":
     import sys, argparse, csv, json
@@ -54,40 +69,15 @@ if __name__ == "__main__":
     parser.add_argument('sensor_id',
                         help='The sensor id to get timeseries data for')
     opts = parser.parse_args()
+    service = helium.Service(opts.api_key)
 
     with opts.output as file:
-        ports = opts.port
-        if ports == None:
-            def port_filter(reading): return True
-        else:
-            def port_filter(reading):
-                return reading['meta']['port'] in ports
-
+        port_filter = reading_port_filter(opts.port)
         if opts.format == 'json':
-            first_reading = [True] # Storing in an array to avoid non local errors in 2.7
-            file.write('[')
-            def write_readings(readings, done):
-                for reading in filter(port_filter, readings):
-                    if first_reading[0]:
-                        first_reading[0] = False
-                    else:
-                        file.write(',')
-                    file.write(json.dumps(reading))
-                if done: file.write(']')
-
+            write_readings = json_writer(file, port_filter)
         elif opts.format == 'csv':
-            fieldnames = ['sensor-id', 'reading-id', 'timestamp-utc', 'port', 'value']
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
+            write_readings = csv_writer(file, port_filter)
 
-            def write_readings(readings, done):
-                for reading in filter(port_filter, readings):
-                    row = { 'reading-id': reading['id'],
-                            'sensor-id': reading['relationships']['sensor']['data']['id'],
-                            'timestamp-utc': reading['meta']['timestamp'],
-                            'port': reading['meta']['port'],
-                            'value': reading['meta']['value']
-                    }
-                    writer.writerow(row)
-
-        sensor_timeseries(opts, write_readings)
+        sensor_timeseries(service, opts.sensor_id,
+                          write_readings,
+                          page_size = opts.page_size)
