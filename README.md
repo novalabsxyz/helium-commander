@@ -15,24 +15,36 @@ parameters it supports
 
 For example:
 
-
 ``` shellsession
 ./sensor-timeseries.py -h
-usage: sensor-timeseries.py [-h] [-f {csv,json}] [-s PAGE_SIZE]
-                            [-p PORT [PORT ...]] [-o [OUTPUT]] -k API_KEY
-                            sensor_id
-
-positional arguments:
-  sensor_id             The sensor id to get timeseries data for
+usage: sensor-timeseries.py [-h] [--format {csv,json}] [--page-size PAGE_SIZE]
+                            [--port PORT [PORT ...]] -k API_KEY
+                            [-s SENSOR [SENSOR ...] | -l LABEL | -o]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f {csv,json}, --format {csv,json}
-                        The output format for the results (default 'csv')
-  -s PAGE_SIZE, --page-size PAGE_SIZE
+  --format {csv,json}   The output format for the results (default 'csv')
+  --page-size PAGE_SIZE
                         The page size for each page
-  -p PORT [PORT ...], --port PORT [PORT ...]
+  --port PORT [PORT ...]
                         The ports to filter readings on
+  -k API_KEY, --api-key API_KEY
+                        Your Helium API key
+  -s SENSOR [SENSOR ...], --sensor SENSOR [SENSOR ...]
+                        Get timeseries data for one or more sensors
+  -l LABEL, --label LABEL
+                        Get timeseries data for all sensors in a label
+  -o, --org             Get timeseries data for all sensors in the
+                        organization
+```
+
+``` shellsession
+./sensor.py -h
+usage: sensor.py [-h] [--format {csv,json}] [-o [OUTPUT]] -k API_KEY
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --format {csv,json}   The output format for the results (default 'csv')
   -o [OUTPUT], --output [OUTPUT]
                         The output to write to (default stdout)
   -k API_KEY, --api-key API_KEY
