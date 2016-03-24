@@ -1,7 +1,6 @@
 import requests
 
 class Service:
-    import sys
     base_url = "https://api.helium.com/v1/"
 
     def __init__(self, api_key):
@@ -51,3 +50,9 @@ class Service:
     def get_next_page(self, json):
         next_url = self._get_json_path(json, ["links", "next"])
         return self._get_url(next_url)
+
+    def get_labels(self):
+        return self._get_path('label')
+
+    def get_label(self, label_id):
+        return self._get_path('label/{}', None, label_id)

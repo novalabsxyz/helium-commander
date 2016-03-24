@@ -1,43 +1,33 @@
 #!/usr/bin/env python
 
 import helium.service as helium
+import util.writer as writer
 
 def sensor(service,  writer):
     json_data = lambda json: json['data']
     res = service.get_sensors()
-    writer(json_data(res))
+    writer.start()
+    writer.write_readings(json_data(res))
+    writer.finish()
 
 if __name__ == "__main__":
-    import sys, argparse, csv, json
+    import sys, argparse, io
 
     parser = argparse.ArgumentParser()
+    writer.add_writer_arguments(parser)
     parser.add_argument('-o', '--output', nargs='?',
                         type=argparse.FileType('w'), default=sys.stdout,
                         help='The output to write to (default stdout)')
-    parser.add_argument('-f', '--format', default='csv', choices=['csv', 'json'],
-                        help='The output format for the results (default \'csv\')')
     parser.add_argument('-k', '--api-key',  required=True,
                         help='Your Helium API key')
-    opts = parser.parse_args()
 
+    opts = parser.parse_args()
     service = helium.Service(opts.api_key)
 
     with opts.output as file:
-
-        if opts.format == 'json':
-            def write_values(values):
-                file.write(json.dumps(values))
-
-        elif opts.format == 'csv':
-            fieldnames = ['sensor-id', 'sensor-name']
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-
-            def write_values(values):
-                for value in values:
-                    row = { 'sensor-name': value['attributes']['name'],
-                            'sensor-id': value['id']
-                    }
-                    writer.writerow(row)
-
-        sensor(service, write_values)
+        csv_mapping = {
+            'sensor-name': 'attributes/name',
+            'sensor-id': 'id'
+        }
+        output = writer.writer_for_opts(opts, file, mapping = csv_mapping)
+        sensor(service, output)
