@@ -21,12 +21,12 @@ def sensor_timeseries(service, sensor_id, writer, ports = None, **kwargs):
 def get_sensors(service, opts):
     if opts.sensor is not None:
         return opts.sensor
-    elif opts.org is not None:
-        sensors = service.get_sensors()
-        return dpath.values(sensors, '/data/*/id')
     elif opts.label is not None:
         labels = service.get_label(opts.label)
         return dpath.values(labels, 'data/relationships/sensor/data/*/id')
+    elif opts.org:
+        sensors = service.get_sensors()
+        return dpath.values(sensors, '/data/*/id')
 
 def reading_port_filter(ports):
     if ports == None:
