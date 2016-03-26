@@ -34,7 +34,7 @@ class Service:
         return self._get_path('sensor')
 
     def get_sensor(self, sensor_id):
-        return self._get_path('sensor/{}', sensor_id)
+        return self._get_path('sensor/{}', None, sensor_id)
 
     def get_sensor_timeseries(self, sensor_id, **kwargs):
         params = self._params_from_kwargs({
@@ -56,3 +56,9 @@ class Service:
 
     def get_label(self, label_id):
         return self._get_path('label/{}', None, label_id)
+
+    def get_elements(self):
+        return self._get_path('element')
+
+    def get_element(self, element_id):
+        return self._get_path('element/{}', None, element_id)
