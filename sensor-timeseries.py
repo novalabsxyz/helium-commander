@@ -77,6 +77,7 @@ if __name__ == "__main__":
             service = helium.Service(opts.api_key)
             return sensor_timeseries(service, sensor_id, output, opts.port, page_size=opts.page_size)
 
+    sensor_timeseries(service, sensors[0], output, opts.port, page_size=opts.page_size)
     with futures.ProcessPoolExecutor(max_workers=10) as executor:
         sensor_futures = dict((executor.submit(timeseries, sensor_id, opts),
                                sensor_id) for sensor_id in sensors)

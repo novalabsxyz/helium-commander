@@ -5,13 +5,13 @@ import csv
 import json
 
 def add_writer_arguments(parser):
-    parser.add_argument('--format', default='csv', choices=['csv', 'json'],
-                        help='The output format for the results (default \'csv\')')
+    parser.add_argument('--dump-format', default='csv', choices=['csv', 'json'],
+                        help='the dump output format (default \'csv\')')
 
 def writer_for_opts(opts, file, **kwargs):
-    if opts.format == 'json':
+    if opts.dump_format == 'json':
         return JSONWriter(file, **kwargs)
-    elif opts.format == 'csv':
+    elif opts.dump_format == 'csv':
         return CSVWriter(file, **kwargs)
 
 

@@ -8,11 +8,12 @@ def list(service, opts):
 
 
 
-def _register_commands(parser, action):
+def _register_commands(parser):
     list_parser = parser.add_parser("list", help="list all or specific sensors")
-    list_parser.add_argument("sensors", metavar="SENSOR", nargs="*",
-                             help="the id of a sensor",
-                             action= action(list, {
+    list_parser.set_defaults(command=list,
+                             mapping= {
                                  'id': 'id',
                                  'name': 'attributes/name'
-                             }))
+                             })
+    list_parser.add_argument("sensors", metavar="SENSOR", nargs="*",
+                             help="the id of a sensor")

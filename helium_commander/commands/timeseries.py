@@ -1,0 +1,70 @@
+from concurrent import futures
+import _dump_writer as writer
+import dpath.util as dpath
+import io
+import helium
+
+def _dump_get_sensors(service, opts):
+    if opts.sensors is not None:
+        return opts.sensors
+    elif opts.label is not None:
+        labels = service.get_label(opts.label)
+        return dpath.values(labels, 'data/relationships/sensor/data/*/id')
+    elif opts.org:
+        sensors = service.get_sensors()
+        return dpath.values(sensors, '/data/*/id')
+
+def _process_sensor_timeseries(service, sensor_id, writer, ports = None, **kwargs):
+    def json_data(json, ports):
+        data = json['data'] if json else None
+        if data is None or ports is None: return data
+        return [ item for item in data if item['meta']['port'] in ports ]
+
+    # Get the first page
+    res = service.get_sensor_timeseries(sensor_id, **kwargs)
+    writer.start()
+    writer.write_readings(json_data(res, ports))
+    while res != None:
+        res = service.get_prev_page(res)
+        writer.write_readings(json_data(res, ports))
+    writer.finish()
+
+def _dump_timeseries(sensor_id, opts):
+    with io.BufferedWriter(io.FileIO(sensor_id + '.' + opts.dump_format, "wb")) as file:
+        csv_mapping = {
+            'reading-id': 'id',
+            'sensor-id': 'relationships/sensor/data/id',
+            'timestamp-utc': 'meta/timestamp',
+            'port': 'meta/port',
+            'value': 'meta/value'
+        }
+        output = writer.writer_for_opts(opts, file, mapping=csv_mapping)
+        service = helium.Service(opts.api_key)
+        return _process_sensor_timeseries(service, sensor_id, output, opts.port, page_size=opts.page_size)
+
+
+def dump(service ,opts):
+    sensors = _dump_get_sensors(service, opts)
+    with futures.ProcessPoolExecutor(max_workers=10) as executor:
+        sensor_futures = dict((executor.submit(_dump_timeseries, sensor_id, opts),
+                               sensor_id) for sensor_id in sensors)
+        futures.wait(sensor_futures)
+
+
+def _register_commands(parser):
+    dump_parser = parser.add_parser("dump",
+                                    help="dump timeseries data to files")
+    dump_parser.set_defaults(command=dump)
+    dump_parser.add_argument('--page-size', type=int, default=5000,
+                             help='The page size for each page')
+    dump_parser.add_argument('--port', nargs='+',
+                             help='The ports to filter readings on')
+    writer.add_writer_arguments(dump_parser)
+    # Mutually exclusive sources to get timeseries data for
+    dump_source_group = dump_parser.add_mutually_exclusive_group(required=True)
+    dump_source_group.add_argument('-s', '--sensors', metavar="SENSOR", nargs='+',
+                                   help='the id for a sensor')
+    dump_source_group.add_argument('-l', '--label',
+                                   help='the id for a label')
+    dump_source_group.add_argument('-o', '--org', action="store_true",
+                                   help='timeseries data for all sensors in the organization')

@@ -5,7 +5,7 @@ import tablib
 import os
 import dpath.util as dpath
 
-__commands__ = ["label", "sensor", "element"]
+__commands__ = ["label", "sensor", "element", "timeseries"]
 
 class EnvDefault(argparse.Action):
     def __init__(self, envvar, required=True, default=None, **kwargs):
@@ -21,15 +21,6 @@ class EnvDefault(argparse.Action):
         setattr(namespace, self.dest, values)
 
 
-def _mk_action(action, mapping=None):
-    class commandAction(argparse.Action):
-        def __call__(self, parser, args, values, option_string=None):
-            setattr(args, self.dest, values)
-            setattr(args, "command", action)
-            setattr(args, "mapping", mapping)
-    return commandAction
-
-
 def register_commands(parser):
     subparsers = parser.add_subparsers(help="one of the helium commands")
     for command_name in __commands__:
@@ -39,11 +30,11 @@ def register_commands(parser):
         if setup:
             # add the command and sub-commmands
             subparser = subparsers.add_parser(command_name).add_subparsers()
-            setup(subparser, _mk_action)
+            setup(subparser)
 
 def perform_command(service, opts):
     result = opts.command(service, opts)
-    mapping = opts.mapping
+    mapping = opts.mapping if 'mapping' in opts else None
     if not mapping or not result: return result
 
     def map_object(o, mapping):
