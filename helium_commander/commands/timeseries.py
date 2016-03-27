@@ -63,6 +63,7 @@ def list(service, opts):
 def _register_commands(parser):
     dump_parser = parser.add_parser("dump",
                                     help="dump timeseries data to files. Note that --dump-format determines the file format")
+    ## Dump
     dump_parser.set_defaults(command=dump)
     dump_parser.add_argument('--page-size', type=int, default=5000,
                              help='The page size for each page')
@@ -78,6 +79,7 @@ def _register_commands(parser):
     dump_source_group.add_argument('-o', '--org', action="store_true",
                                    help='timeseries data for all sensors in the organization')
 
+    ## List
     list_parser = parser.add_parser("list",
                                     help="list timeseries data for a sensor")
     list_parser.set_defaults(command=list,
