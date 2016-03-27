@@ -20,7 +20,7 @@ def main(args=None):
 
     # execute the command
     result = commands.perform_command(service, opts)
-    if opts.format:
+    if result and opts.format:
         print result.export(opts.format)
     elif result:
         print result

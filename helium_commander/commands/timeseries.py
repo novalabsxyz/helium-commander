@@ -4,6 +4,10 @@ import dpath.util as dpath
 import io
 import helium
 
+def _filter_timeseries(data, ports=None):
+    if data is None or ports is None: return data
+    return [ item for item in data if item['meta']['port'] in ports ]
+
 def _dump_get_sensors(service, opts):
     if opts.sensors is not None:
         return opts.sensors
@@ -50,10 +54,15 @@ def dump(service ,opts):
                                sensor_id) for sensor_id in sensors)
         futures.wait(sensor_futures)
 
+def list(service, opts):
+    sensor_id = opts.sensor
+    data = service.get_sensor_timeseries(sensor_id, page_size=opts.page_size).get("data")
+    return _filter_timeseries(data, opts.port)
+
 
 def _register_commands(parser):
     dump_parser = parser.add_parser("dump",
-                                    help="dump timeseries data to files")
+                                    help="dump timeseries data to files. Note that --dump-format determines the file format")
     dump_parser.set_defaults(command=dump)
     dump_parser.add_argument('--page-size', type=int, default=5000,
                              help='The page size for each page')
@@ -68,3 +77,18 @@ def _register_commands(parser):
                                    help='the id for a label')
     dump_source_group.add_argument('-o', '--org', action="store_true",
                                    help='timeseries data for all sensors in the organization')
+
+    list_parser = parser.add_parser("list",
+                                    help="list timeseries data for a sensor")
+    list_parser.set_defaults(command=list,
+                             mapping={
+                                 'timestamp': 'meta/timestamp',
+                                 'port': 'meta/port',
+                                 'value': 'meta/value'
+                             })
+    list_parser.add_argument('--page-size', type=int, default=50,
+                             help='The number of readings to get')
+    list_parser.add_argument('--port', nargs='+',
+                             help='The ports to filter readings on')
+    list_parser.add_argument("sensor",
+                             help="the id of the sensor to fetch readings for")

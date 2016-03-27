@@ -53,6 +53,7 @@ class JSONWriter(BaseWriter):
         self.is_first_readings = True
 
     def write_readings(self, readings):
+        if readings is None: return
         for reading in readings:
             if self.is_first_readings:
                 self.is_first_readings = False
