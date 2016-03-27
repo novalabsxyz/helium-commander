@@ -10,43 +10,43 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-Run each script with `-h` to get help on running the script and what
-parameters it supports
+``` shellsession
+ ./helium-commander.py --help
+usage: helium-commander.py [-h] -k API_KEY
+                           [--format {csv,tsv,json,yaml,html,xls,xlsx,latex}]
+                           {label,sensor,element,timeseries} ...
+
+positional arguments:
+  {label,sensor,element,timeseries}
+                        one of the helium commands
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -k API_KEY, --api-key API_KEY
+                        your Helium API key. Can also be specified using the
+                        HELIUM_API_KEY environment variable
+  --format {csv,tsv,json,yaml,html,xls,xlsx,latex}
+                        the output format for the results
+```
+
+*Note* that each of the top level commands has their own set of sub-commands
+with their own features and flags. Run each of them with -h to find out more.
 
 For example:
 
 ``` shellsession
-./sensor-timeseries.py -h
-usage: sensor-timeseries.py [-h] [--format {csv,json}] [--page-size PAGE_SIZE]
-                            [--port PORT [PORT ...]] -k API_KEY
-                            [-s SENSOR [SENSOR ...] | -l LABEL | -o]
+
+ ./helium-commander.py timeseries -h
+usage: helium-commander.py timeseries [-h] {dump,list} ...
+
+positional arguments:
+  {dump,list}
+    dump       dump timeseries data to files. Note that --dump-format
+               determines the file format
+    list       list timeseries data for a given sensor
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --format {csv,json}   The output format for the results (default 'csv')
-  --page-size PAGE_SIZE
-                        The page size for each page
-  --port PORT [PORT ...]
-                        The ports to filter readings on
-  -k API_KEY, --api-key API_KEY
-                        Your Helium API key
-  -s SENSOR [SENSOR ...], --sensor SENSOR [SENSOR ...]
-                        Get timeseries data for one or more sensors
-  -l LABEL, --label LABEL
-                        Get timeseries data for all sensors in a label
-  -o, --org             Get timeseries data for all sensors in the
-                        organization
-```
+  -h, --help   show this help message and exit
 
-``` shellsession
-./sensor.py -h
-usage: sensor.py [-h] [--format {csv,json}] [-o [OUTPUT]] -k API_KEY
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --format {csv,json}   The output format for the results (default 'csv')
-  -o [OUTPUT], --output [OUTPUT]
-                        The output to write to (default stdout)
-  -k API_KEY, --api-key API_KEY
-                        Your Helium API key
 ```

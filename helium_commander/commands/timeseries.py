@@ -62,13 +62,13 @@ def list(service, opts):
 
 def _register_commands(parser):
     dump_parser = parser.add_parser("dump",
-                                    help="dump timeseries data to files. Note that --dump-format determines the file format")
+                                    help="dump timeseries data for a label, sensors or the whole organization to files. Note that --dump-format determines the file format")
     ## Dump
     dump_parser.set_defaults(command=dump)
     dump_parser.add_argument('--page-size', type=int, default=5000,
-                             help='The page size for each page')
+                             help='the page size for each page')
     dump_parser.add_argument('--port', nargs='+',
-                             help='The ports to filter readings on')
+                             help='the ports to filter readings on')
     writer.add_writer_arguments(dump_parser)
     # Mutually exclusive sources to get timeseries data for
     dump_source_group = dump_parser.add_mutually_exclusive_group(required=True)
@@ -81,7 +81,7 @@ def _register_commands(parser):
 
     ## List
     list_parser = parser.add_parser("list",
-                                    help="list timeseries data for a sensor")
+                                    help="list timeseries data for a given sensor")
     list_parser.set_defaults(command=list,
                              mapping={
                                  'timestamp': 'meta/timestamp',
@@ -89,8 +89,8 @@ def _register_commands(parser):
                                  'value': 'meta/value'
                              })
     list_parser.add_argument('--page-size', type=int, default=50,
-                             help='The number of readings to get')
+                             help='the number of readings to get')
     list_parser.add_argument('--port', nargs='+',
-                             help='The ports to filter readings on')
+                             help='the ports to filter readings on')
     list_parser.add_argument("sensor",
                              help="the id of the sensor to fetch readings for")
