@@ -14,13 +14,13 @@ class Service:
             if value: result[result_key] = value
         return result
 
-    def _mk__post_body(type, attributes):
+    def _mk_post_body(self, type, attributes):
         if not attributes or not type: return None
         return {
             "data": {
-                "attributes": attributes
-            },
-            "type": type
+                "attributes": attributes,
+                "type": type
+            }
         }
 
     def _mk_url(self, path, *args):
@@ -31,17 +31,23 @@ class Service:
         params = params or {}
         headers = {'Authorization': self.api_key}
         req = self.session.request(method, url,
-                                   params=params,
+                                   json=params,
                                    headers=headers,
                                    allow_redirects=True)
         req.raise_for_status()
-        return req.json()
+        try:
+            return req.json()
+        except ValueError, e:
+            return req
 
     def _get_url(self, url,  params=None):
         return self._do_url('GET', url, params)
 
     def _post_url(self, url, params=None):
         return self._do_url('POST', url, params)
+
+    def _delete_url(self, url, params=None):
+        return self._do_url('DELETE', url, params)
 
     def _get_json_path(self, json, path):
         try: # try to get the value
@@ -50,11 +56,14 @@ class Service:
             return None
 
     def create_sensor(self, name=None):
-        params = _mk_post_body("sensor", {
+        params = self._mk_post_body("sensor", {
             "name": name
         }) if name else None
-        return self._post_url(self._mk_url('/sensor'),
+        return self._post_url(self._mk_url('sensor'),
                               params=params)
+
+    def delete_sensor(self, sensor_id):
+        return self._delete_url(self._mk_url('sensor/{}', sensor_id))
 
     def get_sensors(self):
         return self._get_url(self._mk_url("sensor"))
