@@ -84,9 +84,9 @@ def _register_commands(parser):
                                     help="list timeseries data for a given sensor")
     list_parser.set_defaults(command=list,
                              mapping={
-                                 'timestamp': 'meta/timestamp',
-                                 'port': 'meta/port',
-                                 'value': 'meta/value'
+                                 'timestamp': 'attributes/timestamp',
+                                 'port': 'attributes/port',
+                                 'value': 'attributes/value'
                              })
     list_parser.add_argument('--page-size', type=int, default=50,
                              help='the number of readings to get')
