@@ -14,13 +14,19 @@ class Service:
             if value: result[result_key] = value
         return result
 
-    def _mk_post_body(self, type, attributes):
-        if not attributes or not type: return None
+    def _mk_attributes_body(self, type, attributes):
+        if attributes is None or not type: return None
         return {
             "data": {
                 "attributes": attributes,
                 "type": type
             }
+        }
+
+    def _mk_relationships_body(self, type, ids):
+        if ids is None or not type: return None
+        return {
+            "data": [{"id": id, "type": type} for id in ids]
         }
 
     def _mk_url(self, path, *args):
@@ -50,6 +56,9 @@ class Service:
     def _delete_url(self, url, **kwargs):
         return self._do_url('DELETE', url, **kwargs)
 
+    def _patch_url(self, url, **kwargs):
+        return self._do_url('PATCH', url, **kwargs)
+
     def _get_json_path(self, json, path):
         try: # try to get the value
             return reduce(dict.__getitem__, path, json)
@@ -57,7 +66,7 @@ class Service:
             return None
 
     def create_sensor(self, name=None):
-        body = self._mk_post_body("sensor", {
+        body = self._mk_attributes_body("sensor", {
             "name": name
         }) if name else None
         return self._post_url(self._mk_url('sensor'), json=body)
@@ -87,11 +96,28 @@ class Service:
         next_url = self._get_json_path(json, ["links", "next"])
         return self._get_url(next_url)
 
+    def create_label(self, name=None):
+        body = self._mk_attributes_body("label", {
+            "name": name
+        }) if name else None
+        return self._post_url(self._mk_url('label'), json=body)
+
+    def delete_label(self, label_id):
+        return self._delete_url(self._mk_url('label/{}', label_id))
+
     def get_labels(self):
         return self._get_url(self._mk_url('label'))
 
     def get_label(self, label_id):
         return self._get_url(self._mk_url('label/{}', label_id))
+
+    def get_label_sensors(self, label_id):
+        return self._get_url(self._mk_url('label/{}/relationships/sensor', label_id))
+
+    def update_label_sensors(self, label_id, sensor_ids):
+        body = self._mk_relationships_body("sensor", sensor_ids)
+        return self._patch_url(self._mk_url('label/{}/relationships/sensor', label_id),
+                               json=body)
 
     def get_elements(self):
         return self._get_url(self._mk_url('element'))
