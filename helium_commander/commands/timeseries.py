@@ -55,8 +55,11 @@ def dump(service ,opts):
         futures.wait(sensor_futures)
 
 def list(service, opts):
-    sensor_id = opts.sensor
-    data = service.get_sensor_timeseries(sensor_id, page_size=opts.page_size).get("data")
+    if opts.sensor:
+        data = service.get_sensor_timeseries(opts.sensor, page_size=opts.page_size).get("data")
+    else:
+        data = service.get_org_timeseries(page_size=opts.page_size).get("data")
+
     return _filter_timeseries(data, opts.port)
 
 
@@ -81,16 +84,20 @@ def _register_commands(parser):
 
     ## List
     list_mapping = [
+        ('id', 'id'),
         ('timestamp', 'attributes/timestamp'),
         ('port', 'attributes/port'),
         ('value', 'attributes/value')
     ]
     list_parser = parser.add_parser("list",
-                                    help="list timeseries data for a given sensor")
+                                    help="list timeseries data for a given sensor or the organization timeseries")
     list_parser.set_defaults(command=list, mapping=list_mapping)
-    list_parser.add_argument('--page-size', type=int, default=50,
+    list_parser.add_argument('--page-size', type=int, default=20,
                              help='the number of readings to get')
     list_parser.add_argument('--port', nargs='+',
                              help='the ports to filter readings on')
-    list_parser.add_argument("sensor",
-                             help="the id of the sensor to fetch readings for")
+    list_source_group = list_parser.add_mutually_exclusive_group(required=True)
+    list_source_group.add_argument("-s", '--sensor', metavar="SENSOR",
+                                   help="the id of the sensor to fetch readings for")
+    list_source_group.add_argument("-o", '--org', action="store_true",
+                                   help="fetch timeseries data for the organization endpoint")
