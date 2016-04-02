@@ -1,11 +1,12 @@
 from inspect import getmembers, isfunction
 from importlib import import_module
+from collections import OrderedDict
 import argparse
 import tablib
 import os
 import dpath.util as dpath
 
-__commands__ = ["label", "sensor", "element", "timeseries"]
+__commands__ = ["label", "sensor", "element", "timeseries", "sensor-script"]
 
 class EnvDefault(argparse.Action):
     def __init__(self, envvar, required=True, default=None, **kwargs):
@@ -34,11 +35,17 @@ def register_commands(parser):
 
 def perform_command(service, opts):
     result = opts.command(service, opts)
-    mapping = opts.mapping if 'mapping' in opts else None
+    mapping = OrderedDict(opts.mapping) if 'mapping' in opts else None
     if not mapping or not result: return result
 
+    def safe_lookup(o, path):
+        try:
+            return dpath.get(o, path)
+        except KeyError, e:
+            return ""
+
     def map_object(o, mapping):
-        return [dpath.get(o, path) for k, path in mapping.items()]
+        return [safe_lookup(o, path) for k, path in mapping.items()]
 
     mapped_result = [map_object(o, mapping) for o in result]
     data = tablib.Dataset(*mapped_result, headers=mapping.keys())

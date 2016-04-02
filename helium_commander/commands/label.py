@@ -33,10 +33,10 @@ def remove(service, opts):
     return sensor.list(service, opts)
 
 def _register_commands(parser):
-    name_mapping={
-        'id': 'id',
-        'name': 'attributes/name'
-    }
+    name_mapping=[
+        ('id', 'id'),
+        ('name', 'attributes/name')
+    ]
     #list
     list_parser = parser.add_parser("list", help="list all or specific labels")
     list_parser.set_defaults(command=list, mapping=name_mapping)

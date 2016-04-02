@@ -20,10 +20,11 @@ def delete(service, opts):
     return "Deleted" if result.status_code == 204 else result
 
 def _register_commands(parser):
-    sensor_mapping= {
-        'id': 'id',
-        'name': 'attributes/name'
-    }
+    sensor_mapping=[
+        ('id', 'id'),
+        ('mac', 'meta/mac'),
+        ('name', 'attributes/name'),
+    ]
     # list
     list_parser = parser.add_parser("list", help="list all or specific sensors")
     list_parser.set_defaults(command=list, mapping=sensor_mapping)

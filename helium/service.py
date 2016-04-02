@@ -124,3 +124,9 @@ class Service:
 
     def get_element(self, element_id):
         return self._get_url(self._mk_url('element/{}', element_id))
+
+    def get_sensor_scripts(self):
+        return self._get_url(self._mk_url('sensor-script'))
+
+    def get_sensor_script(self, script_id):
+        return self._get_url(self._mk_url('sensor-script/{}', script_id))

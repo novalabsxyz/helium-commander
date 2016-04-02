@@ -80,14 +80,14 @@ def _register_commands(parser):
                                    help='timeseries data for all sensors in the organization')
 
     ## List
+    list_mapping = [
+        ('timestamp', 'attributes/timestamp'),
+        ('port', 'attributes/port'),
+        ('value', 'attributes/value')
+    ]
     list_parser = parser.add_parser("list",
                                     help="list timeseries data for a given sensor")
-    list_parser.set_defaults(command=list,
-                             mapping={
-                                 'timestamp': 'attributes/timestamp',
-                                 'port': 'attributes/port',
-                                 'value': 'attributes/value'
-                             })
+    list_parser.set_defaults(command=list, mapping=list_mapping)
     list_parser.add_argument('--page-size', type=int, default=50,
                              help='the number of readings to get')
     list_parser.add_argument('--port', nargs='+',
