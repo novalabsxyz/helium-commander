@@ -14,14 +14,17 @@ class Service:
             if value: result[result_key] = value
         return result
 
-    def _mk_attributes_body(self, type, attributes):
+    def _mk_attributes_body(self, type, id, attributes):
         if attributes is None or not type: return None
-        return {
+        result = {
             "data": {
                 "attributes": attributes,
                 "type": type
             }
         }
+        if id is not None:
+            result['data']['id'] = id
+        return result
 
     def _mk_relationships_body(self, type, ids):
         if ids is None or not type: return None
@@ -66,7 +69,7 @@ class Service:
             return None
 
     def create_sensor(self, name=None):
-        body = self._mk_attributes_body("sensor", {
+        body = self._mk_attributes_body("sensor", None, {
             "name": name
         }) if name else None
         return self._post_url(self._mk_url('sensor'), json=body)
@@ -104,7 +107,7 @@ class Service:
         return self._get_url(next_url)
 
     def create_label(self, name=None):
-        body = self._mk_attributes_body("label", {
+        body = self._mk_attributes_body("label", None, {
             "name": name
         }) if name else None
         return self._post_url(self._mk_url('label'), json=body)
@@ -137,3 +140,17 @@ class Service:
 
     def get_sensor_script(self, script_id):
         return self._get_url(self._mk_url('sensor-script/{}', script_id))
+
+    def get_cloud_scripts(self):
+        return self._get_url(self._mk_url('cloud-script'))
+
+    def get_cloud_script(self, script_id):
+        return self._get_url(self._mk_url('cloud-script/{}', script_id))
+
+    def update_cloud_script(self, script_id, name=None, start=False):
+        body = self._mk_attributes_body("cloud-script", script_id, {
+            "state": "running" if start else "stopped",
+            "name": name
+        })
+        return self._patch_url(self._mk_url('cloud-script/{}', script_id),
+                               json=body)

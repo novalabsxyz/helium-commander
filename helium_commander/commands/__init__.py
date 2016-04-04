@@ -6,7 +6,14 @@ import tablib
 import os
 import dpath.util as dpath
 
-__commands__ = ["label", "sensor", "element", "timeseries", "sensor-script"]
+__commands__ = [
+    "label",
+    "sensor",
+    "element",
+    "timeseries",
+    "sensor-script",
+    "cloud-script"
+]
 
 class EnvDefault(argparse.Action):
     def __init__(self, envvar, required=True, default=None, **kwargs):
