@@ -45,14 +45,17 @@ def perform_command(service, opts):
     mapping = OrderedDict(opts.mapping) if 'mapping' in opts else None
     if not mapping or not result: return result
 
-    def safe_lookup(o, path):
+    def _lookup(o, path):
         try:
-            return dpath.get(o, path)
+            if hasattr(path, '__call__'):
+                return path(o)
+            else:
+                return dpath.get(o, path)
         except KeyError, e:
             return ""
 
     def map_object(o, mapping):
-        return [safe_lookup(o, path) for k, path in mapping.items()]
+        return [_lookup(o, path) for k, path in mapping.items()]
 
     mapped_result = [map_object(o, mapping) for o in result]
     data = tablib.Dataset(*mapped_result, headers=mapping.keys())
