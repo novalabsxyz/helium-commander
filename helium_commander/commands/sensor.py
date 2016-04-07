@@ -3,10 +3,7 @@ import dpath.util as dpath
 def list(service, opts):
 
     if opts.label:
-        labels = service.get_label(opts.label).get('data')
-        # TODO: Use include query param once available to avoid N+1 queries
-        label_sensors = dpath.values(labels, "relationships/sensor/data/*/id")
-        return [service.get_sensor(id).get('data') for id in label_sensors]
+        return service.get_label(opts.label,include="sensor").get('included')
     elif opts.sensors:
         return [service.get_sensor(id).get('data') for id in opts.sensors]
     else:

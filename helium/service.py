@@ -83,19 +83,24 @@ class Service:
     def get_sensor(self, sensor_id):
         return self._get_url(self._mk_url('sensor/{}', sensor_id))
 
-    def _page_params_fromk_kwargs(self, **kwargs):
+    def _page_params_from_kwargs(self, **kwargs):
         return self._params_from_kwargs({
             "page_id": "page[id]",
             "page_size": "page[size]"
         }, kwargs)
 
+    def _include_params_from_kwargs(self, **kwargs):
+        return self._params_from_kwargs({
+            "include": "include"
+        }, kwargs)
+
     def get_sensor_timeseries(self, sensor_id, **kwargs):
-        params = self._page_params_fromk_kwargs(**kwargs)
+        params = self._page_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
                              params=params)
 
     def get_org_timeseries(self, **kwargs):
-        params = self._page_params_fromk_kwargs(**kwargs)
+        params = self._page_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('organization/timeseries'), params=params)
 
     def get_prev_page(self, json):
@@ -115,11 +120,13 @@ class Service:
     def delete_label(self, label_id):
         return self._delete_url(self._mk_url('label/{}', label_id))
 
-    def get_labels(self):
-        return self._get_url(self._mk_url('label'))
+    def get_labels(self, **kwargs):
+        params = self._include_params_from_kwargs(**kwargs)
+        return self._get_url(self._mk_url('label'), params=params)
 
-    def get_label(self, label_id):
-        return self._get_url(self._mk_url('label/{}', label_id))
+    def get_label(self, label_id, **kwargs):
+        params = self._include_params_from_kwargs(**kwargs)
+        return self._get_url(self._mk_url('label/{}', label_id), params=params)
 
     def get_label_sensors(self, label_id):
         return self._get_url(self._mk_url('label/{}/relationships/sensor', label_id))
