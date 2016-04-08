@@ -4,10 +4,6 @@ import dpath.util as dpath
 import io
 import helium
 
-def _filter_timeseries(data, ports=None):
-    if data is None or ports is None: return data
-    return [ item for item in data if item['meta']['port'] in ports ]
-
 def _dump_get_sensors(service, opts):
     if opts.sensors is not None:
         return opts.sensors
@@ -18,11 +14,9 @@ def _dump_get_sensors(service, opts):
         sensors = service.get_sensors()
         return dpath.values(sensors, '/data/*/id')
 
-def _process_sensor_timeseries(service, sensor_id, writer, ports = None, **kwargs):
+def _process_sensor_timeseries(service, sensor_id, writer, **kwargs):
     def json_data(json, ports):
-        data = json['data'] if json else None
-        if data is None or ports is None: return data
-        return [ item for item in data if item['meta']['port'] in ports ]
+        return json['data'] if json else None
 
     # Get the first page
     res = service.get_sensor_timeseries(sensor_id, **kwargs)
@@ -44,8 +38,9 @@ def _dump_timeseries(sensor_id, opts):
         }
         output = writer.writer_for_opts(opts, file, mapping=csv_mapping)
         service = helium.Service(opts.api_key)
-        return _process_sensor_timeseries(service, sensor_id, output, opts.port, page_size=opts.page_size)
-
+        return _process_sensor_timeseries(service, sensor_id, output,
+                                          port=opts.port,
+                                          page_size=opts.page_size)
 
 def dump(service ,opts):
     sensors = _dump_get_sensors(service, opts)
@@ -56,11 +51,9 @@ def dump(service ,opts):
 
 def list(service, opts):
     if opts.sensor:
-        data = service.get_sensor_timeseries(opts.sensor, page_size=opts.page_size).get("data")
+        return service.get_sensor_timeseries(opts.sensor, page_size=opts.page_size, port=opts.port).get("data")
     else:
-        data = service.get_org_timeseries(page_size=opts.page_size).get("data")
-
-    return _filter_timeseries(data, opts.port)
+        return service.get_org_timeseries(page_size=opts.page_size, port=opts.port).get("data")
 
 
 def _register_commands(parser):
@@ -94,8 +87,8 @@ def _register_commands(parser):
     list_parser.set_defaults(command=list, mapping=list_mapping)
     list_parser.add_argument('--page-size', type=int, default=20,
                              help='the number of readings to get')
-    list_parser.add_argument('--port', nargs='+',
-                             help='the ports to filter readings on')
+    list_parser.add_argument('--port', metavar='PORT', nargs='+',
+                             help='a port to filter readings on')
     list_source_group = list_parser.add_mutually_exclusive_group(required=True)
     list_source_group.add_argument("-s", '--sensor', metavar="SENSOR",
                                    help="the id of the sensor to fetch readings for")

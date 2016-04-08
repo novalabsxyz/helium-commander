@@ -83,10 +83,11 @@ class Service:
     def get_sensor(self, sensor_id):
         return self._get_url(self._mk_url('sensor/{}', sensor_id))
 
-    def _page_params_from_kwargs(self, **kwargs):
+    def _timeseries_params_from_kwargs(self, **kwargs):
         return self._params_from_kwargs({
             "page_id": "page[id]",
-            "page_size": "page[size]"
+            "page_size": "page[size]",
+            "port": "filter[port]"
         }, kwargs)
 
     def _include_params_from_kwargs(self, **kwargs):
@@ -95,12 +96,12 @@ class Service:
         }, kwargs)
 
     def get_sensor_timeseries(self, sensor_id, **kwargs):
-        params = self._page_params_from_kwargs(**kwargs)
+        params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
                              params=params)
 
     def get_org_timeseries(self, **kwargs):
-        params = self._page_params_from_kwargs(**kwargs)
+        params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('organization/timeseries'), params=params)
 
     def get_prev_page(self, json):
