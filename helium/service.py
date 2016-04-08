@@ -1,4 +1,7 @@
 import requests
+import json
+import io
+import os
 
 class Service:
     base_url = "https://api.helium.com/v1/"
@@ -35,13 +38,14 @@ class Service:
     def _mk_url(self, path, *args):
         return self.base_url + str.format(path, *args)
 
-    def _do_url(self, method, url, params=None, json=None):
+    def _do_url(self, method, url, params=None, json=None, files=None):
         if url is None: return None
         params = params or {}
         headers = {'Authorization': self.api_key}
         req = self.session.request(method, url,
                                    params=params,
                                    json=json,
+                                   files=files,
                                    headers=headers,
                                    allow_redirects=True)
         req.raise_for_status()
@@ -148,6 +152,22 @@ class Service:
 
     def get_sensor_script(self, script_id):
         return self._get_url(self._mk_url('sensor-script/{}', script_id))
+
+    def deploy_sensor_script(self, files, labels=[], sensors=[]):
+        manifest = {
+            "target": {
+                "labels": labels or [],
+                "sensors": sensors or []
+            }
+        }
+        uploads = { os.path.basename(name): (os.path.basename(name),
+                                             io.open(name, 'rb'),
+                                             'application/x-lua')
+                    for name in files
+        }
+        uploads['manifest'] = ('manifest.json', json.dumps(manifest), 'application/json')
+        return self._post_url(self._mk_url('sensor-script'), files=uploads)
+
 
     def get_cloud_scripts(self):
         return self._get_url(self._mk_url('cloud-script'))
