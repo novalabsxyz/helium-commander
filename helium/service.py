@@ -41,7 +41,10 @@ class Service:
     def _do_url(self, method, url, params=None, json=None, files=None):
         if url is None: return None
         params = params or {}
-        headers = {'Authorization': self.api_key}
+        headers = {
+            'Authorization': self.api_key,
+            'User-agent': 'HePy/1.0'
+        }
         req = self.session.request(method, url,
                                    params=params,
                                    json=json,
