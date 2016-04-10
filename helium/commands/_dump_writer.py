@@ -4,14 +4,10 @@ import dpath.util as dpath
 import csv
 import json
 
-def add_writer_arguments(parser):
-    parser.add_argument('--dump-format', default='csv', choices=['csv', 'json'],
-                        help='the dump output format (default \'csv\')')
-
-def writer_for_opts(opts, file, **kwargs):
-    if opts.dump_format == 'json':
+def writer_for_format(format, file, **kwargs):
+    if format == 'json':
         return JSONWriter(file, **kwargs)
-    elif opts.dump_format == 'csv':
+    elif format == 'csv':
         return CSVWriter(file, **kwargs)
 
 
@@ -20,6 +16,21 @@ class BaseWriter:
 
     def __init__(self, file, **kwargs):
         self.file = file
+
+    def process_timeseries(self, service, sensor_id, **kwargs):
+        def json_data(json):
+            return json['data'] if json else None
+        # Get the first page
+        try:
+            res = service.get_sensor_timeseries(sensor_id, **kwargs)
+            self.start()
+            self.write_readings(json_data(res))
+            while res != None:
+                res = service.get_prev_page(res)
+                self.write_readings(json_data(res))
+            self.finish()
+        except Error, e:
+            print e
 
     def start(self):
         return

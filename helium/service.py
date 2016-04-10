@@ -2,9 +2,11 @@ import requests
 import json
 import io
 import os
+from . import __version__
 
 class Service:
     base_url = "https://api.helium.com/v1/"
+    user_agent="Helium/"+__version__
 
     def __init__(self, api_key):
         self.api_key = api_key
@@ -43,7 +45,7 @@ class Service:
         params = params or {}
         headers = {
             'Authorization': self.api_key,
-            'User-agent': 'HePy/1.0'
+            'User-agent': self.user_agent
         }
         req = self.session.request(method, url,
                                    params=params,
