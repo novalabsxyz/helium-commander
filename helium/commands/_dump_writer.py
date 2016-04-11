@@ -21,16 +21,13 @@ class BaseWriter:
         def json_data(json):
             return json['data'] if json else None
         # Get the first page
-        try:
-            res = service.get_sensor_timeseries(sensor_id, **kwargs)
-            self.start()
+        res = service.get_sensor_timeseries(sensor_id, **kwargs)
+        self.start()
+        self.write_readings(json_data(res))
+        while res != None:
+            res = service.get_prev_page(res)
             self.write_readings(json_data(res))
-            while res != None:
-                res = service.get_prev_page(res)
-                self.write_readings(json_data(res))
-            self.finish()
-        except Error, e:
-            print e
+        self.finish()
 
     def start(self):
         return

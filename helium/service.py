@@ -5,6 +5,11 @@ import os
 from . import __version__
 from urlparse import urlunsplit, urlsplit
 
+# Silence warnings since turning verification of against non production urls
+# cause unsightly warning messages. Verification still happens against production
+import requests.packages.urllib3 as urllib3
+urllib3.disable_warnings()
+
 def _url_path_join(*parts):
     """Normalize url parts and join them with a slash."""
     def first_of_each(*sequences):
@@ -109,7 +114,9 @@ class Service:
         return self._params_from_kwargs({
             "page_id": "page[id]",
             "page_size": "page[size]",
-            "port": "filter[port]"
+            "port": "filter[port]",
+            "start": "filter[start]",
+            "end": "filter[end]"
         }, kwargs)
 
     def _include_params_from_kwargs(self, **kwargs):
