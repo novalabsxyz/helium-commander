@@ -3,6 +3,14 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.2.0
+-------------
+
+Released on April 11th 2016
+
+- Add support for HELIUM_API_URL to set the base url to use 
+
+
 Version 0.1.0
 -------------
 
