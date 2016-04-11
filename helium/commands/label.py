@@ -13,9 +13,12 @@ def cli():
     pass
 
 def _tabulate(result):
+    def _map_sensor_count(json):
+        return len(dpath.get(json, 'relationships/sensor/data'))
     util.output(util.tabulate(result, [
         ('id', 'id'),
-        ('name', 'attributes/name')
+        ('name', 'attributes/name'),
+        ('sensors', _map_sensor_count)
     ]))
 
 
@@ -31,7 +34,7 @@ def list(ctx, label):
         ctx.invoke(sensor.list, label=label)
     else:
         service = ctx.find_object(helium.Service)
-        _tabulate(service.get_labels().get('data'))
+        _tabulate(service.get_labels(include='sensor').get('data'))
 
 
 @cli.command()
