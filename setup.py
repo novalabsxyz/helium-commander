@@ -5,8 +5,8 @@ from setuptools import setup
 
 setup(
     name='helium-commander',
-    version='0.2.0',
-    url='http://github.com/helium/api_example/',
+    version='0.2.1-dev',
+    url='http://github.com/helium/helium-commander/',
     license='BSD',
     author='Marc Nijdam',
     author_email='marc@helium.com',
