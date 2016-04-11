@@ -3,13 +3,25 @@ import json
 import io
 import os
 from . import __version__
+from urlparse import urlunsplit, urlsplit
+
+def _url_path_join(*parts):
+    """Normalize url parts and join them with a slash."""
+    def first_of_each(*sequences):
+        return (next((x for x in sequence if x), '') for sequence in sequences)
+    schemes, netlocs, paths, queries, fragments = zip(*(urlsplit(part) for part in parts))
+    scheme, netloc, query, fragment = first_of_each(schemes, netlocs, queries, fragments)
+    path = '/'.join(x.strip('/') for x in paths if x)
+    return urlunsplit((scheme, netloc, path, query, fragment))
+
 
 class Service:
-    base_url = "https://api.helium.com/v1/"
+    production_base_url = "https://api.helium.com/v1"
     user_agent="Helium/"+__version__
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, base_url=None):
         self.api_key = api_key
+        self.base_url = base_url if base_url else self.production_base_url
         self.session = requests.Session()
 
     def _params_from_kwargs(self, map, kwargs):
@@ -38,7 +50,7 @@ class Service:
         }
 
     def _mk_url(self, path, *args):
-        return self.base_url + str.format(path, *args)
+        return _url_path_join(self.base_url, str.format(path, *args))
 
     def _do_url(self, method, url, params=None, json=None, files=None):
         if url is None: return None
@@ -52,6 +64,7 @@ class Service:
                                    json=json,
                                    files=files,
                                    headers=headers,
+                                   verify=(self.base_url == self.production_base_url),
                                    allow_redirects=True)
         req.raise_for_status()
         try:
