@@ -85,7 +85,7 @@ def set_setup_version(version):
 
 
 def build_and_upload():
-    Popen([sys.executable, 'setup.py', 'release', 'sdist', 'bdist_wheel', 'upload']).wait()
+    Popen([sys.executable, 'setup.py', 'sdist', 'bdist_wheel', 'upload']).wait()
 
 
 def fail(message, *args):
