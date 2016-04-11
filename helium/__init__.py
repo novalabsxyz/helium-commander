@@ -1,3 +1,3 @@
-__version__='0.1.1-dev'
+__version__='0.2.0'
 
 from service import Service
