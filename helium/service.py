@@ -193,6 +193,9 @@ class Service:
     def get_cloud_script(self, script_id):
         return self._get_url(self._mk_url('cloud-script/{}', script_id))
 
+    def delete_cloud_script(self, script_id):
+        return self._delete_url(self._mk_url('cloud-script/{}', script_id))
+
     def update_cloud_script(self, script_id, name=None, start=False):
         body = self._mk_attributes_body("cloud-script", script_id, {
             "state": "running" if start else "stopped",

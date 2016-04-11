@@ -62,6 +62,18 @@ def stop(service, script):
 
 @cli.command()
 @click.argument('script')
+@pass_service
+def delete(service, script):
+    """Delete a given cloud-script.
+
+    Deletes the cloud-SCRIPT with the given id.
+    """
+    result = service.delete_cloud_script(script)
+    click.echo("Deleted" if result.status_code == 204 else result)
+
+
+@cli.command()
+@click.argument('script')
 @click.argument('file')
 @pass_service
 def show(service, script, file):
