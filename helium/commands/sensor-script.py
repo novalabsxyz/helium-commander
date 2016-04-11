@@ -24,6 +24,7 @@ def _tabulate_scripts(result):
         ('id', 'id'),
         ('created', 'meta/created'),
         ('sensors', _map_sensor_count),
+        ('state', 'meta/state'),
         ('progress', _map_progress)
     ]))
 
