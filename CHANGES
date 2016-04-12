@@ -3,10 +3,10 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
-Version 0.2.2
+Version 0.3.0
 -------------
 
-Release on April 11th 2016
+Release on April 12th 2016
 
 - Add timeseries list/dump start and end date filtering support
 - Add cloud-script delete support
