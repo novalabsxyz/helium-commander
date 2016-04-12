@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='helium-commander',
-    version='0.3.0',
+    version='0.3.1-dev',
     url='http://github.com/helium/helium-commander/',
     license='BSD',
     author='Marc Nijdam',

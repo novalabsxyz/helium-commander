@@ -3,6 +3,7 @@ import helium
 import util
 import click
 import dpath.util as dpath
+import timeseries as ts
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -98,3 +99,23 @@ def remove(service, label, sensor):
     if sensor_ids is None: sensor_ids = []
     service.update_label_sensors(label, sensor_ids)
     ctx.invoke(sensor.list, label=label)
+
+
+@cli.command()
+@click.argument('label')
+@ts.format_option()
+@ts.options()
+@pass_service
+def dump(service, label, format, **kwargs):
+    """Dumps timeseries data to files.
+
+    Dumps the timeseries data for all sensors in a given LABEL.
+
+    One file is generated for each sensor with the sensor id as filename and the
+    file extension based on the requested dump format
+
+    This command takes the same arguments as the `timeseries` command, including
+    the ability to filter by PORT, START and END date
+    """
+    sensors = dpath.values(service.get_sensors(), '/data/*/id')
+    ts.dump(service, sensors, format, **kwargs)

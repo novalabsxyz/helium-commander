@@ -4,6 +4,7 @@ import requests
 import click
 import helium
 import util
+import timeseries as ts
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -70,6 +71,26 @@ def delete(service, script):
     """
     result = service.delete_cloud_script(script)
     click.echo("Deleted" if result.status_code == 204 else result)
+
+
+@cli.command()
+@click.argument('script')
+@ts.options()
+@pass_service
+def timeseries(service, script, **kwargs):
+    """List readings for a cloud-script.
+
+    Lists one page of readings for a given SCRIPT.
+    Readings can be filtered by PORT and by START and END date. Dates are given
+    in ISO-8601 and may be one of the following forms:
+
+    \b
+    * YYYY-MM-DD - Example: 2016-05-05
+    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
+
+    """
+    data = service.get_cloud_script_timeseries(script, **kwargs).get('data')
+    ts.tabulate(data)
 
 
 @cli.command()

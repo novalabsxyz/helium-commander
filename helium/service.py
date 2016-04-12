@@ -200,6 +200,11 @@ class Service:
     def get_cloud_script(self, script_id):
         return self._get_url(self._mk_url('cloud-script/{}', script_id))
 
+    def get_cloud_script_timeseries(self, script_id, **kwargs):
+        params = self._timeseries_params_from_kwargs(**kwargs)
+        return self._get_url(self._mk_url('cloud-script/{}/timeseries', script_id),
+                             params=params)
+
     def delete_cloud_script(self, script_id):
         return self._delete_url(self._mk_url('cloud-script/{}', script_id))
 

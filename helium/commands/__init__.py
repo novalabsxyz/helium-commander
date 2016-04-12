@@ -11,9 +11,9 @@ __commands__ = [
     "label",
     "sensor",
     "element",
-    "timeseries",
     "sensor-script",
-    "cloud-script"
+    "cloud-script",
+    "organization"
 ]
 
 

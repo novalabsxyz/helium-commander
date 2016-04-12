@@ -1,6 +1,7 @@
 import click
 import helium
 import util
+import timeseries as ts
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -47,7 +48,7 @@ def create(service, name):
     _tabulate(sensors)
 
 
-@cli.command(short_help="delete a sensor")
+@cli.command()
 @click.argument('sensor')
 @pass_service
 def delete(service, sensor):
@@ -57,3 +58,43 @@ def delete(service, sensor):
     """
     result = service.delete_sensor(sensor)
     click.echo("Deleted" if result.status_code == 204 else result)
+
+
+@cli.command()
+@click.argument('sensor')
+@ts.options()
+@pass_service
+def timeseries(service, sensor, **kwargs):
+    """List readings for a sensor.
+
+    Lists one page of readings for a given SENSOR.
+    Readings can be filtered by PORT and by START and END date. Dates are given
+    in ISO-8601 and may be one of the following forms:
+
+    \b
+    * YYYY-MM-DD - Example: 2016-05-05
+    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
+
+    """
+    data = service.get_sensor_timeseries(sensor, **kwargs).get('data')
+    ts.tabulate(data)
+
+
+@cli.command()
+@ts.format_option()
+@click.argument('sensor')
+@ts.options(page_size=5000)
+@pass_service
+def dump(service, sensor, format, **kwargs):
+    """Dumps timeseries data to files.
+
+    Dumps the timeseries data for one SENSOR to a file.
+    If no sensors or label is specified all sensors for the organization are dumped.
+
+    One file is generated with the sensor id as filename and the
+    file extension based on the requested dump format
+
+    This command takes the same arguments as the `timeseries` command, including
+    the ability to filter by PORT, START and END date
+    """
+    ts.dump(service, [sensor], format, **kwargs)
