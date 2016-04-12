@@ -57,10 +57,9 @@ To use the `helium` command, explore the help options:
       cloud-script   Operations on cloud-scripts
       element        Operations on elements.
       label          Operations on labels of sensors.
+      organization   Operations on physical or virtual sensors.
       sensor         Operations on physical or virtual sensors.
       sensor-script  Operations on sensor-script.
-      timeseries     Operations on timeseries data
-
 
 
 .. _Helium: https://helium.com
