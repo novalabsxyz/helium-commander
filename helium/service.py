@@ -95,6 +95,16 @@ class Service:
         except KeyError:
             return None
 
+    def get_user(self):
+        return self._get_url(self._mk_url('user'))
+
+    def auth_user(self, user, password):
+        body={
+            "email":user,
+            "password":password
+        }
+        return self._post_url(self._mk_url('user/auth'), json=body)
+
     def create_sensor(self, name=None):
         body = self._mk_attributes_body("sensor", None, {
             "name": name

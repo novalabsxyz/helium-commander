@@ -3,6 +3,14 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.4.1
+-------------
+
+Released on April 13th 2016
+
+- Introduces user command
+- Introduces user list and auth subcommands
+
 
 Version 0.4.0
 -------------

@@ -13,7 +13,8 @@ __commands__ = [
     "element",
     "sensor-script",
     "cloud-script",
-    "organization"
+    "organization",
+    "user"
 ]
 
 
