@@ -42,23 +42,27 @@ def list(service):
 
 @cli.command()
 @click.argument('script')
+@click.option('--name',
+              help="the new name for the script")
 @pass_service
 def start(service, script):
     """Starts a given cloud-script.
 
     Starts the SCRIPT with the given id.
     """
-    _tabluate([service.update_cloud_script(script, start=True).get('data')])
+    _tabulate([service.update_cloud_script(script, name=name, start=True).get('data')])
 
 @cli.command()
 @click.argument('script')
+@click.option('--name',
+              help="the new name for the script")
 @pass_service
-def stop(service, script):
+def stop(service, script, name):
     """Stop a given cloud-script.
 
     Stops the SCRIPT with the given id.
     """
-    _tabluate([service.update_cloud_script(script, start=False).get('data')])
+    _tabulate([service.update_cloud_script(script, name=name, start=False).get('data')])
 
 
 @cli.command()
@@ -107,3 +111,18 @@ def show(service, script, file):
     names = dict(zip(_extract_script_filenames(file_urls), file_urls))
     file_url = names[opts.file]
     click.echo(requests.get(file_url).text())
+
+
+@cli.command()
+@click.argument('file', nargs=-1)
+@pass_service
+def deploy(service, file):
+    """Deploy  a cloud-script.
+
+    Submits a deploy request of one ore more FILEs.
+
+    Note: One of the given files _must_ be called user.lua. This file will be
+    considered the primary script for the deploy.
+    """
+    deploy=service.deploy_cloud_script(file).get('data')
+    _tabulate([deploy])

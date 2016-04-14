@@ -54,6 +54,30 @@ class Service:
             "data": [{"id": id, "type": type} for id in ids]
         }
 
+    def _timeseries_params_from_kwargs(self, **kwargs):
+        return self._params_from_kwargs({
+            "page_id": "page[id]",
+            "page_size": "page[size]",
+            "port": "filter[port]",
+            "start": "filter[start]",
+            "end": "filter[end]"
+        }, kwargs)
+
+    def _include_params_from_kwargs(self, **kwargs):
+        return self._params_from_kwargs({
+            "include": "include"
+        }, kwargs)
+
+    def _lua_uploads_from_files(self, files):
+        def basename(f):
+            return os.path.basename(f)
+        return { basename(name): (basename(name),
+                                     io.open(name, 'rb'),
+                                     'application/x-lua')
+                    for name in files
+        }
+
+
     def _mk_url(self, path, *args):
         return _url_path_join(self.base_url, str.format(path, *args))
 
@@ -120,20 +144,6 @@ class Service:
     def get_sensor(self, sensor_id):
         return self._get_url(self._mk_url('sensor/{}', sensor_id))
 
-    def _timeseries_params_from_kwargs(self, **kwargs):
-        return self._params_from_kwargs({
-            "page_id": "page[id]",
-            "page_size": "page[size]",
-            "port": "filter[port]",
-            "start": "filter[start]",
-            "end": "filter[end]"
-        }, kwargs)
-
-    def _include_params_from_kwargs(self, **kwargs):
-        return self._params_from_kwargs({
-            "include": "include"
-        }, kwargs)
-
     def get_sensor_timeseries(self, sensor_id, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
@@ -195,11 +205,7 @@ class Service:
                 "sensors": sensors or []
             }
         }
-        uploads = { os.path.basename(name): (os.path.basename(name),
-                                             io.open(name, 'rb'),
-                                             'application/x-lua')
-                    for name in files
-        }
+        uploads = self._lua_uploads_from_files(files)
         uploads['manifest'] = ('manifest.json', json.dumps(manifest), 'application/json')
         return self._post_url(self._mk_url('sensor-script'), files=uploads)
 
@@ -225,3 +231,7 @@ class Service:
         })
         return self._patch_url(self._mk_url('cloud-script/{}', script_id),
                                json=body)
+
+    def deploy_cloud_script(self, files):
+        uploads = self._lua_uploads_from_files(files)
+        return self._post_url(self._mk_url('cloud-script'), files=uploads)
