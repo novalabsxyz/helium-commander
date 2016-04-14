@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.4.2
+-------------
+
+Released on April 14th 2016
+
+- Introduces the cloud-script deplpoy subcommand
+- Add option to change name of cloud-script during start/stop
+
+
 Version 0.4.1
 -------------
 
