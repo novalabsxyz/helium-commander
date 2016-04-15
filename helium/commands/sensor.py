@@ -36,7 +36,7 @@ def list(service, label):
 
 
 @cli.command()
-@click.option('-n', '--name', required=True,
+@click.option('--name', required=True,
               help="the name for the new virtual sensor")
 @pass_service
 def create(service, name):
@@ -46,6 +46,19 @@ def create(service, name):
     """
     sensors = [service.create_sensor(name).get('data')]
     _tabulate(sensors)
+
+@cli.command()
+@click.argument('sensor')
+@click.option('--name',
+              help="the new name for the sensor")
+@pass_service
+def update(service, sensor, **kwargs):
+    """Updates the attributes of a sensor.
+
+    Updates the attributes of a given SENSOR.
+    """
+    sensor = service.update_sensor(sensor, **kwargs).get('data')
+    _tabulate([sensor])
 
 
 @cli.command()

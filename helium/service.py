@@ -129,11 +129,13 @@ class Service:
         }
         return self._post_url(self._mk_url('user/auth'), json=body)
 
-    def create_sensor(self, name=None):
-        body = self._mk_attributes_body("sensor", None, {
-            "name": name
-        }) if name else None
+    def create_sensor(self, **kwargs):
+        body = self._mk_attributes_body("sensor", None, kwargs)
         return self._post_url(self._mk_url('sensor'), json=body)
+
+    def update_sensor(self, sensor_id, **kwargs):
+        body=self._mk_attributes_body("sensor", sensor_id, kwargs)
+        return self._patch_url(self._mk_url('sensor/{}', sensor_id), json=body)
 
     def delete_sensor(self, sensor_id):
         return self._delete_url(self._mk_url('sensor/{}', sensor_id))
@@ -148,6 +150,9 @@ class Service:
         params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
                              params=params)
+
+    def post_sensor_timeseries(self, sensor_id, data):
+        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id), json=data)
 
     def get_org_timeseries(self, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
