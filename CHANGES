@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.4.4
+-------------
+
+Released on April 17th 2016
+
+- Removes the api-key requirement to allow user auth to work
+
+
+
 Version 0.4.3
 -------------
 

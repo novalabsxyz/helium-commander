@@ -5,7 +5,6 @@ import click
 @click.command(cls=commands.Loader)
 @click.option('--api-key',
               envvar='HELIUM_API_KEY',
-              required=True,
               help='your Helium API key. Can also be specified using the HELIUM_API_KEY environment variable')
 @click.option('--host',
               envvar='HELIUM_API_URL',
