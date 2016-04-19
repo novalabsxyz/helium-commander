@@ -4,6 +4,14 @@ Helium Commander Changelog
 Here you'll find the major differences between each release.
 
 
+Version 0.4.5
+-------------
+
+Released on April 18th 2016
+
+- Adds the --main option to the cloud-script deploy sub-command
+
+
 Version 0.4.4
 -------------
 

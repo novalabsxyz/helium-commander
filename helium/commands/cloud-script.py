@@ -115,14 +115,20 @@ def show(service, script, file):
 
 @cli.command()
 @click.argument('file', nargs=-1)
+@click.option('--main', type=click.Path(exists=True),
+              help="The main file for the script")
 @pass_service
-def deploy(service, file):
+def deploy(service, file, main):
     """Deploy  a cloud-script.
 
     Submits a deploy request of one ore more FILEs.
 
-    Note: One of the given files _must_ be called user.lua. This file will be
-    considered the primary script for the deploy.
+    If the --main option is specified the given file is used as the `user.lua`,
+    i.e. the main user script for the deployment. The file may  be part of
+    the list of files given to make it easier to specify wildcards
+
+    Note: One of the given files _must_ be called user.lua if the --main option is not given.
+    This file will be considered the primary script for the deploy.
     """
-    deploy=service.deploy_cloud_script(file).get('data')
+    deploy=service.deploy_cloud_script(file, main=main).get('data')
     _tabulate([deploy])

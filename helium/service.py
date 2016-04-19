@@ -68,14 +68,19 @@ class Service:
             "include": "include"
         }, kwargs)
 
-    def _lua_uploads_from_files(self, files):
+    def _lua_uploads_from_files(self, files, **kwargs):
         def basename(f):
             return os.path.basename(f)
-        return { basename(name): (basename(name),
-                                     io.open(name, 'rb'),
-                                     'application/x-lua')
-                    for name in files
-        }
+        def lua_file(name):
+            return (basename(name), io.open(name, 'rb'), 'application/x-lua')
+
+        main_file = kwargs.pop('main', None)
+        # construct a dictionary of files that are not the main file
+        files = { basename(name): lua_file(name) for name in files if name != main_file}
+        # then add the main file if given
+        if main_file:
+            files["user.lua"] = lua_file(main_file)
+        return files
 
 
     def _mk_url(self, path, *args):
@@ -203,14 +208,14 @@ class Service:
     def get_sensor_script(self, script_id):
         return self._get_url(self._mk_url('sensor-script/{}', script_id))
 
-    def deploy_sensor_script(self, files, labels=[], sensors=[]):
+    def deploy_sensor_script(self, files, **kwargs):
         manifest = {
             "target": {
-                "labels": labels or [],
-                "sensors": sensors or []
+                "labels": kwargs.pop('labels', []),
+                "sensors": kwargs.pop('sensors', [])
             }
         }
-        uploads = self._lua_uploads_from_files(files)
+        uploads = self._lua_uploads_from_files(files, **kwargs)
         uploads['manifest'] = ('manifest.json', json.dumps(manifest), 'application/json')
         return self._post_url(self._mk_url('sensor-script'), files=uploads)
 
@@ -237,6 +242,8 @@ class Service:
         return self._patch_url(self._mk_url('cloud-script/{}', script_id),
                                json=body)
 
-    def deploy_cloud_script(self, files):
-        uploads = self._lua_uploads_from_files(files)
+    def deploy_cloud_script(self, files, **kwargs):
+        uploads = self._lua_uploads_from_files(files, **kwargs)
+        print uploads
+        return
         return self._post_url(self._mk_url('cloud-script'), files=uploads)
