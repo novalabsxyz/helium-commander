@@ -3,6 +3,13 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.4.9
+-------------
+
+Released on April 20th 2016
+
+- Fixes up label create, delete and add subcommands issues
+
 
 Version 0.4.8
 -------------

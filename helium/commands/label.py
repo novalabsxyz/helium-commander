@@ -1,4 +1,4 @@
-import sensor
+import sensor as _sensor
 import helium
 import util
 import click
@@ -32,7 +32,7 @@ def list(ctx, label):
     Lists information on a given label or all labels in the organization
     """
     if label:
-        ctx.invoke(sensor.list, label=label)
+        ctx.invoke(_sensor.list, label=label)
     else:
         service = ctx.find_object(helium.Service)
         _tabulate(service.get_labels(include='sensor').get('data'))
@@ -41,17 +41,18 @@ def list(ctx, label):
 @cli.command()
 @click.argument('name', nargs=1)
 @click.argument('sensor', nargs=-1)
-@pass_service
-def create(service, name, sensor):
+@click.pass_context
+def create(ctx, name, sensor):
     """Create a label.
 
     Creates a label with a given NAME and an (optional) list of SENSORs
     associated with that label.
     """
+    service = ctx.find_object(helium.Service)
     label = service.create_label(name).get('data')
     if sensor:
         service.update_label_sensors(label['id'], sensor)
-    _tabulate([label])
+    ctx.invoke(_sensor.list, label=label['id'])
 
 
 @cli.command()
@@ -70,7 +71,7 @@ def delete(service, label):
 @click.argument('label',nargs=1)
 @click.argument('sensor',nargs=-1)
 @click.pass_context
-def add(service, label, sensor):
+def add(ctx, label, sensor):
     """Add sensors to a label.
 
     Adds a given list of SENSORs to the LABEL with the given id.
@@ -80,14 +81,14 @@ def add(service, label, sensor):
     sensor_ids = dpath.values(sensors, "*/id")
     sensor_ids = set(sensor_ids).union(set(sensor))
     service.update_label_sensors(label, sensor_ids)
-    ctx.invoke(sensor.list, label=label)
+    ctx.invoke(_sensor.list, label=label)
 
 
 @cli.command()
 @click.argument('label',nargs=1)
 @click.argument('sensor',nargs=-1)
-@pass_service
-def remove(service, label, sensor):
+@click.pass_context
+def remove(ctx, label, sensor):
     """Remove sensors from a label.
 
     Removes a given list of SENSORs from the LABEL with the given id.
@@ -98,7 +99,7 @@ def remove(service, label, sensor):
     sensor_ids = set(sensor_ids).difference(set(sensor))
     if sensor_ids is None: sensor_ids = []
     service.update_label_sensors(label, sensor_ids)
-    ctx.invoke(sensor.list, label=label)
+    ctx.invoke(_sensor.list, label=label)
 
 
 @cli.command()
