@@ -23,7 +23,8 @@ def _tabulate(result):
         ('id', 'id'),
         ('state', 'attributes/state'),
         ('name', 'attributes/name'),
-        ('files', _map_script_filenames)
+        ('files', _map_script_filenames),
+        ('error', 'attributes/error/error')
     ]))
 
 
@@ -132,3 +133,19 @@ def deploy(service, file, main):
     """
     deploy=service.deploy_cloud_script(file, main=main).get('data')
     _tabulate([deploy])
+
+
+@cli.command()
+@click.argument('script')
+@pass_service
+def status(service, script):
+    """Displays current status information for a script.
+
+    Display status information a given SCRIPT. If the script is in an error
+    condition the error details are displayed.
+    """
+    data = service.get_cloud_script(script).get('data')
+    click.echo('Status: ' + dpath.get(data, "attributes/state"))
+    error = dpath.get(data, "attributes/error")
+    if error:
+        click.echo('Error: ' + error.get('details'))

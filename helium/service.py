@@ -244,6 +244,4 @@ class Service:
 
     def deploy_cloud_script(self, files, **kwargs):
         uploads = self._lua_uploads_from_files(files, **kwargs)
-        print uploads
-        return
         return self._post_url(self._mk_url('cloud-script'), files=uploads)

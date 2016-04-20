@@ -3,6 +3,22 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.4.7
+-------------
+
+Released on April 19th 2016
+
+- Removes the debug information from the cloud-script deploy command
+- Adds the cloud-script status subcommand to print out error details
+
+
+Version 0.4.6
+-------------
+
+Released on April 19th 2016
+
+- Fixes erroneous entry in deploying cloud-script
+
 
 Version 0.4.5
 -------------
