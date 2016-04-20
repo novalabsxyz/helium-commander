@@ -44,7 +44,7 @@ def create(service, name):
 
     Create a virtual sensor with a name.
     """
-    sensors = [service.create_sensor(name).get('data')]
+    sensors = [service.create_sensor(name=name).get('data')]
     _tabulate(sensors)
 
 @cli.command()
