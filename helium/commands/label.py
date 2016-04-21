@@ -17,14 +17,28 @@ def _tabulate(result):
     def _map_sensor_count(json):
         return len(dpath.get(json, 'relationships/sensor/data'))
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('name', 'attributes/name'),
         ('sensors', _map_sensor_count)
     ]))
 
+def _update_label_sensors(ctx, label, sensor, set_func):
+    service = ctx.find_object(helium.Service)
+    label = util.lookup_resource_id(service.get_labels, label)
+    # Fetch the existing sensors
+    sensors = service.get_label_sensors(label).get('data')
+    sensor_ids = dpath.values(sensors, "*/id")
+    # Look up full sensor ids for all given sensors
+    sensor_list = [util.lookup_resource_id(service.get_sensors, sensor_id)
+                   for sensor_id in sensor]
+    # And perform the set operation and ensure we have a valid list
+    sensor_ids = set_func(set(sensor_ids), set(sensor_list))
+    if sensor_ids is None: sensor_ids = []
+    service.update_label_sensors(label, sensor_ids)
+
 
 @cli.command()
-@click.argument('label',required=False)
+@click.argument('label', required=False)
 @click.pass_context
 def list(ctx, label):
     """Lists information on labels.
@@ -50,21 +64,29 @@ def create(ctx, name, sensor):
     """
     service = ctx.find_object(helium.Service)
     label = service.create_label(name).get('data')
+    label_id = label['id']
     if sensor:
-        service.update_label_sensors(label['id'], sensor)
-    ctx.invoke(_sensor.list, label=label['id'])
+        sensor_list = service.get_sensors().get('data')
+        sensors = [util.lookup_resource_id(sensor_list, sensor_id)
+                   for sensor_id in sensor]
+        service.update_label_sensors(label_id, sensors)
+    _tabulate([service.get_label(label_id, include='sensor').get('data')])
 
 
 @cli.command()
-@click.argument('label')
+@click.argument('label', nargs=-1)
 @pass_service
 def delete(service, label):
     """Delete a label.
 
     Deletes the LABEL with the given id
     """
-    result = service.delete_label(label)
-    click.echo("Deleted" if result.status_code == 204 else result)
+    label_list = service.get_labels().get('data')
+    label = [util.lookup_resource_id(label_list, label_id)
+             for label_id in label]
+    for entry in label:
+        result = service.delete_label(entry)
+        click.echo("Deleted: " +  entry if result.status_code == 204 else result)
 
 
 @cli.command()
@@ -76,29 +98,20 @@ def add(ctx, label, sensor):
 
     Adds a given list of SENSORs to the LABEL with the given id.
     """
-    service = ctx.find_object(helium.Service)
-    sensors = service.get_label_sensors(label).get('data')
-    sensor_ids = dpath.values(sensors, "*/id")
-    sensor_ids = set(sensor_ids).union(set(sensor))
-    service.update_label_sensors(label, sensor_ids)
+    _update_label_sensors(ctx, label, sensor, set.union)
     ctx.invoke(_sensor.list, label=label)
 
 
 @cli.command()
-@click.argument('label',nargs=1)
-@click.argument('sensor',nargs=-1)
+@click.argument('label', nargs=1)
+@click.argument('sensor', nargs=-1)
 @click.pass_context
 def remove(ctx, label, sensor):
     """Remove sensors from a label.
 
     Removes a given list of SENSORs from the LABEL with the given id.
     """
-    service = ctx.find_object(helium.Service)
-    sensors = service.get_label_sensors(label).get('data')
-    sensor_ids = dpath.values(sensors, "*/id")
-    sensor_ids = set(sensor_ids).difference(set(sensor))
-    if sensor_ids is None: sensor_ids = []
-    service.update_label_sensors(label, sensor_ids)
+    _update_label_sensors(ctx, label, sensor, set.difference)
     ctx.invoke(_sensor.list, label=label)
 
 
@@ -118,5 +131,6 @@ def dump(service, label, format, **kwargs):
     This command takes the same arguments as the `timeseries` command, including
     the ability to filter by PORT, START and END date
     """
-    sensors = dpath.values(service.get_sensors(), '/data/*/id')
+    label = util.lookup_resource_id(service.get_labels, label)
+    sensors = dpath.values(service.get_label_sensors(label), '/data/*/id')
     ts.dump(service, sensors, format, **kwargs)

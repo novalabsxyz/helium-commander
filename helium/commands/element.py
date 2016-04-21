@@ -12,7 +12,7 @@ def cli():
 
 def _tabulate(result):
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
         ('name', 'attributes/name')
     ]))
@@ -27,6 +27,7 @@ def list(service, element):
     Lists one or all elements in the organization.
     """
     if element:
+        element = util.lookup_resource_id(service.get_elements, element)
         elements=[service.get_element(element).get('data')]
     else:
         elements=service.get_elements().get('data')

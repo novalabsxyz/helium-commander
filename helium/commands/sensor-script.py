@@ -21,7 +21,7 @@ def _tabulate_scripts(result):
         return sum(progress)/len(progress) if len(progress) > 0 else 0
 
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('created', 'meta/created'),
         ('sensors', _map_sensor_count),
         ('state', 'meta/state'),
@@ -30,7 +30,7 @@ def _tabulate_scripts(result):
 
 def _tabulate_status(result):
     util.output(util.tabulate(result, [
-        ('sensor', 'id'),
+        ('sensor', util.shorten_json_id),
         ('mac', 'meta/mac'),
         ('progress', 'meta/progress')
     ]))
@@ -52,6 +52,7 @@ def status(service, script):
 
     Retrieves the current status for a sensor-script deploy request.
     """
+    script = util.lookup_resource_id(service.get_sensor_scripts, script)
     script_info = service.get_sensor_script(script)
     _tabulate_status(dpath.get(script_info, 'data/relationships/status/data'))
 

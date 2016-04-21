@@ -43,7 +43,7 @@ def tabulate(result):
         click.echo('No data')
         return
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('timestamp', 'attributes/timestamp'),
         ('port', 'attributes/port'),
         ('value', 'attributes/value')

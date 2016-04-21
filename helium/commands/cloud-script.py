@@ -20,7 +20,7 @@ def _tabulate(result):
         return ','.join(_extract_script_filenames(files))
 
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('state', 'attributes/state'),
         ('name', 'attributes/name'),
         ('files', _map_script_filenames),
@@ -51,6 +51,7 @@ def start(service, script):
 
     Starts the SCRIPT with the given id.
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     _tabulate([service.update_cloud_script(script, name=name, start=True).get('data')])
 
 @cli.command()
@@ -63,6 +64,7 @@ def stop(service, script, name):
 
     Stops the SCRIPT with the given id.
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     _tabulate([service.update_cloud_script(script, name=name, start=False).get('data')])
 
 
@@ -74,8 +76,10 @@ def delete(service, script):
 
     Deletes the cloud-SCRIPT with the given id.
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     result = service.delete_cloud_script(script)
-    click.echo("Deleted" if result.status_code == 204 else result)
+    click.echo("Deleted: " + script.encode('ascii')
+               if result.status_code == 204 else result)
 
 
 @cli.command()
@@ -94,6 +98,7 @@ def timeseries(service, script, **kwargs):
     * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
 
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     data = service.get_cloud_script_timeseries(script, **kwargs).get('data')
     ts.tabulate(data)
 
@@ -107,6 +112,7 @@ def show(service, script, file):
 
     Fetches a FILE from a given cloud-SCRIPT.
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     json = service.get_cloud_script(script).get('data')
     file_urls = [f.encode('utf-8') for f in dpath.get(json, 'meta/scripts')]
     names = dict(zip(_extract_script_filenames(file_urls), file_urls))
@@ -119,7 +125,7 @@ def show(service, script, file):
 @click.option('--main', type=click.Path(exists=True),
               help="The main file for the script")
 @pass_service
-def deploy(service, file, main):
+def deploy(service, file, **kwargs):
     """Deploy  a cloud-script.
 
     Submits a deploy request of one ore more FILEs.
@@ -131,7 +137,7 @@ def deploy(service, file, main):
     Note: One of the given files _must_ be called user.lua if the --main option is not given.
     This file will be considered the primary script for the deploy.
     """
-    deploy=service.deploy_cloud_script(file, main=main).get('data')
+    deploy=service.deploy_cloud_script(file, **kwargs).get('data')
     _tabulate([deploy])
 
 
@@ -144,6 +150,7 @@ def status(service, script):
     Display status information a given SCRIPT. If the script is in an error
     condition the error details are displayed.
     """
+    script = util.lookup_resource_id(service.get_cloud_scripts, script)
     data = service.get_cloud_script(script).get('data')
     click.echo('Status: ' + dpath.get(data, "attributes/state"))
     error = dpath.get(data, "attributes/error")

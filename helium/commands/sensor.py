@@ -13,10 +13,11 @@ def cli():
 
 def _tabulate(result):
     util.output(util.tabulate(result, [
-        ('id', 'id'),
+        ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
         ('name', 'attributes/name'),
     ]))
+
 
 @cli.command()
 @click.option('-l', '--label',
@@ -29,6 +30,7 @@ def list(service, label):
     the organization.
     """
     if label:
+        label = util.lookup_resource_id(service.get_labels, label)
         sensors = service.get_label(label,include="sensor").get('included')
     else:
         sensors = service.get_sensors().get('data')
@@ -57,8 +59,9 @@ def update(service, sensor, **kwargs):
 
     Updates the attributes of a given SENSOR.
     """
-    sensor = service.update_sensor(sensor, **kwargs).get('data')
-    _tabulate([sensor])
+    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    data = service.update_sensor(sensor, **kwargs).get('data')
+    _tabulate([data])
 
 
 @cli.command()
@@ -69,6 +72,7 @@ def delete(service, sensor):
 
     Deletes the SENSOR with the given id.
     """
+    sensor = util.lookup_resource_id(service.get_sensors, sensor)
     result = service.delete_sensor(sensor)
     click.echo("Deleted" if result.status_code == 204 else result)
 
@@ -89,6 +93,7 @@ def timeseries(service, sensor, **kwargs):
     * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
 
     """
+    sensor = util.lookup_resource_id(service.get_sensors, sensor)
     data = service.get_sensor_timeseries(sensor, **kwargs).get('data')
     ts.tabulate(data)
 
@@ -110,4 +115,5 @@ def dump(service, sensor, format, **kwargs):
     This command takes the same arguments as the `timeseries` command, including
     the ability to filter by PORT, START and END date
     """
+    sensor = util.lookup_resource_id(service.get_sensors, sensor)
     ts.dump(service, [sensor], format, **kwargs)
