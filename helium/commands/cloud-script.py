@@ -46,26 +46,26 @@ def list(service):
 @click.option('--name',
               help="the new name for the script")
 @pass_service
-def start(service, script):
+def start(service, script, **kwargs):
     """Starts a given cloud-script.
 
     Starts the SCRIPT with the given id.
     """
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
-    _tabulate([service.update_cloud_script(script, name=name, start=True).get('data')])
+    _tabulate([service.update_cloud_script(script, state="running", **kwargs).get('data')])
 
 @cli.command()
 @click.argument('script')
 @click.option('--name',
               help="the new name for the script")
 @pass_service
-def stop(service, script, name):
+def stop(service, script, **kwargs):
     """Stop a given cloud-script.
 
     Stops the SCRIPT with the given id.
     """
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
-    _tabulate([service.update_cloud_script(script, name=name, start=False).get('data')])
+    _tabulate([service.update_cloud_script(script, state="stopped", **kwargs).get('data')])
 
 
 @cli.command()
@@ -124,11 +124,18 @@ def show(service, script, file):
 @click.argument('file', nargs=-1)
 @click.option('--main', type=click.Path(exists=True),
               help="The main file for the script")
+@click.option('--name',
+              help="the name for the script")
+@click.option('--state', type=click.Choice(['running', 'stopped']),
+              default='running',
+              help="the starting state for the script")
 @pass_service
 def deploy(service, file, **kwargs):
     """Deploy  a cloud-script.
 
     Submits a deploy request of one ore more FILEs.
+    Optionally specify a name and the starting state of the script once
+    it is deployed.
 
     If the --main option is specified the given file is used as the `user.lua`,
     i.e. the main user script for the deployment. The file may  be part of

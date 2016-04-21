@@ -234,14 +234,19 @@ class Service:
     def delete_cloud_script(self, script_id):
         return self._delete_url(self._mk_url('cloud-script/{}', script_id))
 
-    def update_cloud_script(self, script_id, name=None, start=False):
-        body = self._mk_attributes_body("cloud-script", script_id, {
-            "state": "running" if start else "stopped",
-            "name": name
+    def _mk_cloud_script_attributes(self, script_id, **kwargs):
+        return self._mk_attributes_body("cloud-script", script_id, {
+            "state": kwargs.pop("state", "running"),
+            "name": kwargs.pop("name", None)
         })
+
+    def update_cloud_script(self, script_id, **kwargs):
+        body = self._mk_cloud_script_attributes(script_id, **kwargs)
         return self._patch_url(self._mk_url('cloud-script/{}', script_id),
                                json=body)
 
     def deploy_cloud_script(self, files, **kwargs):
         uploads = self._lua_uploads_from_files(files, **kwargs)
+        attributes = self._mk_cloud_script_attributes(None, **kwargs)
+        uploads['attributes'] = ('attributes.json', json.dumps(attributes), 'application/json')
         return self._post_url(self._mk_url('cloud-script'), files=uploads)
