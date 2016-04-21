@@ -153,6 +153,9 @@ def status(service, script):
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
     data = service.get_cloud_script(script).get('data')
     click.echo('Status: ' + dpath.get(data, "attributes/state"))
-    error = dpath.get(data, "attributes/error")
+    try:
+        error = dpath.get(data, "attributes/error")
+    except KeyError:
+        error = None
     if error:
         click.echo('Error: ' + error.get('details'))
