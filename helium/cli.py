@@ -2,7 +2,11 @@ import commands
 import helium
 import click
 
-@click.command(cls=commands.Loader)
+CONTEXT_SETTINGS = dict(
+    help_option_names=['-h', '--help']
+)
+
+@click.command(cls=commands.Loader, context_settings=CONTEXT_SETTINGS)
 @click.option('--api-key',
               envvar='HELIUM_API_KEY',
               help='your Helium API key. Can also be specified using the HELIUM_API_KEY environment variable')
@@ -11,7 +15,7 @@ import click
               default=None,
               help= 'The Helium base API URL. Can also be specified using the HELIUM_API_URL environment variable.' )
 @click.pass_context
-def cli(ctx, api_key, host):
+def cli(ctx, api_key, host, **kwargs):
     ctx.obj = helium.Service(api_key, host)
 
 
