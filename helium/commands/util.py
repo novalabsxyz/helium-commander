@@ -48,7 +48,11 @@ def shorten_id(str):
     return str.split('-')[0]
 
 def shorten_json_id(json):
-    return shorten_id(json.get('id'))
+    # Ugh, reaching for global state isn't great but very convenient here
+    shorten = click.get_current_context().find_root().params.get('uuid', "short") == "short"
+    json_id = json.get('id')
+    return shorten_id(json_id) if shorten else json_id
+
 
 def tabulate(result, map):
     mapping = OrderedDict(map)
