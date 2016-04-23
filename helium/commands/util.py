@@ -1,9 +1,11 @@
 from collections import OrderedDict
 import dpath.util as dpath
-import tablib
 import sys
 import click
 import uuid
+import json
+import writer
+import StringIO
 
 def is_uuid(str):
     try:
@@ -49,7 +51,7 @@ def shorten_id(str):
 
 def shorten_json_id(json):
     # Ugh, reaching for global state isn't great but very convenient here
-    shorten = click.get_current_context().find_root().params.get('uuid', "short") == "short"
+    shorten = not click.get_current_context().find_root().params.get('uuid', False)
     json_id = json.get('id')
     return shorten_id(json_id) if shorten else json_id
 
@@ -58,26 +60,13 @@ def tabulate(result, map):
     mapping = OrderedDict(map)
     if not mapping or not result: return result
 
-    def _lookup(o, path):
-        try:
-            if hasattr(path, '__call__'):
-                return path(o)
-            else:
-                return dpath.get(o, path)
-        except KeyError, e:
-            return ""
-
-    def map_object(o, mapping):
-        return [_lookup(o, path) for k, path in mapping.items()]
-
-    mapped_result = [map_object(o, mapping) for o in result]
-    data = tablib.Dataset(*mapped_result, headers=mapping.keys())
-    return data
-
-def output(result):
-    if sys.stdout.isatty():
-        click.echo(result)
-    elif result.export:
-        click.echo(result.export('csv'))
-    else:
-        click.echo(result)
+    # Ugh, reaching for global state isn't great but very convenient here
+    default_format = 'tty' if sys.stdout.isatty() else 'csv'
+    format = click.get_current_context().find_root().params.get('format')
+    # Ensure format is set to something sensible
+    format = format or default_format
+    file = click.utils.get_text_stream('stdout')
+    output = writer.for_format(format, file, mapping=mapping)
+    output.start()
+    output.write_entries(result)
+    output.finish()

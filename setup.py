@@ -19,7 +19,7 @@ setup(
         'requests>=2.9',
         'dpath>=1.4',
         'futures>=3.0',
-        'tablib>=0.11',
+        'terminaltables>=2.1.0',
         'click>=6.6',
     ],
     classifiers=[

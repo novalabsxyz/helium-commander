@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.5.1
+-------------
+
+Released on April 23th 2016
+
+- Adds -h as a short form for --help
+- Adds --uuid as as a top level flag to display full uuids
+- Adds --format as a top level option to force output format if needed
+
+
 Version 0.5.0
 -------------
 

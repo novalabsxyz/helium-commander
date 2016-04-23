@@ -14,8 +14,10 @@ CONTEXT_SETTINGS = dict(
               envvar='HELIUM_API_URL',
               default=None,
               help= 'The Helium base API URL. Can also be specified using the HELIUM_API_URL environment variable.' )
-@click.option('--uuid', type=click.Choice(["short", "long"]), default="short",
-              help="Whether to display long or short identifiers")
+@click.option('--uuid', is_flag=True,
+              help="Whether to display long identifiers")
+@click.option('--format', type=click.Choice(['csv', 'json', 'tty']), default=None,
+              help="The output format (default 'tty')")
 @click.pass_context
 def cli(ctx, api_key, host, **kwargs):
     ctx.obj = helium.Service(api_key, host)

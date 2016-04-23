@@ -8,7 +8,7 @@ pass_service=click.make_pass_decorator(helium.Service)
 
 @click.group()
 def cli():
-    """Operations on physical or virtual sensors.
+    """Operations on the authorized organization
     """
     pass
 

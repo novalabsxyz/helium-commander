@@ -11,11 +11,11 @@ def cli():
     pass
 
 def _tabulate(result):
-    util.output(util.tabulate(result, [
+    util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
         ('name', 'attributes/name')
-    ]))
+    ])
 
 
 @cli.command()

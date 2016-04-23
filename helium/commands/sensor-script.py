@@ -7,7 +7,7 @@ pass_service=click.make_pass_decorator(helium.Service)
 
 @click.group()
 def cli():
-    """Operations on sensor-script.
+    """Operations on sensor-scripts.
     """
     pass
 
@@ -20,20 +20,20 @@ def _tabulate_scripts(result):
         progress = dpath.values(json, "relationships/status/data/*/meta/progress")
         return sum(progress)/len(progress) if len(progress) > 0 else 0
 
-    util.output(util.tabulate(result, [
+    util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('created', 'meta/created'),
         ('sensors', _map_sensor_count),
         ('state', 'meta/state'),
         ('progress', _map_progress)
-    ]))
+    ])
 
 def _tabulate_status(result):
-    util.output(util.tabulate(result, [
+    util.tabulate(result, [
         ('sensor', util.shorten_json_id),
         ('mac', 'meta/mac'),
         ('progress', 'meta/progress')
-    ]))
+    ])
 
 
 @cli.command()

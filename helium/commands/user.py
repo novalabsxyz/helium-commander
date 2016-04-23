@@ -12,10 +12,10 @@ def cli():
     pass
 
 def _tabulate(result):
-    util.output(util.tabulate(result, [
+    util.tabulate(result, [
         ('id', 'id'),
         ('name', 'attributes/name')
-    ]))
+    ])
 
 
 @cli.command()

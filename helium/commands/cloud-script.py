@@ -10,7 +10,7 @@ pass_service=click.make_pass_decorator(helium.Service)
 
 @click.group()
 def cli():
-    """Operations on cloud-scripts
+    """Operations on cloud-scripts.
     """
     pass
 
@@ -19,13 +19,13 @@ def _tabulate(result):
         files = dpath.get(json, 'meta/scripts')
         return ','.join(_extract_script_filenames(files))
 
-    util.output(util.tabulate(result, [
+    util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('state', 'attributes/state'),
         ('name', 'attributes/name'),
         ('files', _map_script_filenames),
         ('error', 'attributes/error/error')
-    ]))
+    ])
 
 
 def _extract_script_filenames(files):
@@ -128,7 +128,7 @@ def show(service, script, file):
               help="the name for the script")
 @click.option('--state', type=click.Choice(['running', 'stopped']),
               default='running',
-              help="the starting state for the script")
+              help="the starting state for the script (default 'running')")
 @pass_service
 def deploy(service, file, **kwargs):
     """Deploy  a cloud-script.
