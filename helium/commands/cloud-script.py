@@ -164,5 +164,8 @@ def status(service, script):
         error = dpath.get(data, "attributes/error")
     except KeyError:
         error = None
+    # Pull out the details if they're there
+    if isinstance(error, dict):
+        error = error.get('details')
     if error:
-        click.echo('Error: ' + error.get('details'))
+        click.echo('Error: ' + error)
