@@ -2,6 +2,8 @@ import re
 import ast
 from setuptools import setup
 
+with open('README.rst') as file:
+    long_description = file.read()
 
 setup(
     name='helium-commander',
@@ -11,7 +13,7 @@ setup(
     author='Marc Nijdam',
     author_email='marc@helium.com',
     description='A CLI and service wrapper for the Helium API',
-    long_description=__doc__,
+    long_description=long_description,
     packages=['helium', 'helium.commands'],
     include_package_data=True,
     platforms='all',
