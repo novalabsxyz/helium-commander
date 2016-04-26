@@ -116,8 +116,8 @@ def show(service, script, file):
     json = service.get_cloud_script(script).get('data')
     file_urls = [f.encode('utf-8') for f in dpath.get(json, 'meta/scripts')]
     names = dict(zip(_extract_script_filenames(file_urls), file_urls))
-    file_url = names[opts.file]
-    click.echo(requests.get(file_url).text())
+    file_url = names[file]
+    click.echo(requests.get(file_url, verify=service.is_production()).text)
 
 
 @cli.command()
@@ -139,7 +139,7 @@ def deploy(service, file, **kwargs):
 
     If the --main option is specified the given file is used as the `user.lua`,
     i.e. the main user script for the deployment. The file may  be part of
-    the list of files given to make it easier to specify wildcards
+    the list of files given to make it easier to specify wildcards.
 
     Note: One of the given files _must_ be called user.lua if the --main option is not given.
     This file will be considered the primary script for the deploy.

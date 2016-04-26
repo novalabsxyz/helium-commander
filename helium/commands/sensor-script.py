@@ -36,9 +36,10 @@ def _tabulate_status(result):
     ])
 
 
-@cli.command()
+@cli.command(name="list")
 @pass_service
-def list(service):
+# renamed function to avoid collision with use of the built-in list function
+def _list(service):
     """List all known sensor-scripts.
     """
     _tabulate_scripts(service.get_sensor_scripts().get('data'))
@@ -59,20 +60,34 @@ def status(service, script):
 
 @cli.command()
 @click.argument('file', nargs=-1)
+@click.option('--main', type=click.Path(exists=True),
+              help="The main file for the script")
 @click.option('-l', '--label', multiple=True,
               help="the id of a label")
 @click.option('-s', '--sensor', multiple=True,
               help="the id of a sensor")
+@click.option('-sf', '--sensor-file', type=click.File('rb'),
+              help="the name of a file with sensor ids")
 @pass_service
-def deploy(service, file, label, sensor):
+def deploy(service, file, sensor, sensor_file, label, main):
     """Deploy a sensor-script.
 
     Submit a deploy request of one or more FILEs. The targets for the deploy can
-    be given as a combination of specific sensors or labels.
+    be a combination of sensors or labels.
 
-    Note: One of the given files _must_ be called user.lua. This file will be
-    considered the primary script file for the deploy.
+    The label (-l) and sensor (-s) specifier can be given multiple times to target
+    multiple labels or sensors for a deploy.
 
+    If the --main option is specified the given file is used as the `user.lua`,
+    i.e. the main user script for the deployment. The file may  be part of
+    the list of files given to make it easier to specify wildcards.
+
+    Note: One of the given files _must_ be called user.lua if the --main option is not given.
+    This file will be considered the primary script for the deploy.
     """
-    deploy=service.deploy_sensor_script(file, labels=label, sensors=sensor).get('data')
+    sensor = list(sensor)
+    if sensor_file:
+        sensor.extend(sensor_file.read().splitlines())
+    sensor = [util.lookup_resource_id(service.get_sensors, sensor_id) for sensor_id in sensor]
+    deploy=service.deploy_sensor_script(file, label=label, sensor=sensor, main=main).get('data')
     _tabulate_scripts([deploy])

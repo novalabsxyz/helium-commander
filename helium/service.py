@@ -98,7 +98,7 @@ class Service:
                                    json=json,
                                    files=files,
                                    headers=headers,
-                                   verify=(self.base_url == self.production_base_url),
+                                   verify=self.is_production(),
                                    allow_redirects=True)
         req.raise_for_status()
         try:
@@ -123,6 +123,9 @@ class Service:
             return reduce(dict.__getitem__, path, json)
         except KeyError:
             return None
+
+    def is_production(self):
+        return self.base_url == self.production_base_url
 
     def get_user(self):
         return self._get_url(self._mk_url('user'))
@@ -211,8 +214,8 @@ class Service:
     def deploy_sensor_script(self, files, **kwargs):
         manifest = {
             "target": {
-                "labels": kwargs.pop('labels', []),
-                "sensors": kwargs.pop('sensors', [])
+                "labels": kwargs.pop('label', []),
+                "sensors": kwargs.pop('sensor', [])
             }
         }
         uploads = self._lua_uploads_from_files(files, **kwargs)
