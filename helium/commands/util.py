@@ -5,7 +5,8 @@ import click
 import uuid
 import json
 import writer
-import StringIO
+import urlparse
+
 
 def is_uuid(str):
     try:
@@ -70,3 +71,10 @@ def tabulate(result, map):
     output.start()
     output.write_entries(result)
     output.finish()
+
+def map_script_filenames(json):
+    files = dpath.get(json, 'meta/scripts')
+    return ', '.join(extract_script_filenames(files))
+
+def extract_script_filenames(files):
+    return [urlparse.urlsplit(url).path.split('/')[-1] for url in files]

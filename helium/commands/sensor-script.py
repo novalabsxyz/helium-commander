@@ -2,6 +2,7 @@ import click
 import util
 import helium
 import dpath.util as dpath
+import requests
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -25,14 +26,16 @@ def _tabulate_scripts(result):
         ('created', 'meta/created'),
         ('sensors', _map_sensor_count),
         ('state', 'meta/state'),
-        ('progress', _map_progress)
+        ('progress', _map_progress),
+        ('files', util.map_script_filenames)
     ])
 
 def _tabulate_status(result):
     util.tabulate(result, [
         ('sensor', util.shorten_json_id),
         ('mac', 'meta/mac'),
-        ('progress', 'meta/progress')
+        ('progress', 'meta/progress'),
+        ('files', util.map_script_filenames)
     ])
 
 
@@ -91,3 +94,20 @@ def deploy(service, file, sensor, sensor_file, label, main):
     sensor = [util.lookup_resource_id(service.get_sensors, sensor_id) for sensor_id in sensor]
     deploy=service.deploy_sensor_script(file, label=label, sensor=sensor, main=main).get('data')
     _tabulate_scripts([deploy])
+
+
+@cli.command()
+@click.argument('script')
+@click.argument('file')
+@pass_service
+def show(service, script, file):
+    """Gets a script file from a given sensor-script.
+
+    Fetches a FILE from a given sensor-SCRIPT.
+    """
+    script = util.lookup_resource_id(service.get_sensor_scripts, script)
+    json = service.get_sensor_script(script).get('data')
+    file_urls = [f.encode('utf-8') for f in dpath.get(json, 'meta/scripts')]
+    names = dict(zip(util.extract_script_filenames(file_urls), file_urls))
+    file_url = names[file]
+    click.echo(requests.get(file_url, verify=service.is_production()).text)

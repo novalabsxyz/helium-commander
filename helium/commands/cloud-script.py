@@ -1,5 +1,4 @@
 import dpath.util as dpath
-import urlparse
 import requests
 import click
 import helium
@@ -15,21 +14,13 @@ def cli():
     pass
 
 def _tabulate(result):
-    def _map_script_filenames(json):
-        files = dpath.get(json, 'meta/scripts')
-        return ','.join(_extract_script_filenames(files))
-
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('state', 'attributes/state'),
         ('name', 'attributes/name'),
-        ('files', _map_script_filenames),
+        ('files', util.map_script_filenames),
         ('error', 'attributes/error/error')
     ])
-
-
-def _extract_script_filenames(files):
-    return [urlparse.urlsplit(url).path.split('/')[-1] for url in files]
 
 
 @cli.command()
@@ -115,7 +106,7 @@ def show(service, script, file):
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
     json = service.get_cloud_script(script).get('data')
     file_urls = [f.encode('utf-8') for f in dpath.get(json, 'meta/scripts')]
-    names = dict(zip(_extract_script_filenames(file_urls), file_urls))
+    names = dict(zip(util.extract_script_filenames(file_urls), file_urls))
     file_url = names[file]
     click.echo(requests.get(file_url, verify=service.is_production()).text)
 

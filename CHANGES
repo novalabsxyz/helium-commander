@@ -6,10 +6,11 @@ Here you'll find the major differences between each release.
 Version 0.5.2
 -------------
 
-Released on April 25th 2016
+Released on April 26th 2016
 
 - Adds --main support for sensor-script deploy
 - Adds -sf support for sensor-script deploy to enable listing sensor ids in a file
+- Adds show subcommand for sensor-script to download files for a deploy
 
 
 Version 0.5.1
