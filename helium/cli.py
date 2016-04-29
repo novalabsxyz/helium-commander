@@ -18,6 +18,7 @@ CONTEXT_SETTINGS = dict(
               help="Whether to display long identifiers")
 @click.option('--format', type=click.Choice(['csv', 'json', 'tty']), default=None,
               help="The output format (default 'tty')")
+@click.version_option()
 @click.pass_context
 def cli(ctx, api_key, host, **kwargs):
     ctx.obj = helium.Service(api_key, host)
