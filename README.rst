@@ -38,6 +38,23 @@ package system-wide
    $ sudo pip install helium-commander
 
 
+Nix
+---
+
+helium-commander can also be installed using the Nix_ package manager. Clone
+the repository and run:
+
+::
+
+   $ nix-env --install --file default.nix
+
+To upgrade on version releases, run:
+
+::
+
+   $ nix-env --upgrade --file default.nix
+
+
 Usage
 =====
 
@@ -64,4 +81,5 @@ To use the `helium` command, explore the help options:
 
 .. _Helium: https://helium.com
 .. _API: https://docs.helium.com
-.. _PyPi: https:pypi.python.org
+.. _PyPi: https://pypi.python.org
+.. _Nix: https://nixos.org/nix/
