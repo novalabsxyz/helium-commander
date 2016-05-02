@@ -110,4 +110,4 @@ def show(service, script, file):
     file_urls = [f.encode('utf-8') for f in dpath.get(json, 'meta/scripts')]
     names = dict(zip(util.extract_script_filenames(file_urls), file_urls))
     file_url = names[file]
-    click.echo(requests.get(file_url, verify=service.is_production()).text)
+    click.echo(requests.get(file_url).text)

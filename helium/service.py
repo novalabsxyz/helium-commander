@@ -98,7 +98,6 @@ class Service:
                                    json=json,
                                    files=files,
                                    headers=headers,
-                                   verify=self.is_production(),
                                    allow_redirects=True)
         req.raise_for_status()
         try:
