@@ -93,17 +93,31 @@ class Service:
             'Authorization': self.api_key,
             'User-agent': self.user_agent
         }
-        req = self.session.request(method, url,
+        res = self.session.request(method, url,
                                    params=params,
                                    json=json,
                                    files=files,
                                    headers=headers,
                                    allow_redirects=True)
-        req.raise_for_status()
-        try:
-            return req.json()
-        except ValueError, e:
-            return req
+        if res.ok:
+            try:
+                return res.json()
+            except ValueError:
+                return res
+        else:
+            try:
+                # Pull out the first error info block (for now)
+                errors = res.json()['errors']
+                err = errors[0]
+                errmsg = str.format("{} Error: {} for url {}",
+                                    err['status'],
+                                    err['detail'],
+                                    res.url)
+                # and use that as the error
+                raise requests.HTTPError(errmsg, response=res)
+            except ValueError:
+                # otherwise raise as a base HTTPError
+                res.raise_for_status()
 
     def _get_url(self, url,  **kwargs):
         return self._do_url('GET', url, **kwargs)
