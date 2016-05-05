@@ -14,7 +14,11 @@ This package makes it easy to talk to the Helium API_. It offers:
 Installation
 ============
 
-From source. Use this if you're actively developing or extending
+
+Source
+------
+
+Use this if you're actively developing or extending
 
 ::
 
@@ -22,6 +26,9 @@ From source. Use this if you're actively developing or extending
     $ source env/bin/activate
     $ pip install -e .
 
+
+PyPi
+----
 
 From PyPi_. Use this if you want to use the
 command line tool on its own.
