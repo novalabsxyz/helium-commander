@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.5.3
+-------------
+
+Released on May 4th 2016
+
+- Add --version option to get the current version of the script
+- Clip exception traces and only display the message 
+- Capture error responses from the API and use those when available
+
+
 Version 0.5.2
 -------------
 

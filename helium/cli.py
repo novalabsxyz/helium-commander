@@ -27,7 +27,12 @@ def cli(ctx, api_key, host, **kwargs):
 def main():
     import sys
     args = sys.argv[1:]
-    cli.main(args=args, prog_name=None)
+    try:
+        cli.main(args=args, prog_name=None)
+    except Exception, e:
+        click.secho(str(e), fg='red')
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
