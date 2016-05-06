@@ -218,6 +218,10 @@ class Service:
     def get_element(self, element_id):
         return self._get_url(self._mk_url('element/{}', element_id))
 
+    def update_element(self, element_id, **kwargs):
+        body=self._mk_attributes_body("element", element_id, kwargs)
+        return self._patch_url(self._mk_url('element/{}', element_id), json=body)
+
     def get_sensor_scripts(self):
         return self._get_url(self._mk_url('sensor-script'))
 

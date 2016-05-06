@@ -32,3 +32,18 @@ def list(service, element):
     else:
         elements=service.get_elements().get('data')
     _tabulate(elements)
+
+
+@cli.command()
+@click.argument('element')
+@click.option('--name',
+              help="the new name for the sensor")
+@pass_service
+def update(service, element, **kwargs):
+    """Updates the attributes of an element.
+
+    Updates the attributes of a given ELEMENT.
+    """
+    sensor = util.lookup_resource_id(service.get_elements, element)
+    data = service.update_element(sensor, **kwargs).get('data')
+    _tabulate([data])
