@@ -3,6 +3,17 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.5.4
+-------------
+
+Released on May 6th 2016
+
+- Add organization user to list the users in the authorized organization
+- Add organization update to enable name changes on the organization
+- Add element update to enable name changes on a given element
+
+
 Version 0.5.3
 -------------
 
