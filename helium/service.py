@@ -175,6 +175,13 @@ class Service:
     def post_sensor_timeseries(self, sensor_id, data):
         return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id), json=data)
 
+    def get_org(self):
+        return self._get_url(self._mk_url('organization'))
+
+    def update_org(self, **kwargs):
+        body=self._mk_attributes_body("organization", None, kwargs)
+        return self._patch_url(self._mk_url('organization'), json=body)
+
     def get_org_timeseries(self, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('organization/timeseries'), params=params)
