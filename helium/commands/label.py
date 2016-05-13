@@ -127,9 +127,6 @@ def dump(service, label, format, **kwargs):
 
     One file is generated for each sensor with the sensor id as filename and the
     file extension based on the requested dump format
-
-    This command takes the same arguments as the `timeseries` command, including
-    the ability to filter by PORT, START and END date
     """
     label = util.lookup_resource_id(service.get_labels, label)
     sensors = dpath.values(service.get_label_sensors(label), '/data/*/id')

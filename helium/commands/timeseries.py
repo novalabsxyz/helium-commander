@@ -3,6 +3,7 @@ from collections import OrderedDict
 import helium
 import click
 import util
+import sys
 import writer
 
 def format_option():
@@ -16,35 +17,73 @@ def format_option():
         return func
     return wrapper
 
+_options_docs = """
+    Readings can be filtered by PORT and by START and END date and can
+    be aggregated given an aggregation type and aggregation window size.
+
+    Dates are given in ISO-8601 and may be one of the following forms:
+
+    \b
+    * YYYY-MM-DD - Example: 2016-05-05
+    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
+"""
+
 def options(page_size=20):
+    """Standard options for retrieving timeseries readings. In addition it
+    appends the documentation for these options to the caller.
+
+    The common usecase is to use this function as a decorator for a
+    command like:
+
+    \b
+    ...
+    @timeseries.options()
+    def dump():
+        ...
+    """
     options = [
         click.option('--page-size', default=page_size,
                      help="the number of readings to get per request"),
-        click.option('--port', multiple=True,
+        click.option('--port',
                      help="the port to filter readings on"),
         click.option('--start',
                      help="the start date to filter readings on"),
         click.option('--end',
                      help="the end date to filter readings on"),
+        click.option('--agg-size',
+                     help="the time window of the aggregation"),
+        click.option('--agg-type',
+                     help="the kinds of aggregations to perform")
     ]
 
     def wrapper(func):
+        func.__doc__ += _options_docs
         for option in options:
             func = option(func)
         return func
     return wrapper
 
 
-def tabulate(result):
+def _mapping_for(shorten_json_id=True, **kwargs):
+    agg_types = kwargs.pop('agg_type')
+    if agg_types:
+        value_map = [(key, "attributes/value/" + key) for key in agg_types.split(',')]
+    else:
+        value_map = [('value', 'attributes/value')]
+    map = [
+        ('id', util.shorten_json_id if shorten_json_id  else 'id'),
+        ('timestamp', 'attributes/timestamp'),
+        ('port', 'attributes/port')
+    ]
+    map.extend(value_map)
+    return map
+
+
+def tabulate(result, **kwargs):
     if not result:
         click.echo('No data')
         return
-    util.tabulate(result, [
-        ('id', util.shorten_json_id),
-        ('timestamp', 'attributes/timestamp'),
-        ('port', 'attributes/port'),
-        ('value', 'attributes/value')
-    ])
+    util.tabulate(result, _mapping_for(**kwargs))
 
 
 def dump(service, sensors, format, **kwargs):
@@ -63,6 +102,7 @@ def dump(service, sensors, format, **kwargs):
             for future in result_futures.done:
                 future.result() # re-raises the exception
 
+
 def _process_timeseries(writer, service, sensor_id, **kwargs):
     def json_data(json):
         return json['data'] if json else None
@@ -78,13 +118,7 @@ def _process_timeseries(writer, service, sensor_id, **kwargs):
 def _dump_one(service, sensor_id, format, **kwargs):
     filename = (sensor_id+'.'+format).encode('ascii', 'replace')
     with click.open_file(filename, "wb") as file:
-        csv_mapping = OrderedDict([
-            ('id', 'id'),
-            ('sensor', 'relationships/sensor/data/id'),
-            ('timestamp', 'attributes/timestamp'),
-            ('port', 'attributes/port'),
-            ('value', 'attributes/value')
-        ])
+        csv_mapping = OrderedDict(_mapping_for(shorten_json_id=False, **kwargs))
         service = helium.Service(service.api_key, service.base_url)
         output = writer.for_format(format, file, mapping=csv_mapping)
         _process_timeseries(output, service, sensor_id, **kwargs)

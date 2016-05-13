@@ -60,7 +60,9 @@ class Service:
             "page_size": "page[size]",
             "port": "filter[port]",
             "start": "filter[start]",
-            "end": "filter[end]"
+            "end": "filter[end]",
+            "agg_size": "agg[size]",
+            "agg_type": "agg[type]"
         }, kwargs)
 
     def _include_params_from_kwargs(self, **kwargs):

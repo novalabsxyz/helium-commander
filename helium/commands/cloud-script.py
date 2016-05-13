@@ -81,17 +81,10 @@ def timeseries(service, script, **kwargs):
     """List readings for a cloud-script.
 
     Lists one page of readings for a given SCRIPT.
-    Readings can be filtered by PORT and by START and END date. Dates are given
-    in ISO-8601 and may be one of the following forms:
-
-    \b
-    * YYYY-MM-DD - Example: 2016-05-05
-    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
-
     """
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
     data = service.get_cloud_script_timeseries(script, **kwargs).get('data')
-    ts.tabulate(data)
+    ts.tabulate(data, **kwargs)
 
 
 @cli.command()

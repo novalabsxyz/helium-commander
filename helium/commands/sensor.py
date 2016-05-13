@@ -84,18 +84,11 @@ def delete(service, sensor):
 def timeseries(service, sensor, **kwargs):
     """List readings for a sensor.
 
-    Lists one page of readings for a given SENSOR.
-    Readings can be filtered by PORT and by START and END date. Dates are given
-    in ISO-8601 and may be one of the following forms:
-
-    \b
-    * YYYY-MM-DD - Example: 2016-05-05
-    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
-
+    Lists one page of readings or aggregations of readings for a given SENSOR.
     """
     sensor = util.lookup_resource_id(service.get_sensors, sensor)
     data = service.get_sensor_timeseries(sensor, **kwargs).get('data')
-    ts.tabulate(data)
+    ts.tabulate(data, **kwargs)
 
 
 @cli.command()
@@ -111,9 +104,6 @@ def dump(service, sensor, format, **kwargs):
 
     One file is generated with the sensor id as filename and the
     file extension based on the requested dump format
-
-    This command takes the same arguments as the `timeseries` command, including
-    the ability to filter by PORT, START and END date
     """
     sensor = util.lookup_resource_id(service.get_sensors, sensor)
     ts.dump(service, [sensor], format, **kwargs)

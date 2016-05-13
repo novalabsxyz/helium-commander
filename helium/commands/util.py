@@ -52,7 +52,10 @@ def shorten_id(str):
 
 def shorten_json_id(json):
     # Ugh, reaching for global state isn't great but very convenient here
-    shorten = not click.get_current_context().find_root().params.get('uuid', False)
+    try:
+        shorten = not click.get_current_context().find_root().params.get('uuid', False)
+    except:
+        shorten = False
     json_id = json.get('id')
     return shorten_id(json_id) if shorten else json_id
 
