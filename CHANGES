@@ -16,7 +16,7 @@ Version 0.6.0
 
 Released on May 16th 2016
 
-- Add agg-type and agg-size otpion to expose timeseries aggregation
+- Add agg-type and agg-size option to expose timeseries aggregation
 - Add versions support for elements and sensors
 
 

@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='helium-commander',
-    version='0.6.1',
+    version='0.6.2-dev',
     url='http://github.com/helium/helium-commander/',
     license='BSD',
     author='Marc Nijdam',
