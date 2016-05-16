@@ -1,5 +1,3 @@
-__version__='0.6.0'
+__version__='0.6.1-dev'
 
 from service import Service
-from resource import Resource
-from sensor import Sensor
