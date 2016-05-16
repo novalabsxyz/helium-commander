@@ -10,18 +10,28 @@ def cli():
     """
     pass
 
-def _tabulate(result):
+def _tabulate(result, **kwargs):
+    version_map = []
+    version_option = kwargs.pop('versions', 'none')
+    if version_option == 'fw':
+        version_map = [
+            ('firmware', 'meta/versions/element'),
+        ]
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
+    ] +  version_map + [
         ('name', 'attributes/name')
     ])
 
 
 @cli.command()
 @click.argument('element',required=False)
+@click.option('--versions', type=click.Choice(['none', 'fw']),
+              default='none',
+              help="display element version information")
 @pass_service
-def list(service, element):
+def list(service, element, **kwargs):
     """List elements.
 
     Lists one or all elements in the organization.
@@ -31,7 +41,7 @@ def list(service, element):
         elements=[service.get_element(element).get('data')]
     else:
         elements=service.get_elements().get('data')
-    _tabulate(elements)
+    _tabulate(elements, **kwargs)
 
 
 @cli.command()

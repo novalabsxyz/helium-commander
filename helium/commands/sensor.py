@@ -2,6 +2,7 @@ import click
 import helium
 import util
 import timeseries as ts
+import dpath.util as dpath
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -11,10 +12,29 @@ def cli():
     """
     pass
 
-def _tabulate(result):
+def _tabulate(result, **kwargs):
+    version_map = []
+    version_base = [
+        ('atom', 'meta/versions/atom'),
+        ('firmware', 'meta/versions/sensor'),
+    ]
+    version_option = kwargs.pop('versions', 'none')
+    if version_option == 'fw':
+        version_map = version_base
+    elif version_option == 'all':
+        def _map_script_versions(json):
+            versions = dpath.values(json, 'meta/versions/sensor-script/*/version')
+            return '\n'.join([v for v in versions if not v.startswith('ffffffff')])
+        version_map = version_base + [
+            ('libary', 'meta/versions/sensor-library'),
+            ('config', 'meta/versions/sensor-config'),
+            ('script', _map_script_versions)
+        ]
+
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
+    ] + version_map + [
         ('name', 'attributes/name'),
     ])
 
@@ -22,8 +42,11 @@ def _tabulate(result):
 @cli.command()
 @click.option('-l', '--label',
               help="the id of a label")
+@click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
+              default='none',
+              help="display sensor version information")
 @pass_service
-def list(service, label):
+def list(service, label, **kwargs):
     """List sensors.
 
     Lists information for a label of sensors or all sensors in
@@ -34,7 +57,7 @@ def list(service, label):
         sensors = service.get_label(label,include="sensor").get('included')
     else:
         sensors = service.get_sensors().get('data')
-    _tabulate(sensors)
+        _tabulate(sensors, **kwargs)
 
 
 @cli.command()
