@@ -1,4 +1,4 @@
-__version__='0.5.5-dev'
+__version__='0.6.0'
 
 from service import Service
 from resource import Resource
