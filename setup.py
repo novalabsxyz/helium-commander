@@ -1,13 +1,14 @@
 import re
 import ast
 from setuptools import setup
+from helium.version import get_version
 
 with open('README.rst') as file:
     long_description = file.read()
 
 setup(
     name='helium-commander',
-    version='0.6.2-dev',
+    version=get_version(),
     url='http://github.com/helium/helium-commander/',
     license='BSD',
     author='Marc Nijdam',

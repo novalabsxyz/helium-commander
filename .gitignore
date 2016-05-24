@@ -32,6 +32,7 @@ env/
 build/
 develop-eggs/
 dist/
+py-build/
 downloads/
 eggs/
 .eggs/

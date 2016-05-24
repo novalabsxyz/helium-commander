@@ -26,6 +26,25 @@ _options_docs = """
     \b
     * YYYY-MM-DD - Example: 2016-05-05
     * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
+
+    Aggregations or bucketing of data can be done by specifying
+    the size of each aggregation bucket using agg-size
+    and one of the size specifiers.
+
+    \b
+    Examples: 1m, 2m, 5m, 10m, 30m, 1h, 1d
+
+    How data-points are aggregated is indicated by a list of
+    aggregation types using agg-type.
+
+    \b
+    Examples: min, max, avg
+
+    For example, to aggregate min, max for a specific port 't' and
+    aggregate on a daily basis use the following:
+
+    \b
+    --agg-type min,max --agg-size 1d --port t
 """
 
 def options(page_size=20):
