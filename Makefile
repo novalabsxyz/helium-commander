@@ -37,7 +37,7 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
 	@echo "==> Python 2.7 (release)"
-	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python2.7 setup.py build --build-base=py-build/2.7 bdist_wheel upload -s -i $(RELEASE_GPG_KEYNAME)
 
 
 clean:
