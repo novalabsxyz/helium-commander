@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.6.2
+-------------
+
+Released on May 24th 2016
+
+- Changed the release scripts to be more maintainable
+- Added more documentation for the timeseries subcommand
+
+
 Version 0.6.1
 -------------
 
