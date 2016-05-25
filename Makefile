@@ -25,6 +25,7 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
 	@echo "==> Python tagging version $(VERSION)"
+	@echo "__version__=\"$(VERSION)\"" > helium/version.py
 	@bash ./scripts/publish.sh $(VERSION) validate
 	@git tag --sign -a "$(VERSION)" -m "helium-commander $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags

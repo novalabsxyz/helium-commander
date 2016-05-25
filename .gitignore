@@ -27,6 +27,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+helium/version.py
 .Python
 env/
 build/

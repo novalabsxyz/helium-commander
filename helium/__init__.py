@@ -1,4 +1,2 @@
-import helium.version
-__version__ = version.get_version()
-
+from helium.version import __version__
 from helium.service import Service

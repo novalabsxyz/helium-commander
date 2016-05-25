@@ -1,2 +1,3 @@
 include LICENCE.txt
 include README.rst
+include helium/version.py
