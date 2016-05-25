@@ -34,7 +34,7 @@ endif
 	@git tag --sign -a "$(VERSION)" -m "helium-commander $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags
 
-release_sdist: version
+release_sdist:
 	@echo "==> Python (sdist release)"
 	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
 	@bash ./scripts/publish.sh $(VERSION)
