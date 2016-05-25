@@ -17,18 +17,24 @@ unexport LC_TIME
 test_sdist:
 	@python setup.py sdist
 
-release_sdist:
-ifeq ($(VERSION),)
-	$(error VERSION must be set to build a release and deploy this package)
-endif
+version:
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
-	@echo "==> Python tagging version $(VERSION)"
+ifeq ($(VERSION),)
+	$(error VERSION must be set to build a release and deploy this package)
+endif
+ifneq (x$(shell git status --porcelain),x)
+	$(error You have uncommitted files in git)
+endif
+	@echo "==> Python tagging version   $(VERSION)"
 	@echo "__version__=\"$(VERSION)\"" > helium/version.py
+	@git commit -am "Creating version $(VERSION)"
 	@bash ./scripts/publish.sh $(VERSION) validate
 	@git tag --sign -a "$(VERSION)" -m "helium-commander $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags
+
+release_sdist: version
 	@echo "==> Python (sdist release)"
 	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
 	@bash ./scripts/publish.sh $(VERSION)
