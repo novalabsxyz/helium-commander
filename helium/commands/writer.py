@@ -110,8 +110,13 @@ class TerminalWriter(BaseWriter):
         pass
 
     def write_entries(self, entries):
+        def safe_unicode(o, *args):
+            try:
+                return unicode(o, *args)
+            except UnicodeDecodeError:
+                return unicode(str(o).encode('string_escape'))
         def map_entry(o):
-            return [str(self.lookup(o, path, json=self.json_opts))
+            return [safe_unicode(self.lookup(o, path, json=self.json_opts))
                     for _,path in self.mapping.items()]
 
         if entries is None: return
