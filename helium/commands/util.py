@@ -15,13 +15,14 @@ def is_uuid(str):
     except ValueError:
         return False
 
-def lookup_resource_id(list, id_rep):
+def lookup_resource_id(list, id_rep, name_path=None):
     if hasattr(list, '__call__'):
         list = list().get('data')
     lookup = {}
     _is_uuid = is_uuid(id_rep)
     short_id_matches = []
     name_matches = []
+    name_path = name_path or "attributes/name"
     for entry in list:
         entry_id = entry.get('id')
         if _is_uuid:
@@ -33,7 +34,7 @@ def lookup_resource_id(list, id_rep):
                 short_id_matches.append(entry_id)
             else:
                 try:
-                    entry_name = dpath.get(entry, "attributes/name")
+                    entry_name = dpath.get(entry, name_path)
                     if entry_name == id_rep:
                         name_matches.append(entry_id)
                 except KeyError:
