@@ -18,13 +18,11 @@ def is_uuid(str):
 def lookup_resource_id(list, id_rep, name_path=None):
     if hasattr(list, '__call__'):
         list = list().get('data')
-    lookup = {}
     _is_uuid = is_uuid(id_rep)
-    short_id_matches = []
-    name_matches = []
-    name_path = name_path or "attributes/name"
     id_rep_lower = id_rep.lower()
     id_rep_len = len(id_rep)
+    name_path = name_path or "attributes/name"
+    matches = []
     for entry in list:
         entry_id = entry.get('id')
         if _is_uuid:
@@ -33,22 +31,22 @@ def lookup_resource_id(list, id_rep, name_path=None):
         else:
             short_id = shorten_id(entry_id)
             if short_id == id_rep:
-                short_id_matches.append(entry_id)
+                matches.append(entry_id.encode('utf8'))
             else:
                 try:
                     entry_name = dpath.get(entry, name_path)
                     if entry_name[:id_rep_len].lower() == id_rep_lower:
-                        name_matches.append(entry_id)
+                        matches.append(entry_id.encode('utf8'))
                 except KeyError:
                     pass
-    if len(short_id_matches) == 0 and len(name_matches) == 0:
-        raise KeyError('Id ' + id_rep.encode('ascii')  + ' does not exist')
-    elif len(short_id_matches) == 1 and len(name_matches) == 0:
-        return short_id_matches[0]
-    elif len(short_id_matches) == 0 and len(name_matches) == 1:
-        return name_matches[0]
-    else:
-        raise KeyError('Ambiguous id: ' + id_rep.encode('ascii'))
+    if len(matches) == 0:
+        raise KeyError('Id: ' + id_rep.encode('utf8')  + ' does not exist')
+    elif len(matches) > 1:
+        short_matches = [shorten_id(id) for id in matches]
+        raise KeyError('Ambiguous id: ' + id_rep.encode('utf8') + ' (' + ', '.join(short_matches) + ')')
+
+    return matches[0]
+
 
 def shorten_id(str):
     return str.split('-')[0]
