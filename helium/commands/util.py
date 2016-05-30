@@ -23,6 +23,8 @@ def lookup_resource_id(list, id_rep, name_path=None):
     short_id_matches = []
     name_matches = []
     name_path = name_path or "attributes/name"
+    id_rep_lower = id_rep.lower()
+    id_rep_len = len(id_rep)
     for entry in list:
         entry_id = entry.get('id')
         if _is_uuid:
@@ -35,7 +37,7 @@ def lookup_resource_id(list, id_rep, name_path=None):
             else:
                 try:
                     entry_name = dpath.get(entry, name_path)
-                    if entry_name == id_rep:
+                    if entry_name[:id_rep_len].lower() == id_rep_lower:
                         name_matches.append(entry_id)
                 except KeyError:
                     pass
