@@ -1,11 +1,14 @@
 from collections import OrderedDict
 import dpath.util as dpath
 import sys
+import os
 import click
 import uuid
 import json
 import writer
 import urlparse
+from functools import update_wrapper
+from importlib import import_module
 
 
 def is_uuid(str):
@@ -82,3 +85,47 @@ def map_script_filenames(json):
 
 def extract_script_filenames(files):
     return [urlparse.urlsplit(url).path.split('/')[-1] for url in files]
+
+CONTEXT_SETTINGS = dict(
+    help_option_names=['-h', '--help']
+)
+
+
+
+def cli(version=None, package=None,  commands=None):
+    class Loader(click.MultiCommand):
+        def list_commands(self, ctx):
+            commands.sort()
+            return commands
+        def get_command(self, ctx, name):
+            try:
+                command = import_module(package +"."+name)
+            except ImportError, e:
+                print e
+                return
+
+    def decorator(f):
+        @click.option('--uuid', is_flag=True,
+                      help="Whether to display long identifiers")
+        @click.option('--format', type=click.Choice(['csv', 'json', 'tty']), default=None,
+                      help="The output format (default 'tty')")
+        @click.version_option(version=version)
+        @click.command(cls=Loader, context_settings=CONTEXT_SETTINGS)
+        @click.pass_context
+        def new_func(ctx, *args, **kwargs):
+            ctx.invoke(f, ctx, *args, **kwargs)
+        return update_wrapper(new_func, f)
+    return decorator
+
+
+def main(cli):
+    def decorator():
+        args = sys.argv[1:]
+        try:
+            cli.main(args=args, prog_name=None)
+        except Exception, e:
+            if os.environ.get("HELIUM_COMMANDER_DEBUG"):
+                raise
+            click.secho(str(e), fg='red')
+            sys.exit(1)
+    return decorator

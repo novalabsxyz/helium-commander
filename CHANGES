@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.6.4
+-------------
+
+Released on June 5th 2016
+
+ - Prefix based and case insensitive name lookup for resources
+ - More explicit error reporting of ambiguous resource id matches
+ - Expose re-usable cli and main functions for derived tools
+
 
 Version 0.6.3
 -------------
