@@ -100,8 +100,9 @@ def cli(version=None, package=None,  commands=None):
         def get_command(self, ctx, name):
             try:
                 command = import_module(package +"."+name)
+                return command.cli
             except ImportError, e:
-                print e
+                click.secho(str(e), fg='red')
                 return
 
     def decorator(f):

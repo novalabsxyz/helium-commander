@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.6.5
+-------------
+
+Released on June 6th 2016
+
+- Fix re-usable util.cli loader
+
+
 Version 0.6.4
 -------------
 
