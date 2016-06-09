@@ -73,18 +73,23 @@ To use the `helium` command, explore the help options:
     Usage: helium [OPTIONS] COMMAND [ARGS]...
 
     Options:
-      -k, --api-key TEXT  your Helium API key. Can also be specified using the
-                          HELIUM_API_KEY environment variable  [required]
-      --help              Show this message and exit.
+      --version                Show the version and exit.
+      --format [csv|json|tty]  The output format (default 'tty')
+      --uuid                   Whether to display long identifiers
+      --host TEXT              The Helium base API URL. Can also be specified
+                               using the HELIUM_API_URL environment variable.
+      --api-key TEXT           your Helium API key. Can also be specified using
+                               the HELIUM_API_KEY environment variable
+      -h, --help               Show this message and exit.
 
     Commands:
-      cloud-script   Operations on cloud-scripts
+      cloud-script   Operations on cloud-scripts.
       element        Operations on elements.
       label          Operations on labels of sensors.
-      organization   Operations on physical or virtual sensors.
+      organization   Operations on the authorized organization
       sensor         Operations on physical or virtual sensors.
-      sensor-script  Operations on sensor-script.
-
+      sensor-script  Operations on sensor-scripts.
+      user           Operations on the user.
 
 .. _Helium: https://helium.com
 .. _API: https://docs.helium.com
