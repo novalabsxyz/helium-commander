@@ -1,8 +1,14 @@
 import click
 import util
 import helium
+import helium.commands.sensor as _sensor
+import dpath.util as dpath
 
 pass_service=click.make_pass_decorator(helium.Service)
+
+def _find_element_id(service, element):
+    return util.lookup_resource_id(service.get_elements, element)
+
 
 @click.group()
 def cli():
@@ -11,6 +17,8 @@ def cli():
     pass
 
 def _tabulate(result, **kwargs):
+    def _map_sensor_count(json):
+        return len(dpath.get(json, 'relationships/sensor/data'))
     version_map = []
     version_option = kwargs.pop('versions', 'none')
     if version_option == 'fw':
@@ -20,6 +28,7 @@ def _tabulate(result, **kwargs):
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
+        ('sensors', _map_sensor_count)
     ] +  version_map + [
         ('name', 'attributes/name')
     ])
@@ -37,10 +46,10 @@ def list(service, element, **kwargs):
     Lists one or all elements in the organization.
     """
     if element:
-        element = util.lookup_resource_id(service.get_elements, element)
-        elements=[service.get_element(element).get('data')]
+        element = _find_element_id(service, element)
+        elements=[service.get_element(element, include='sensor').get('data')]
     else:
-        elements=service.get_elements().get('data')
+        elements=service.get_elements(include='sensor').get('data')
     _tabulate(elements, **kwargs)
 
 
@@ -54,6 +63,20 @@ def update(service, element, **kwargs):
 
     Updates the attributes of a given ELEMENT.
     """
-    sensor = util.lookup_resource_id(service.get_elements, element)
-    data = service.update_element(sensor, **kwargs).get('data')
+    element = _find_element_id(service, element)
+    data = service.update_element(element, **kwargs).get('data')
     _tabulate([data])
+
+
+@cli.command()
+@click.argument('element')
+@_sensor.version_option
+@pass_service
+def sensor(service, element, **kwargs):
+    """Lists sensors for an element.
+
+    Lists the sensors for a given ELEMENT.
+    """
+    element = _find_element_id(service, element)
+    sensors = service.get_element(element, include='sensor').get('included')
+    _sensor._tabulate(sensors, **kwargs)

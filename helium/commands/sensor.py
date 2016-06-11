@@ -3,8 +3,20 @@ import helium
 import util
 import timeseries as ts
 import dpath.util as dpath
+from functools import update_wrapper
+
 
 pass_service=click.make_pass_decorator(helium.Service)
+
+def version_option(f):
+    @click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
+                  default='none',
+                  help="display version information")
+    def decorator(*args, **kwargs):
+        return f(click.get_current_context(), *args, **kwargs)
+    return update_wrapper(decorator, f)
+
+
 
 @click.group()
 def cli():
@@ -42,9 +54,7 @@ def _tabulate(result, **kwargs):
 @cli.command()
 @click.option('-l', '--label',
               help="the id of a label")
-@click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
-              default='none',
-              help="display sensor version information")
+@version_option
 @pass_service
 def list(service, label, **kwargs):
     """List sensors.
@@ -71,6 +81,7 @@ def create(service, name):
     """
     sensors = [service.create_sensor(name=name).get('data')]
     _tabulate(sensors)
+
 
 @cli.command()
 @click.argument('sensor')

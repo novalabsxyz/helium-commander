@@ -221,11 +221,13 @@ class Service:
         return self._patch_url(self._mk_url('label/{}/relationships/sensor', label_id),
                                json=body)
 
-    def get_elements(self):
-        return self._get_url(self._mk_url('element'))
+    def get_elements(self, **kwargs):
+        params = self._include_params_from_kwargs(**kwargs)
+        return self._get_url(self._mk_url('element'), params=params)
 
-    def get_element(self, element_id):
-        return self._get_url(self._mk_url('element/{}', element_id))
+    def get_element(self, element_id, **kwargs):
+        params = self._include_params_from_kwargs(**kwargs)
+        return self._get_url(self._mk_url('element/{}', element_id), params=params)
 
     def update_element(self, element_id, **kwargs):
         body=self._mk_attributes_body("element", element_id, kwargs)
