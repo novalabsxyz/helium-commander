@@ -4,6 +4,16 @@ Helium Commander Changelog
 Here you'll find the major differences between each release.
 
 
+Version 0.6.6
+-------------
+
+Released on June 13th 2016
+
+- Add last seen reading time to sensor output
+- Add element sensor command to list the sensors an element last saw connected
+- Make a re-usable versions option
+
+
 Version 0.6.5
 -------------
 

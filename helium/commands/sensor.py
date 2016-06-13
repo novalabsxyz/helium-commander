@@ -46,6 +46,7 @@ def _tabulate(result, **kwargs):
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
+        ('seen', 'meta/last-seen'),
     ] + version_map + [
         ('name', 'attributes/name'),
     ])
