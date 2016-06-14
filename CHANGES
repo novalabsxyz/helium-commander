@@ -3,6 +3,13 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.6.7
+-------------
+
+Released on June 14th 2016
+
+- Fixes a versions option issue that broke reuse
+
 
 Version 0.6.6
 -------------

@@ -13,7 +13,7 @@ def version_option(f):
                   default='none',
                   help="display version information")
     def decorator(*args, **kwargs):
-        return f(click.get_current_context(), *args, **kwargs)
+        return f(*args, **kwargs)
     return update_wrapper(decorator, f)
 
 
