@@ -42,10 +42,18 @@ def _tabulate(result, **kwargs):
             ('config', 'meta/versions/sensor-config'),
             ('script', _map_script_versions)
         ]
+    def _map_card(json):
+        card_type = {
+            '2': 'blue',
+            '5': 'green',
+        }
+        key = unicode(dpath.get(json, 'meta/card/id'))
+        return card_type.get(key, key)
 
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
+        ('card', _map_card),
         ('seen', 'meta/last-seen'),
     ] + version_map + [
         ('name', 'attributes/name'),
