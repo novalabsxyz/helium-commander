@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.6.8
+-------------
+
+Released on June 14th 2016
+
+- Adds a friendly name for the sensor type based on card id
+
+
 Version 0.6.7
 -------------
 
