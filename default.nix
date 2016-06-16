@@ -29,7 +29,7 @@ let
 
   helium-commander = buildPythonPackage rec {
     name = "helium-commander-${version}";
-    version = "0.6.8";
+    version = "0.6.9";
 
     src = ./.;
 

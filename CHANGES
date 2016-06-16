@@ -3,6 +3,13 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.6.9
+-------------
+
+Released on June 16th 2016
+
+- Better unicode support for csv output
+
 
 Version 0.6.8
 -------------

@@ -23,6 +23,7 @@ setup(
         'futures>=3.0',
         'terminaltables>=2.1.0',
         'click>=6.6',
+        'unicodecsv>=0.14.1',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
