@@ -4,6 +4,7 @@ import io
 import os
 from . import __version__
 from urlparse import urlunsplit, urlsplit
+from  datetime import datetime
 
 # Silence warnings since turning verification of against non production urls
 # cause unsightly warning messages. Verification still happens against production
@@ -53,6 +54,15 @@ class Service:
         return {
             "data": [{"id": id, "type": type} for id in ids]
         }
+
+    def _mk_datapoint_body(self, **kwargs):
+        if not kwargs.get('timestamp'): kwargs['timestamp'] = datetime.now().isoformat() + 'Z'
+        params = self._params_from_kwargs({
+            'value': 'value',
+            'port': 'port',
+            'timestamp': 'timestamp',
+        }, kwargs)
+        return self._mk_attributes_body("data-point", None, params)
 
     def _timeseries_params_from_kwargs(self, **kwargs):
         return self._params_from_kwargs({
@@ -174,8 +184,9 @@ class Service:
         return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
                              params=params)
 
-    def post_sensor_timeseries(self, sensor_id, data):
-        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id), json=data)
+    def post_sensor_timeseries(self, sensor_id, **kwargs):
+        body = self._mk_datapoint_body(**kwargs)
+        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id), json=body)
 
     def get_org(self):
         return self._get_url(self._mk_url('organization'))
@@ -187,6 +198,10 @@ class Service:
     def get_org_timeseries(self, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
         return self._get_url(self._mk_url('organization/timeseries'), params=params)
+
+    def post_org_timeseries(self, **kwargs):
+        body = self._mk_datapoint_body(**kwargs)
+        return self._post_url(self._mk_url('organization/timeseries'), json=body)
 
     def get_prev_page(self, json):
         prev_url = self._get_json_path(json, ["links", "prev"])
