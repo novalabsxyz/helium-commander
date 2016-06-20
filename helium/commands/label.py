@@ -117,7 +117,6 @@ def remove(ctx, label, sensor):
 
 @cli.command()
 @click.argument('label')
-@ts.format_option()
 @ts.options()
 @pass_service
 def dump(service, label, format, **kwargs):

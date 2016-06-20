@@ -27,21 +27,31 @@ def cli():
     """
     pass
 
-@cli.command()
-@ts.options()
+
 @pass_service
-def timeseries(service, **kwargs):
+def _get_org_timeseries(service, **kwargs):
     """List readings for the organization.
 
-    Lists one page of readings for the organization.
+    Get readings for the authenticated organization.
     """
-    data = service.get_org_timeseries(**kwargs).get('data')
-    ts.tabulate(data, **kwargs)
+    return service.get_org_timeseries(**kwargs).get('data')
+
+
+@pass_service
+def _post_org_timeseries(service, **kwargs):
+    """Post readings to the organization.
+
+    Posts timeseries to the authenticated organization.
+    """
+    return [service.post_org_timeseries(**kwargs).get('data')]
+
+
+cli.add_command(ts.cli(get=_get_org_timeseries,
+                       post=_post_org_timeseries))
 
 
 @cli.command()
-@ts.format_option()
-@ts.options(page_size=5000)
+@ts.options(page_size=5000, format='csv')
 @pass_service
 def dump(service, format, **kwargs):
     """Dumps timeseries data to files.

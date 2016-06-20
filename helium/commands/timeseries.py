@@ -1,21 +1,46 @@
 from concurrent import futures
 from collections import OrderedDict
+from functools import update_wrapper
 import helium
 import click
 import util
 import sys
 import writer
+import json
 
-def format_option():
-    options = [
-        click.option('--format', type=click.Choice(['csv', 'json']), default='csv',
-                     help="the format of the readings (default 'csv')")
-    ]
-    def wrapper(func):
-        for option in options:
-            func = option(func)
-        return func
-    return wrapper
+
+def cli(get=None, post=None):
+    def tabulating_decorator(f):
+        def new_func(*args, **kwargs):
+            ctx = click.get_current_context()
+            data = ctx.invoke(f, *args, **kwargs)
+            tabulate(data, **kwargs)
+            return data
+        return update_wrapper(new_func, f)
+
+    group = click.Group(name='timeseries', short_help="Commands on timeseries readings.")
+
+    # List
+    # Create options, wrapping the tabulating getter
+    options_get = options()(tabulating_decorator(get))
+    # then construct the actual list command
+    list_command = click.command('list')(options_get)
+    group.add_command(list_command)
+
+    # Post
+    # Pull of any parameters from the given poster since we want them
+    # at the head of the other post parameters
+    post_params = getattr(post, '__click_params__', [])
+    post.__click_params__ = []
+    # Construct the post options wrapping the tabulating poster
+    options_post = post_options()(tabulating_decorator(post))
+    post_command = click.command('post')(options_post)
+    # and prefix the poster's parameters
+    post_command.params = post_params + post_command.params
+    group.add_command(post_command)
+
+    return group
+
 
 _options_docs = """
     Readings can be filtered by PORT and by START and END date and can
@@ -47,7 +72,7 @@ _options_docs = """
     --agg-type min,max --agg-size 1d --port t
 """
 
-def options(page_size=20):
+def options(page_size=20, format='tty'):
     """Standard options for retrieving timeseries readings. In addition it
     appends the documentation for these options to the caller.
 
@@ -72,29 +97,69 @@ def options(page_size=20):
         click.option('--agg-size',
                      help="the time window of the aggregation"),
         click.option('--agg-type',
-                     help="the kinds of aggregations to perform")
+                     help="the kinds of aggregations to perform"),
+        click.option('--format', type=click.Choice(['csv', 'json', 'tty']), default=format,
+                     help="the format of the readings")
     ]
-
     def wrapper(func):
         func.__doc__ += _options_docs
-        for option in options:
+        for option in reversed(options):
             func = option(func)
         return func
     return wrapper
 
 
+_post_options_docs = """
+    The given VALUE is inserted to the timeseries stream using the given PORT.
+
+    The optional timestamp option allows fine grained control over the date of
+    the reading and can be given in ISO8601 form:
+
+    \b
+    * YYYY-MM-DD - Example: 2016-05-05
+    * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
+"""
+
+
+def post_options():
+    """Standard arguments and options for posting timeseries readings.
+    """
+    options = [
+        click.argument('port'),
+        click.argument('value', type=JSONParamType()),
+        click.option('--timestamp', metavar='DATE',
+                     help='the time of the reading'),
+    ]
+    def wrapper(func):
+        func.__doc__ += _post_options_docs
+        for option in reversed(options):
+            func = option(func)
+        return func
+    return wrapper
+
+
+class JSONParamType(click.ParamType):
+    name = 'JSON'
+
+    def convert(self, value, param, ctx):
+        try:
+            return json.loads(value)
+        except ValueError:
+            self.fail('{} is not a valid json value'.format(value), param, ctx)
+
+
 def _mapping_for(shorten_json_id=True, **kwargs):
-    agg_types = kwargs.pop('agg_type')
+    agg_types = kwargs.pop('agg_type',None)
     if agg_types:
         value_map = [(key, "attributes/value/" + key) for key in agg_types.split(',')]
     else:
         value_map = [('value', 'attributes/value')]
-    map = [
-        ('id', util.shorten_json_id if shorten_json_id  else 'id'),
-        ('timestamp', 'attributes/timestamp'),
-        ('port', 'attributes/port')
-    ]
-    map.extend(value_map)
+        map = [
+            ('id', util.shorten_json_id if shorten_json_id  else 'id'),
+            ('timestamp', 'attributes/timestamp'),
+            ('port', 'attributes/port')
+        ]
+        map.extend(value_map)
     return map
 
 
@@ -114,7 +179,7 @@ def dump(service, sensors, format, **kwargs):
                 future = executor.submit(_dump_one, service, sensor_id, format, **kwargs)
                 future.add_done_callback(lambda f: bar.update(1))
                 all_futures.append(future)
-            # Pass in timeout to wait to enable keyboard abort (Python 2.7 issue)
+                # Pass in timeout to wait to enable keyboard abort (Python 2.7 issue)
             result_futures = futures.wait(all_futures,
                                           return_when=futures.FIRST_EXCEPTION,
                                           timeout=sys.maxint)
@@ -132,7 +197,7 @@ def _process_timeseries(writer, service, sensor_id, **kwargs):
     while res != None:
         res = service.get_prev_page(res)
         writer.write_entries(json_data(res))
-    writer.finish()
+        writer.finish()
 
 def _dump_one(service, sensor_id, format, **kwargs):
     filename = (sensor_id+'.'+format).encode('ascii', 'replace')

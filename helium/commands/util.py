@@ -70,7 +70,7 @@ def tabulate(result, map):
 
     # Ugh, reaching for global state isn't great but very convenient here
     default_format = 'tty' if sys.stdout.isatty() else 'csv'
-    format = click.get_current_context().find_root().params.get('format')
+    format = click.get_current_context().params.get('format')
     # Ensure format is set to something sensible
     format = format or default_format
     file = click.utils.get_text_stream('stdout')

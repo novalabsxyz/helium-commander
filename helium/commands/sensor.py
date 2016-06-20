@@ -17,6 +17,12 @@ def version_option(f):
     return update_wrapper(decorator, f)
 
 
+def card_type(card_id, default):
+    return {
+        '2': 'blue',
+        '5': 'green',
+    }.get(card_id, default)
+
 
 @click.group()
 def cli():
@@ -43,17 +49,13 @@ def _tabulate(result, **kwargs):
             ('script', _map_script_versions)
         ]
     def _map_card(json):
-        card_type = {
-            '2': 'blue',
-            '5': 'green',
-        }
         key = unicode(dpath.get(json, 'meta/card/id'))
-        return card_type.get(key, key)
+        return card_type(key, key)
 
     util.tabulate(result, [
         ('id', util.shorten_json_id),
         ('mac', 'meta/mac'),
-        ('card', _map_card),
+        ('type', _map_card),
         ('seen', 'meta/last-seen'),
     ] + version_map + [
         ('name', 'attributes/name'),
@@ -120,24 +122,35 @@ def delete(service, sensor):
     click.echo("Deleted" if result.status_code == 204 else result)
 
 
-@cli.command()
 @click.argument('sensor')
-@ts.options()
 @pass_service
-def timeseries(service, sensor, **kwargs):
-    """List readings for a sensor.
+def _get_sensor_timeseries(service, sensor, **kwargs):
+    """Get timeseries readings for a sensor.
 
-    Lists one page of readings or aggregations of readings for a given SENSOR.
+    Retrieve timeseries data for a given SENSOR.
     """
     sensor = util.lookup_resource_id(service.get_sensors, sensor)
-    data = service.get_sensor_timeseries(sensor, **kwargs).get('data')
-    ts.tabulate(data, **kwargs)
+    return service.get_sensor_timeseries(sensor, **kwargs).get('data')
+
+
+@click.argument('sensor')
+@pass_service
+def _post_sensor_timeseries(service, sensor, **kwargs):
+    """Post readings to a sensor.
+
+    Posts timeseries readings for a given SENSOR.
+    """
+    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    return [service.post_sensor_timeseries(sensor, **kwargs).get('data')]
+
+
+cli.add_command(ts.cli(get=_get_sensor_timeseries,
+                       post=_post_sensor_timeseries))
 
 
 @cli.command()
-@ts.format_option()
 @click.argument('sensor')
-@ts.options(page_size=5000)
+@ts.options(page_size=5000, format='csv')
 @pass_service
 def dump(service, sensor, format, **kwargs):
     """Dumps timeseries data to files.
