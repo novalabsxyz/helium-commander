@@ -56,7 +56,6 @@ class Service:
         }
 
     def _mk_datapoint_body(self, **kwargs):
-        if not kwargs.get('timestamp'): kwargs['timestamp'] = datetime.now().isoformat() + 'Z'
         params = self._params_from_kwargs({
             'value': 'value',
             'port': 'port',
