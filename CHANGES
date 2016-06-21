@@ -3,6 +3,15 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.7.1
+-------------
+
+Released on June 21th 2016
+
+- Remove default timestamp from timeseries post since the TZ was wrong
+- Make util.tabulate take an optional writer for better re-use
+
+
 Version 0.7.0
 -------------
 
