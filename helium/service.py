@@ -34,11 +34,13 @@ class Service:
         result = {}
         for kw_key, result_key in map.iteritems():
             value = kwargs.get(kw_key, None)
-            if value: result[result_key] = value
+            if value:
+                result[result_key] = value
         return result
 
     def _mk_attributes_body(self, type, id, attributes):
-        if attributes is None or not type: return None
+        if attributes is None or not type:
+            return None
         result = {
             "data": {
                 "attributes": attributes,
@@ -50,7 +52,8 @@ class Service:
         return result
 
     def _mk_relationships_body(self, type, ids):
-        if ids is None or not type: return None
+        if ids is None or not type:
+            return None
         return {
             "data": [{"id": id, "type": type} for id in ids]
         }
@@ -82,23 +85,25 @@ class Service:
     def _lua_uploads_from_files(self, files, **kwargs):
         def basename(f):
             return os.path.basename(f)
+
         def lua_file(name):
             return (basename(name), io.open(name, 'rb'), 'application/x-lua')
 
         main_file = kwargs.pop('main', None)
         # construct a dictionary of files that are not the main file
-        files = { basename(name): lua_file(name) for name in files if name != main_file}
+        files = {basename(name): lua_file(name) for name in files
+                 if name != main_file}
         # then add the main file if given
         if main_file:
             files["user.lua"] = lua_file(main_file)
         return files
 
-
     def _mk_url(self, path, *args):
         return _url_path_join(self.base_url, str.format(path, *args))
 
     def _do_url(self, method, url, params=None, json=None, files=None):
-        if url is None: return None
+        if url is None:
+            return None
         params = params or {}
         headers = {
             'Authorization': self.api_key,
@@ -143,7 +148,7 @@ class Service:
         return self._do_url('PATCH', url, **kwargs)
 
     def _get_json_path(self, json, path):
-        try: # try to get the value
+        try:
             return reduce(dict.__getitem__, path, json)
         except KeyError:
             return None
@@ -155,9 +160,9 @@ class Service:
         return self._get_url(self._mk_url('user'))
 
     def auth_user(self, user, password):
-        body={
-            "email":user,
-            "password":password
+        body = {
+            "email": user,
+            "password": password
         }
         return self._post_url(self._mk_url('user/auth'), json=body)
 
@@ -166,7 +171,7 @@ class Service:
         return self._post_url(self._mk_url('sensor'), json=body)
 
     def update_sensor(self, sensor_id, **kwargs):
-        body=self._mk_attributes_body("sensor", sensor_id, kwargs)
+        body = self._mk_attributes_body("sensor", sensor_id, kwargs)
         return self._patch_url(self._mk_url('sensor/{}', sensor_id), json=body)
 
     def delete_sensor(self, sensor_id):
@@ -185,22 +190,25 @@ class Service:
 
     def post_sensor_timeseries(self, sensor_id, **kwargs):
         body = self._mk_datapoint_body(**kwargs)
-        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id), json=body)
+        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id),
+                              json=body)
 
     def get_org(self):
         return self._get_url(self._mk_url('organization'))
 
     def update_org(self, **kwargs):
-        body=self._mk_attributes_body("organization", None, kwargs)
+        body = self._mk_attributes_body("organization", None, kwargs)
         return self._patch_url(self._mk_url('organization'), json=body)
 
     def get_org_timeseries(self, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('organization/timeseries'), params=params)
+        return self._get_url(self._mk_url('organization/timeseries'),
+                             params=params)
 
     def post_org_timeseries(self, **kwargs):
         body = self._mk_datapoint_body(**kwargs)
-        return self._post_url(self._mk_url('organization/timeseries'), json=body)
+        return self._post_url(self._mk_url('organization/timeseries'),
+                              json=body)
 
     def get_prev_page(self, json):
         prev_url = self._get_json_path(json, ["links", "prev"])
@@ -228,11 +236,13 @@ class Service:
         return self._get_url(self._mk_url('label/{}', label_id), params=params)
 
     def get_label_sensors(self, label_id):
-        return self._get_url(self._mk_url('label/{}/relationships/sensor', label_id))
+        return self._get_url(self._mk_url('label/{}/relationships/sensor',
+                                          label_id))
 
     def update_label_sensors(self, label_id, sensor_ids):
         body = self._mk_relationships_body("sensor", sensor_ids)
-        return self._patch_url(self._mk_url('label/{}/relationships/sensor', label_id),
+        return self._patch_url(self._mk_url('label/{}/relationships/sensor',
+                                            label_id),
                                json=body)
 
     def get_elements(self, **kwargs):
@@ -241,11 +251,13 @@ class Service:
 
     def get_element(self, element_id, **kwargs):
         params = self._include_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('element/{}', element_id), params=params)
+        return self._get_url(self._mk_url('element/{}', element_id),
+                             params=params)
 
     def update_element(self, element_id, **kwargs):
-        body=self._mk_attributes_body("element", element_id, kwargs)
-        return self._patch_url(self._mk_url('element/{}', element_id), json=body)
+        body = self._mk_attributes_body("element", element_id, kwargs)
+        return self._patch_url(self._mk_url('element/{}', element_id),
+                               json=body)
 
     def get_sensor_scripts(self):
         return self._get_url(self._mk_url('sensor-script'))
@@ -261,9 +273,10 @@ class Service:
             }
         }
         uploads = self._lua_uploads_from_files(files, **kwargs)
-        uploads['manifest'] = ('manifest.json', json.dumps(manifest), 'application/json')
+        uploads['manifest'] = ('manifest.json',
+                               json.dumps(manifest),
+                               'application/json')
         return self._post_url(self._mk_url('sensor-script'), files=uploads)
-
 
     def get_cloud_scripts(self):
         return self._get_url(self._mk_url('cloud-script'))
@@ -273,7 +286,8 @@ class Service:
 
     def get_cloud_script_timeseries(self, script_id, **kwargs):
         params = self._timeseries_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('cloud-script/{}/timeseries', script_id),
+        return self._get_url(self._mk_url('cloud-script/{}/timeseries',
+                                          script_id),
                              params=params)
 
     def delete_cloud_script(self, script_id):
@@ -293,5 +307,7 @@ class Service:
     def deploy_cloud_script(self, files, **kwargs):
         uploads = self._lua_uploads_from_files(files, **kwargs)
         attributes = self._mk_cloud_script_attributes(None, **kwargs)
-        uploads['attributes'] = ('attributes.json', json.dumps(attributes), 'application/json')
+        uploads['attributes'] = ('attributes.json',
+                                 json.dumps(attributes),
+                                 'application/json')
         return self._post_url(self._mk_url('cloud-script'), files=uploads)
