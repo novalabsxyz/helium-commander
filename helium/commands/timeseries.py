@@ -154,12 +154,11 @@ def _mapping_for(shorten_json_id=True, **kwargs):
         value_map = [(key, "attributes/value/" + key) for key in agg_types.split(',')]
     else:
         value_map = [('value', 'attributes/value')]
-        map = [
-            ('id', util.shorten_json_id if shorten_json_id  else 'id'),
-            ('timestamp', 'attributes/timestamp'),
-            ('port', 'attributes/port')
-        ]
-        map.extend(value_map)
+    map = [
+        ('id', util.shorten_json_id if shorten_json_id  else 'id'),
+        ('timestamp', 'attributes/timestamp'),
+        ('port', 'attributes/port')
+    ] + value_map
     return map
 
 

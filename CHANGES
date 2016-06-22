@@ -3,6 +3,14 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.7.2
+-------------
+
+Released on June 22th 2016
+
+- Fix a timeseries aggregation output exception
+
+
 Version 0.7.1
 -------------
 
