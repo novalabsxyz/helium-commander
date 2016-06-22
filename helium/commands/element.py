@@ -1,13 +1,16 @@
 import click
-import util
 import helium
-import helium.commands.sensor as _sensor
+from helium.commands.sensor import version_option as sensor_version_option
+from helium.commands.sensor import mac_option
+from helium.commands.sensor import _tabulate as _tabulate_sensors
+from util import tabulate, lookup_resource_id, shorten_json_id
 import dpath.util as dpath
 
-pass_service=click.make_pass_decorator(helium.Service)
+pass_service = click.make_pass_decorator(helium.Service)
 
-def _find_element_id(service, element):
-    return util.lookup_resource_id(service.get_elements, element)
+
+def _find_element_id(service, element, **kwargs):
+    return lookup_resource_id(service.get_elements, element, **kwargs)
 
 
 @click.group()
@@ -15,6 +18,7 @@ def cli():
     """Operations on elements.
     """
     pass
+
 
 def _tabulate(result, **kwargs):
     def _map_sensor_count(json):
@@ -25,20 +29,21 @@ def _tabulate(result, **kwargs):
         version_map = [
             ('firmware', 'meta/versions/element'),
         ]
-    util.tabulate(result, [
-        ('id', util.shorten_json_id),
+    tabulate(result, [
+        ('id', shorten_json_id),
         ('mac', 'meta/mac'),
         ('sensors', _map_sensor_count)
-    ] +  version_map + [
+    ] + version_map + [
         ('name', 'attributes/name')
     ])
 
 
 @cli.command()
-@click.argument('element',required=False)
+@click.argument('element', required=False)
 @click.option('--versions', type=click.Choice(['none', 'fw']),
               default='none',
               help="display element version information")
+@mac_option
 @pass_service
 def list(service, element, **kwargs):
     """List elements.
@@ -46,10 +51,10 @@ def list(service, element, **kwargs):
     Lists one or all elements in the organization.
     """
     if element:
-        element = _find_element_id(service, element)
-        elements=[service.get_element(element, include='sensor').get('data')]
+        element = _find_element_id(service, element, **kwargs)
+        elements = [service.get_element(element, include='sensor').get('data')]
     else:
-        elements=service.get_elements(include='sensor').get('data')
+        elements = service.get_elements(include='sensor').get('data')
     _tabulate(elements, **kwargs)
 
 
@@ -70,7 +75,7 @@ def update(service, element, **kwargs):
 
 @cli.command()
 @click.argument('element')
-@_sensor.version_option
+@sensor_version_option
 @pass_service
 def sensor(service, element, **kwargs):
     """Lists sensors for an element.
@@ -79,4 +84,4 @@ def sensor(service, element, **kwargs):
     """
     element = _find_element_id(service, element)
     sensors = service.get_element(element, include='sensor').get('included')
-    _sensor._tabulate(sensors, **kwargs)
+    _tabulate_sensors(sensors, **kwargs)

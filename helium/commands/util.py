@@ -18,10 +18,10 @@ def is_uuid(str):
         return False
 
 
-def lookup_resource_id(list, id_rep, name_path=None):
+def lookup_resource_id(list, id_rep, name_path=None, mac=False, **kwargs):
     if hasattr(list, '__call__'):
         list = list().get('data')
-    _is_uuid = is_uuid(id_rep)
+    _is_uuid = not mac and is_uuid(id_rep)
     id_rep_lower = id_rep.lower()
     id_rep_len = len(id_rep)
     name_path = name_path or "attributes/name"
@@ -31,6 +31,14 @@ def lookup_resource_id(list, id_rep, name_path=None):
         if _is_uuid:
             if entry_id == id_rep:
                 return entry_id
+        elif mac:
+            try:
+                entry_mac = dpath.get(entry, 'meta/mac')
+                if entry_mac[-id_rep_len:].lower() == id_rep_lower:
+                    matches.append(entry_id.encode('utf8'))
+            except KeyError:
+                pass
+
         else:
             short_id = shorten_id(entry_id)
             if short_id == id_rep:

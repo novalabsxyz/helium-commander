@@ -6,15 +6,18 @@ import dpath.util as dpath
 from functools import update_wrapper
 
 
-pass_service=click.make_pass_decorator(helium.Service)
+pass_service = click.make_pass_decorator(helium.Service)
+
 
 def version_option(f):
-    @click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
-                  default='none',
-                  help="display version information")
-    def decorator(*args, **kwargs):
-        return f(*args, **kwargs)
-    return update_wrapper(decorator, f)
+    return click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
+                        default='none',
+                        help="display version information")(f)
+
+
+def mac_option(f):
+    return click.option('--mac', is_flag=True,
+                        help="Whether the given id is a mac address")(f)
 
 
 def card_type(card_id, default):
@@ -29,6 +32,11 @@ def cli():
     """Operations on physical or virtual sensors.
     """
     pass
+
+
+def _find_sensor_id(service, sensor, **kwargs):
+    return util.lookup_resource_id(service.get_sensors, sensor, **kwargs)
+
 
 def _tabulate(result, **kwargs):
     version_map = []
@@ -63,11 +71,13 @@ def _tabulate(result, **kwargs):
 
 
 @cli.command()
-@click.option('-l', '--label',
+@click.argument('sensor', required=False)
+@click.option('-l', '--label', metavar='LABEL',
               help="the id of a label")
 @version_option
+@mac_option
 @pass_service
-def list(service, label, **kwargs):
+def list(service, sensor, label, **kwargs):
     """List sensors.
 
     Lists information for a label of sensors or all sensors in
@@ -75,10 +85,13 @@ def list(service, label, **kwargs):
     """
     if label:
         label = util.lookup_resource_id(service.get_labels, label)
-        sensors = service.get_label(label,include="sensor").get('included')
+        sensors = service.get_label(label, include="sensor").get('included')
+    elif sensor:
+        sensor = _find_sensor_id(service, sensor, **kwargs)
+        sensors = [service.get_sensor(sensor).get('data')]
     else:
         sensors = service.get_sensors().get('data')
-        _tabulate(sensors, **kwargs)
+    _tabulate(sensors, **kwargs)
 
 
 @cli.command()
@@ -156,7 +169,8 @@ def dump(service, sensor, format, **kwargs):
     """Dumps timeseries data to files.
 
     Dumps the timeseries data for one SENSOR to a file.
-    If no sensors or label is specified all sensors for the organization are dumped.
+    If no sensors or label is specified all sensors for the organization
+    are dumped.
 
     One file is generated with the sensor id as filename and the
     file extension based on the requested dump format
