@@ -1,9 +1,8 @@
 import click
 import helium
-import util
 import timeseries as ts
 import dpath.util as dpath
-from functools import update_wrapper
+from util import tabulate, lookup_resource_id, shorten_json_id
 
 
 pass_service = click.make_pass_decorator(helium.Service)
@@ -35,7 +34,7 @@ def cli():
 
 
 def _find_sensor_id(service, sensor, **kwargs):
-    return util.lookup_resource_id(service.get_sensors, sensor, **kwargs)
+    return lookup_resource_id(service.get_sensors, sensor, **kwargs)
 
 
 def _tabulate(result, **kwargs):
@@ -56,12 +55,13 @@ def _tabulate(result, **kwargs):
             ('config', 'meta/versions/sensor-config'),
             ('script', _map_script_versions)
         ]
+
     def _map_card(json):
         key = unicode(dpath.get(json, 'meta/card/id'))
         return card_type(key, key)
 
-    util.tabulate(result, [
-        ('id', util.shorten_json_id),
+    tabulate(result, [
+        ('id', shorten_json_id),
         ('mac', 'meta/mac'),
         ('type', _map_card),
         ('seen', 'meta/last-seen'),
@@ -84,7 +84,7 @@ def list(service, sensor, label, **kwargs):
     the organization.
     """
     if label:
-        label = util.lookup_resource_id(service.get_labels, label)
+        label = lookup_resource_id(service.get_labels, label)
         sensors = service.get_label(label, include="sensor").get('included')
     elif sensor:
         sensor = _find_sensor_id(service, sensor, **kwargs)
@@ -111,49 +111,53 @@ def create(service, name):
 @click.argument('sensor')
 @click.option('--name',
               help="the new name for the sensor")
+@mac_option
 @pass_service
 def update(service, sensor, **kwargs):
     """Updates the attributes of a sensor.
 
     Updates the attributes of a given SENSOR.
     """
-    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    sensor = _find_sensor_id(service, sensor, **kwargs)
     data = service.update_sensor(sensor, **kwargs).get('data')
     _tabulate([data])
 
 
 @cli.command()
 @click.argument('sensor')
+@mac_option
 @pass_service
-def delete(service, sensor):
+def delete(service, sensor, **kwargs):
     """Delete a sensor.
 
     Deletes the SENSOR with the given id.
     """
-    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    sensor = _find_sensor_id(service, sensor, **kwargs)
     result = service.delete_sensor(sensor)
     click.echo("Deleted" if result.status_code == 204 else result)
 
 
 @click.argument('sensor')
+@mac_option
 @pass_service
 def _get_sensor_timeseries(service, sensor, **kwargs):
     """Get timeseries readings for a sensor.
 
     Retrieve timeseries data for a given SENSOR.
     """
-    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    sensor = _find_sensor_id(service, sensor, **kwargs)
     return service.get_sensor_timeseries(sensor, **kwargs).get('data')
 
 
 @click.argument('sensor')
+@mac_option
 @pass_service
 def _post_sensor_timeseries(service, sensor, **kwargs):
     """Post readings to a sensor.
 
     Posts timeseries readings for a given SENSOR.
     """
-    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    sensor = _find_sensor_id(service, sensor, **kwargs)
     return [service.post_sensor_timeseries(sensor, **kwargs).get('data')]
 
 
@@ -164,6 +168,7 @@ cli.add_command(ts.cli(get=_get_sensor_timeseries,
 @cli.command()
 @click.argument('sensor')
 @ts.options(page_size=5000, format='csv')
+@mac_option
 @pass_service
 def dump(service, sensor, format, **kwargs):
     """Dumps timeseries data to files.
@@ -175,5 +180,5 @@ def dump(service, sensor, format, **kwargs):
     One file is generated with the sensor id as filename and the
     file extension based on the requested dump format
     """
-    sensor = util.lookup_resource_id(service.get_sensors, sensor)
+    sensor = _find_sensor_id(service, sensor, **kwargs)
     ts.dump(service, [sensor], format, **kwargs)

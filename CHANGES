@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.7.4
+-------------
+
+Released on June 22th 2016
+
+- Apologies for the quick spins!
+- Expanding --mac support for all element and sensor subcommands
+- Make timeseries list arguments be promoted just like post
+
+
 Version 0.7.3
 -------------
 

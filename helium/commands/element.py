@@ -66,13 +66,14 @@ def list(service, element, **kwargs):
 @click.argument('element')
 @click.option('--name',
               help="the new name for the sensor")
+@mac_option
 @pass_service
 def update(service, element, **kwargs):
     """Updates the attributes of an element.
 
     Updates the attributes of a given ELEMENT.
     """
-    element = _find_element_id(service, element)
+    element = _find_element_id(service, element, **kwargs)
     data = service.update_element(element, **kwargs).get('data')
     _tabulate([data])
 
@@ -80,12 +81,13 @@ def update(service, element, **kwargs):
 @cli.command()
 @click.argument('element')
 @sensor_version_option
+@mac_option
 @pass_service
 def sensor(service, element, **kwargs):
     """Lists sensors for an element.
 
     Lists the sensors for a given ELEMENT.
     """
-    element = _find_element_id(service, element)
+    element = _find_element_id(service, element, **kwargs)
     sensors = service.get_element(element, include='sensor').get('included')
     _tabulate_sensors(sensors, **kwargs)
