@@ -18,13 +18,17 @@ def cli(get=None, post=None):
             return data
         return update_wrapper(new_func, f)
 
-    group = click.Group(name='timeseries', short_help="Commands on timeseries readings.")
+    group = click.Group(name='timeseries',
+                        short_help="Commands on timeseries readings.")
 
     # List
     # Create options, wrapping the tabulating getter
+    list_params = getattr(get, '__click_params__', [])
+    get.__click_params__ = []
     options_get = options()(tabulating_decorator(get))
     # then construct the actual list command
     list_command = click.command('list')(options_get)
+    list_command.params = list_params + list_command.params
     group.add_command(list_command)
 
     # Post
@@ -72,6 +76,7 @@ _options_docs = """
     --agg-type min,max --agg-size 1d --port t
 """
 
+
 def options(page_size=20, format='tty'):
     """Standard options for retrieving timeseries readings. In addition it
     appends the documentation for these options to the caller.
@@ -98,9 +103,11 @@ def options(page_size=20, format='tty'):
                      help="the time window of the aggregation"),
         click.option('--agg-type',
                      help="the kinds of aggregations to perform"),
-        click.option('--format', type=click.Choice(['csv', 'json', 'tty']), default=format,
+        click.option('--format', type=click.Choice(['csv', 'json', 'tty']),
+                     default=format,
                      help="the format of the readings")
     ]
+
     def wrapper(func):
         func.__doc__ += _options_docs
         for option in reversed(options):
@@ -130,6 +137,7 @@ def post_options():
         click.option('--timestamp', metavar='DATE',
                      help='the time of the reading'),
     ]
+
     def wrapper(func):
         func.__doc__ += _post_options_docs
         for option in reversed(options):
@@ -149,13 +157,14 @@ class JSONParamType(click.ParamType):
 
 
 def _mapping_for(shorten_json_id=True, **kwargs):
-    agg_types = kwargs.pop('agg_type',None)
+    agg_types = kwargs.pop('agg_type', None)
     if agg_types:
-        value_map = [(key, "attributes/value/" + key) for key in agg_types.split(',')]
+        agg_types = agg_types.split(',')
+        value_map = [(key, "attributes/value/" + key) for key in agg_types]
     else:
         value_map = [('value', 'attributes/value')]
     map = [
-        ('id', util.shorten_json_id if shorten_json_id  else 'id'),
+        ('id', util.shorten_json_id if shorten_json_id else 'id'),
         ('timestamp', 'attributes/timestamp'),
         ('port', 'attributes/port')
     ] + value_map
@@ -171,19 +180,24 @@ def tabulate(result, **kwargs):
 
 def dump(service, sensors, format, **kwargs):
     label = str.format("Dumping {}", len(sensors))
-    with click.progressbar(length=len(sensors), label=label, show_eta=False, width=50) as bar:
+    with click.progressbar(length=len(sensors),
+                           label=label,
+                           show_eta=False,
+                           width=50) as bar:
         with futures.ThreadPoolExecutor(max_workers=10) as executor:
             all_futures = []
             for sensor_id in sensors:
-                future = executor.submit(_dump_one, service, sensor_id, format, **kwargs)
+                future = executor.submit(_dump_one, service, sensor_id, format,
+                                         **kwargs)
                 future.add_done_callback(lambda f: bar.update(1))
                 all_futures.append(future)
-                # Pass in timeout to wait to enable keyboard abort (Python 2.7 issue)
+                # Pass in timeout to wait to enable keyboard abort
+                # (Python 2.7 issue)
             result_futures = futures.wait(all_futures,
                                           return_when=futures.FIRST_EXCEPTION,
                                           timeout=sys.maxint)
             for future in result_futures.done:
-                future.result() # re-raises the exception
+                future.result()  # re-raises the exception
 
 
 def _process_timeseries(writer, service, sensor_id, **kwargs):
@@ -193,15 +207,17 @@ def _process_timeseries(writer, service, sensor_id, **kwargs):
     res = service.get_sensor_timeseries(sensor_id, **kwargs)
     writer.start()
     writer.write_entries(json_data(res))
-    while res != None:
+    while res is not None:
         res = service.get_prev_page(res)
         writer.write_entries(json_data(res))
         writer.finish()
 
+
 def _dump_one(service, sensor_id, format, **kwargs):
     filename = (sensor_id+'.'+format).encode('ascii', 'replace')
     with click.open_file(filename, "wb") as file:
-        csv_mapping = OrderedDict(_mapping_for(shorten_json_id=False, **kwargs))
+        csv_mapping = OrderedDict(_mapping_for(shorten_json_id=False,
+                                               **kwargs))
         service = helium.Service(service.api_key, service.base_url)
         output = writer.for_format(format, file, mapping=csv_mapping)
         _process_timeseries(output, service, sensor_id, **kwargs)
