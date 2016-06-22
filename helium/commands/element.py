@@ -9,8 +9,10 @@ import dpath.util as dpath
 pass_service = click.make_pass_decorator(helium.Service)
 
 
-def _find_element_id(service, element, **kwargs):
-    return lookup_resource_id(service.get_elements, element, **kwargs)
+def version_option(f):
+    return click.option('--versions', type=click.Choice(['none', 'fw']),
+                        default='none',
+                        help="display version information")(f)
 
 
 @click.group()
@@ -18,6 +20,10 @@ def cli():
     """Operations on elements.
     """
     pass
+
+
+def _find_element_id(service, element, **kwargs):
+    return lookup_resource_id(service.get_elements, element, **kwargs)
 
 
 def _tabulate(result, **kwargs):
@@ -40,9 +46,7 @@ def _tabulate(result, **kwargs):
 
 @cli.command()
 @click.argument('element', required=False)
-@click.option('--versions', type=click.Choice(['none', 'fw']),
-              default='none',
-              help="display element version information")
+@version_option
 @mac_option
 @pass_service
 def list(service, element, **kwargs):
