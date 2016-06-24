@@ -73,14 +73,14 @@ To use the `helium` command, explore the help options:
     Usage: helium [OPTIONS] COMMAND [ARGS]...
 
     Options:
-      --version                Show the version and exit.
-      --format [csv|json|tty]  The output format (default 'tty')
-      --uuid                   Whether to display long identifiers
-      --host TEXT              The Helium base API URL. Can also be specified
-                               using the HELIUM_API_URL environment variable.
-      --api-key TEXT           your Helium API key. Can also be specified using
-                               the HELIUM_API_KEY environment variable
-      -h, --help               Show this message and exit.
+      --version                     Show the version and exit.
+      --format [csv|json|tabular]   The output format (default 'tabular')
+      --uuid                        Whether to display long identifiers
+      --host TEXT                   The Helium base API URL. Can also be specified
+                                    using the HELIUM_API_URL environment variable.
+      --api-key TEXT                your Helium API key. Can also be specified using
+                                    the HELIUM_API_KEY environment variable
+      -h, --help                    Show this message and exit.
 
     Commands:
       cloud-script   Operations on cloud-scripts.

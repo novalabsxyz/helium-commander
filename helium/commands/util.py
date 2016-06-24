@@ -64,13 +64,14 @@ def shorten_id(str):
     return str.split('-')[0]
 
 
-def shorten_json_id(json):
+def shorten_json_id(json, **kwargs):
     # Ugh, reaching for global state isn't great but very convenient here
+    _uuid = kwargs.get('uuid', False)
     try:
         root_context = click.get_current_context().find_root()
         shorten = not root_context.params.get('uuid', False)
-    except:
-        shorten = False
+    except RuntimeError:
+        shorten = not _uuid
     json_id = json.get('id')
     return shorten_id(json_id) if shorten else json_id
 
@@ -80,10 +81,8 @@ def tabulate(result, map, **kwargs):
     if not mapping or not result:
         return result
 
-    _writer = kwargs.pop('writer', None)
-    if not _writer:
-        file = click.utils.get_text_stream('stdout')
-        _writer = writer.for_format(output_format(), file, mapping=mapping)
+    file = kwargs.pop('file', click.utils.get_text_stream('stdout'))
+    _writer = writer.for_format(output_format(**kwargs), file, mapping=mapping)
 
     _writer.start()
     _writer.write_entries(result)
@@ -99,12 +98,14 @@ def extract_script_filenames(files):
     return [urlsplit(url).path.split('/')[-1] for url in files]
 
 
-def output_format(default_format='tty'):
+def output_format(default_format='tabular', **kwargs):
+    override_format = kwargs.get('format')
     try:
         root_context = click.get_current_context().find_root()
-        return root_context.params.get('format') or default_format
-    except:
-        return default_format
+        click_format = root_context.params.get('format')
+    except RuntimeError:
+        click_format = None
+    return override_format or click_format or default_format
 
 
 CONTEXT_SETTINGS = dict(
@@ -129,9 +130,9 @@ def cli(version=None, package=None,  commands=None):
     def decorator(f):
         @click.option('--uuid', is_flag=True,
                       help="Whether to display long identifiers")
-        @click.option('--format', type=click.Choice(['csv', 'json', 'tty']),
+        @click.option('--format', type=click.Choice(['csv', 'json', 'tabular']),
                       default=None,
-                      help="The output format (default 'tty')")
+                      help="The output format (default 'tabular')")
         @click.version_option(version=version)
         @click.command(cls=Loader, context_settings=CONTEXT_SETTINGS)
         @click.pass_context

@@ -18,7 +18,7 @@ def for_format(format, file, **kwargs):
             "indent": None
         }
         return CSVWriter(file, json=json_opts, **kwargs)
-    elif format == 'tty':
+    elif format == 'tabular':
         json_opts = json_opts or {
             "indent": 0
         }
