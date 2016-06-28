@@ -1,9 +1,10 @@
-import sensor as _sensor
 import helium
-import util
 import click
 import dpath.util as dpath
-import timeseries as ts
+from .timeseries import options as timeseries_options
+from .timeseries import dump as timeseries_dump
+from .sensor import list as _sensor_list
+from .util import tabulate, lookup_resource_id, shorten_json_id
 
 pass_service=click.make_pass_decorator(helium.Service)
 
@@ -16,20 +17,20 @@ def cli():
 def _tabulate(result):
     def _map_sensor_count(json):
         return len(dpath.get(json, 'relationships/sensor/data'))
-    util.tabulate(result, [
-        ('id', util.shorten_json_id),
+    tabulate(result, [
+        ('id', shorten_json_id),
         ('sensors', _map_sensor_count),
         ('name', 'attributes/name')
     ])
 
 def _update_label_sensors(ctx, label, sensor, set_func):
     service = ctx.find_object(helium.Service)
-    label = util.lookup_resource_id(service.get_labels, label)
+    label = lookup_resource_id(service.get_labels, label)
     # Fetch the existing sensors
     sensors = service.get_label_sensors(label).get('data')
     sensor_ids = dpath.values(sensors, "*/id")
     # Look up full sensor ids for all given sensors
-    sensor_list = [util.lookup_resource_id(service.get_sensors, sensor_id)
+    sensor_list = [lookup_resource_id(service.get_sensors, sensor_id)
                    for sensor_id in sensor]
     # And perform the set operation and ensure we have a valid list
     sensor_ids = set_func(set(sensor_ids), set(sensor_list))
@@ -46,7 +47,7 @@ def list(ctx, label):
     Lists information on a given label or all labels in the organization
     """
     if label:
-        ctx.invoke(_sensor.list, label=label)
+        ctx.invoke(_sensor_list, label=label)
     else:
         service = ctx.find_object(helium.Service)
         _tabulate(service.get_labels(include='sensor').get('data'))
@@ -67,7 +68,7 @@ def create(ctx, name, sensor):
     label_id = label['id']
     if sensor:
         sensor_list = service.get_sensors().get('data')
-        sensors = [util.lookup_resource_id(sensor_list, sensor_id)
+        sensors = [lookup_resource_id(sensor_list, sensor_id)
                    for sensor_id in sensor]
         service.update_label_sensors(label_id, sensors)
     _tabulate([service.get_label(label_id, include='sensor').get('data')])
@@ -82,7 +83,7 @@ def delete(service, label):
     Deletes the LABEL with the given id
     """
     label_list = service.get_labels().get('data')
-    label = [util.lookup_resource_id(label_list, label_id)
+    label = [lookup_resource_id(label_list, label_id)
              for label_id in label]
     for entry in label:
         result = service.delete_label(entry)
@@ -99,7 +100,7 @@ def add(ctx, label, sensor):
     Adds a given list of SENSORs to the LABEL with the given id.
     """
     _update_label_sensors(ctx, label, sensor, set.union)
-    ctx.invoke(_sensor.list, label=label)
+    ctx.invoke(_sensor_list, label=label)
 
 
 @cli.command()
@@ -112,21 +113,22 @@ def remove(ctx, label, sensor):
     Removes a given list of SENSORs from the LABEL with the given id.
     """
     _update_label_sensors(ctx, label, sensor, set.difference)
-    ctx.invoke(_sensor.list, label=label)
+    ctx.invoke(_sensor_list, label=label)
 
 
 @cli.command()
 @click.argument('label')
-@ts.options()
+@timeseries_options()
 @pass_service
-def dump(service, label, format, **kwargs):
+def dump(service, label, **kwargs):
     """Dumps timeseries data to files.
 
     Dumps the timeseries data for all sensors in a given LABEL.
 
-    One file is generated for each sensor with the sensor id as filename and the
-    file extension based on the requested dump format
+    One file is generated for each sensor with the sensor id as
+    filename and the file extension based on the requested dump format
+
     """
-    label = util.lookup_resource_id(service.get_labels, label)
+    label = lookup_resource_id(service.get_labels, label)
     sensors = dpath.values(service.get_label_sensors(label), '/data/*/id')
-    ts.dump(service, sensors, format, **kwargs)
+    timeseries_dump(service, sensors, **kwargs)

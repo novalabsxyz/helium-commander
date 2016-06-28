@@ -1,12 +1,12 @@
+import helium
+import click
+import sys
+import json
 from concurrent import futures
 from collections import OrderedDict
 from functools import update_wrapper
-import helium
-import click
-import util
-import sys
-import writer
-import json
+from .util import shorten_json_id, tabulate, output_format
+from .writer import for_format as writer_for_format
 
 
 def cli(get=None, post=None):
@@ -14,7 +14,7 @@ def cli(get=None, post=None):
         def new_func(*args, **kwargs):
             ctx = click.get_current_context()
             data = ctx.invoke(f, *args, **kwargs)
-            tabulate(data, **kwargs)
+            _tabulate(data, **kwargs)
             return data
         return update_wrapper(new_func, f)
 
@@ -156,7 +156,7 @@ class JSONParamType(click.ParamType):
             self.fail('{} is not a valid json value'.format(value), param, ctx)
 
 
-def _mapping_for(shorten_json_id=True, **kwargs):
+def _mapping_for(uuid=False, **kwargs):
     agg_types = kwargs.pop('agg_type', None)
     if agg_types:
         agg_types = agg_types.split(',')
@@ -164,21 +164,21 @@ def _mapping_for(shorten_json_id=True, **kwargs):
     else:
         value_map = [('value', 'attributes/value')]
     map = [
-        ('id', util.shorten_json_id if shorten_json_id else 'id'),
+        ('id', shorten_json_id if not uuid else 'id'),
         ('timestamp', 'attributes/timestamp'),
         ('port', 'attributes/port')
     ] + value_map
     return map
 
 
-def tabulate(result, **kwargs):
+def _tabulate(result, **kwargs):
     if not result:
         click.echo('No data')
         return
-    util.tabulate(result, _mapping_for(**kwargs))
+    tabulate(result, _mapping_for(**kwargs))
 
 
-def dump(service, sensors, format, **kwargs):
+def dump(service, sensors, **kwargs):
     label = str.format("Dumping {}", len(sensors))
     with click.progressbar(length=len(sensors),
                            label=label,
@@ -186,6 +186,7 @@ def dump(service, sensors, format, **kwargs):
                            width=50) as bar:
         with futures.ThreadPoolExecutor(max_workers=10) as executor:
             all_futures = []
+            format = output_format('csv')
             for sensor_id in sensors:
                 future = executor.submit(_dump_one, service, sensor_id, format,
                                          **kwargs)
@@ -219,5 +220,5 @@ def _dump_one(service, sensor_id, format, **kwargs):
         csv_mapping = OrderedDict(_mapping_for(shorten_json_id=False,
                                                **kwargs))
         service = helium.Service(service.api_key, service.base_url)
-        output = writer.for_format(format, file, mapping=csv_mapping)
+        output = writer_for_format(format, file, mapping=csv_mapping)
         _process_timeseries(output, service, sensor_id, **kwargs)

@@ -1,8 +1,8 @@
 import click
 import helium
-import timeseries as ts
 import dpath.util as dpath
-from util import tabulate, lookup_resource_id, shorten_json_id
+from . import timeseries as ts
+from .util import tabulate, lookup_resource_id, shorten_json_id
 
 
 pass_service = click.make_pass_decorator(helium.Service)

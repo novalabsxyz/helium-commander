@@ -1,9 +1,9 @@
 import click
 import helium
-from helium.commands.sensor import version_option as sensor_version_option
-from helium.commands.sensor import mac_option
-from helium.commands.sensor import _tabulate as _tabulate_sensors
-from util import tabulate, lookup_resource_id, shorten_json_id
+from .sensor import version_option as sensor_version_option
+from .sensor import mac_option
+from .sensor import _tabulate as _tabulate_sensors
+from .util import tabulate, lookup_resource_id, shorten_json_id
 import dpath.util as dpath
 
 pass_service = click.make_pass_decorator(helium.Service)

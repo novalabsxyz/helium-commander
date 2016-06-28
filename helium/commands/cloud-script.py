@@ -2,10 +2,12 @@ import dpath.util as dpath
 import requests
 import click
 import helium
-import util
-import timeseries as ts
+from . import util
+from .timeseries import _tabulate as _tabulate_timeseries
+from .timeseries import options as timeseries_options
 
-pass_service=click.make_pass_decorator(helium.Service)
+pass_service = click.make_pass_decorator(helium.Service)
+
 
 @click.group()
 def cli():
@@ -75,7 +77,7 @@ def delete(service, script):
 
 @cli.command()
 @click.argument('script')
-@ts.options()
+@timeseries_options()
 @pass_service
 def timeseries(service, script, **kwargs):
     """List readings for a cloud-script.
@@ -84,7 +86,7 @@ def timeseries(service, script, **kwargs):
     """
     script = util.lookup_resource_id(service.get_cloud_scripts, script)
     data = service.get_cloud_script_timeseries(script, **kwargs).get('data')
-    ts.tabulate(data, **kwargs)
+    _tabulate_timeseries(data, **kwargs)
 
 
 @cli.command()

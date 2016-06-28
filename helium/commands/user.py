@@ -1,7 +1,7 @@
 import click
 import helium
-import util
 import dpath.util as dpath
+from . import util
 
 pass_service=click.make_pass_decorator(helium.Service)
 

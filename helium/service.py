@@ -1,9 +1,11 @@
+from future.standard_library import install_aliases
+install_aliases()
 import requests
 import json
 import io
 import os
 from . import __version__
-from urlparse import urlunsplit, urlsplit
+from urllib.parse import urlunsplit, urlsplit
 from  datetime import datetime
 
 # Silence warnings since turning verification of against non production urls

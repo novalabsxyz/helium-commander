@@ -1,1 +1,1 @@
-from util import cli, main
+from .util import cli, main

@@ -1,8 +1,8 @@
 import click
 import helium
-import util
 import dpath.util as dpath
-import timeseries as ts
+from . import util
+from . import timeseries as ts
 
 
 pass_service=click.make_pass_decorator(helium.Service)

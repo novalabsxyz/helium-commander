@@ -1,6 +1,7 @@
-import commands
-import click
 import helium
+import click
+from . import commands
+from .version import __version__
 
 _commands = [
     "label",
@@ -19,7 +20,7 @@ _commands = [
               envvar='HELIUM_API_URL',
               default=None,
               help= 'The Helium base API URL. Can also be specified using the HELIUM_API_URL environment variable.' )
-@commands.cli(version=helium.__version__, package='helium.commands', commands = _commands)
+@commands.cli(version=__version__, package='helium.commands', commands = _commands)
 def cli(ctx, api_key, host, **kwargs):
     ctx.obj = helium.Service(api_key, host)
 

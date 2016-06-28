@@ -18,6 +18,7 @@ setup(
     packages=['helium', 'helium.commands'],
     platforms='all',
     install_requires=[
+        'future>=0.15',
         'requests>=2.9',
         'dpath>=1.4',
         'futures>=3.0',

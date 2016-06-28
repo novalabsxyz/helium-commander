@@ -1,11 +1,11 @@
-from collections import OrderedDict
 import dpath.util as dpath
 import sys
 import os
 import click
 import uuid
-import writer
-import urlparse
+from . import writer
+from urllib.parse import urlsplit
+from collections import OrderedDict
 from functools import update_wrapper
 from importlib import import_module
 
@@ -82,13 +82,8 @@ def tabulate(result, map, **kwargs):
 
     _writer = kwargs.pop('writer', None)
     if not _writer:
-        # Ugh, reaching for global state isn't great but very convenient here
-        default_format = 'tty' if sys.stdout.isatty() else 'csv'
-        format = click.get_current_context().params.get('format')
-        # Ensure format is set to something sensible
-        format = format or default_format
         file = click.utils.get_text_stream('stdout')
-        _writer = writer.for_format(format, file, mapping=mapping)
+        _writer = writer.for_format(output_format(), file, mapping=mapping)
 
     _writer.start()
     _writer.write_entries(result)
@@ -101,7 +96,16 @@ def map_script_filenames(json):
 
 
 def extract_script_filenames(files):
-    return [urlparse.urlsplit(url).path.split('/')[-1] for url in files]
+    return [urlsplit(url).path.split('/')[-1] for url in files]
+
+
+def output_format(default_format='tty'):
+    try:
+        root_context = click.get_current_context().find_root()
+        return root_context.params.get('format') or default_format
+    except:
+        return default_format
+
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help']
@@ -118,7 +122,7 @@ def cli(version=None, package=None,  commands=None):
             try:
                 command = import_module(package + "." + name)
                 return command.cli
-            except ImportError, e:
+            except ImportError as e:
                 click.secho(str(e), fg='red')
                 return
 
@@ -142,7 +146,7 @@ def main(cli):
         args = sys.argv[1:]
         try:
             cli.main(args=args, prog_name=None)
-        except Exception, e:
+        except Exception as e:
             if os.environ.get("HELIUM_COMMANDER_DEBUG"):
                 raise
             click.secho(str(e), fg='red')
