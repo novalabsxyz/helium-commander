@@ -167,10 +167,10 @@ cli.add_command(ts.cli(get=_get_sensor_timeseries,
 
 @cli.command()
 @click.argument('sensor')
-@ts.options(page_size=5000, format='csv')
+@ts.options(page_size=5000)
 @mac_option
 @pass_service
-def dump(service, sensor, format, **kwargs):
+def dump(service, sensor, **kwargs):
     """Dumps timeseries data to files.
 
     Dumps the timeseries data for one SENSOR to a file.
@@ -181,4 +181,4 @@ def dump(service, sensor, format, **kwargs):
     file extension based on the requested dump format
     """
     sensor = _find_sensor_id(service, sensor, **kwargs)
-    ts.dump(service, [sensor], format, **kwargs)
+    ts.dump(service, [sensor], **kwargs)

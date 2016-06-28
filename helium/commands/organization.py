@@ -51,7 +51,7 @@ cli.add_command(ts.cli(get=_get_org_timeseries,
 
 
 @cli.command()
-@ts.options(page_size=5000, format='csv')
+@ts.options(page_size=5000)
 @pass_service
 def dump(service, format, **kwargs):
     """Dumps timeseries data to files.
@@ -62,7 +62,7 @@ def dump(service, format, **kwargs):
     file extension based on the requested dump format
     """
     sensors = dpath.values(service.get_sensors(), '/data/*/id')
-    ts.dump(service, sensors, format, **kwargs)
+    ts.dump(service, sensors, **kwargs)
 
 
 @cli.command()

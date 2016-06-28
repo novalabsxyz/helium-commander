@@ -77,7 +77,7 @@ _options_docs = """
 """
 
 
-def options(page_size=20, format='tty'):
+def options(page_size=20):
     """Standard options for retrieving timeseries readings. In addition it
     appends the documentation for these options to the caller.
 
@@ -103,9 +103,6 @@ def options(page_size=20, format='tty'):
                      help="the time window of the aggregation"),
         click.option('--agg-type',
                      help="the kinds of aggregations to perform"),
-        click.option('--format', type=click.Choice(['csv', 'json', 'tty']),
-                     default=format,
-                     help="the format of the readings")
     ]
 
     def wrapper(func):
