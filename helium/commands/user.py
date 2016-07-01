@@ -1,9 +1,11 @@
 import click
 import helium
 import dpath.util as dpath
-from . import util
+from .util import tabulate
 
-pass_service=click.make_pass_decorator(helium.Service)
+
+pass_service = click.make_pass_decorator(helium.Service)
+
 
 @click.group()
 def cli():
@@ -11,8 +13,9 @@ def cli():
     """
     pass
 
+
 def _tabulate(result):
-    util.tabulate(result, [
+    tabulate(result, [
         ('id', 'id'),
         ('name', 'attributes/name')
     ])
@@ -39,4 +42,4 @@ def auth(service, user, password):
     If successful the API key for the account is printed
     """
     result = service.auth_user(user, password).get('data')
-    click.echo(dpath.get(result,'meta/api-token'))
+    click.echo(dpath.get(result, 'meta/api-token'))
