@@ -82,7 +82,8 @@ def tabulate(result, map, **kwargs):
         return result
 
     file = kwargs.pop('file', click.utils.get_text_stream('stdout'))
-    _writer = writer.for_format(output_format(**kwargs), file, mapping=mapping)
+    _writer = writer.for_format(output_format(**kwargs), file,
+                                mapping=mapping, **kwargs)
 
     _writer.start()
     _writer.write_entries(result)
@@ -106,6 +107,21 @@ def output_format(default_format='tabular', **kwargs):
     except RuntimeError:
         click_format = None
     return override_format or click_format or default_format
+
+
+def sort_option(options):
+    options = [
+        click.option('--reverse', is_flag=True,
+                     help='Sort in reverse order'),
+        click.option('--sort', type=click.Choice(options),
+                     help='How to sort the result')
+    ]
+
+    def wrapper(func):
+        for option in reversed(options):
+            func = option(func)
+        return func
+    return wrapper
 
 
 CONTEXT_SETTINGS = dict(

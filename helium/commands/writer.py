@@ -4,6 +4,7 @@ import abc
 import terminaltables
 import dpath.util as dpath
 from textwrap import wrap
+from operator import itemgetter
 
 
 def for_format(format, file, **kwargs):
@@ -22,7 +23,8 @@ def for_format(format, file, **kwargs):
         json_opts = json_opts or {
             "indent": 0
         }
-        return TerminalWriter(file, json = json_opts, **kwargs)
+        return TerminalWriter(file, json=json_opts, **kwargs)
+
 
 class BaseWriter:
     __metaclass__ = abc.ABCMeta
@@ -31,6 +33,8 @@ class BaseWriter:
         self.file = file
         self.mapping = kwargs.pop('mapping', None)
         self.json_opts = kwargs.pop('json', None)
+        self.sort = kwargs.pop('sort', None)
+        self.reverse = kwargs.pop('reverse', False)
 
     def start(self):
         return
@@ -67,10 +71,11 @@ class CSVWriter(BaseWriter):
         self.writer.writeheader()
 
     def write_entries(self, entries):
-        if entries is None: return
+        if entries is None:
+            return
         for entry in entries:
-            row = { key: self.lookup(entry, path, json=self.json_opts)
-                    for key, path in self.mapping.iteritems() }
+            row = {key: self.lookup(entry, path, json=self.json_opts)
+                   for key, path in self.mapping.iteritems()}
             self.writer.writerow(row)
 
 
@@ -83,7 +88,8 @@ class JSONWriter(BaseWriter):
         self.is_first_entries = True
 
     def write_entries(self, entries):
-        if entries is None: return
+        if entries is None:
+            return
         for entry in entries:
             if self.is_first_entries:
                 self.is_first_entries = False
@@ -91,7 +97,8 @@ class JSONWriter(BaseWriter):
                 self.file.write(',')
 
             if self.mapping:
-                entry = {key: self.lookup(entry, path) for key, path in self.mapping.iteritems() }
+                entry = {key: self.lookup(entry, path)
+                         for key, path in self.mapping.iteritems()}
 
             json.dump(entry, self.file, **self.json_opts)
 
@@ -109,21 +116,35 @@ class TerminalWriter(BaseWriter):
     def start(self):
         pass
 
+    def order_entries(self, entries):
+        if not self.mapping:
+            return entries
+        if self.sort:
+            sort_index = self.mapping.keys().index(self.sort)
+            entries = sorted(entries,
+                             key=itemgetter(sort_index),
+                             reverse=self.reverse)
+        elif self.reverse:
+            entries = reversed(entries)
+        return entries
+
     def write_entries(self, entries):
         def safe_unicode(o, *args):
             try:
                 return unicode(o, *args)
             except UnicodeDecodeError:
                 return unicode(str(o).encode('string_escape'))
+
         def map_entry(o):
             return [safe_unicode(self.lookup(o, path, json=self.json_opts))
-                    for _,path in self.mapping.items()]
+                    for _, path in self.mapping.items()]
 
-        if entries is None: return
+        if entries is None:
+            return
         if self.mapping:
-            self.data.extend([map_entry(o) for o in entries])
-        else:
-            self.data.extend(entries)
+            entries = [map_entry(o) for o in entries]
+
+        self.data.extend(self.order_entries(entries))
 
     def finish(self):
         table = terminaltables.AsciiTable(self.data)

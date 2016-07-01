@@ -2,7 +2,7 @@ import click
 import helium
 import dpath.util as dpath
 from . import timeseries as ts
-from .util import tabulate, lookup_resource_id, shorten_json_id
+from .util import tabulate, lookup_resource_id, shorten_json_id, sort_option
 
 
 pass_service = click.make_pass_decorator(helium.Service)
@@ -67,7 +67,7 @@ def _tabulate(result, **kwargs):
         ('seen', 'meta/last-seen'),
     ] + version_map + [
         ('name', 'attributes/name'),
-    ])
+    ], **kwargs)
 
 
 @cli.command()
@@ -76,6 +76,7 @@ def _tabulate(result, **kwargs):
               help="the id of a label")
 @version_option
 @mac_option
+@sort_option(['seen', 'name'])
 @pass_service
 def list(service, sensor, label, **kwargs):
     """List sensors.
