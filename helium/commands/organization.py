@@ -1,7 +1,7 @@
 import click
 import helium
 import dpath.util as dpath
-from .util import tabulate, sort_option
+from .util import tabulate
 from . import timeseries as ts
 
 

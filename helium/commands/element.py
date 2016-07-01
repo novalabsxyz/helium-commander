@@ -1,7 +1,7 @@
 import click
 import helium
 from .sensor import version_option as sensor_version_option
-from .sensor import mac_option
+from .sensor import mac_option, sort_option as sensor_sort_option
 from .sensor import _tabulate as _tabulate_sensors
 from .util import tabulate, lookup_resource_id, shorten_json_id, sort_option
 import dpath.util as dpath
@@ -41,14 +41,14 @@ def _tabulate(result, **kwargs):
         ('sensors', _map_sensor_count)
     ] + version_map + [
         ('name', 'attributes/name')
-    ])
+    ], **kwargs)
 
 
 @cli.command()
 @click.argument('element', required=False)
 @version_option
 @mac_option
-@sort_option(['seen', 'name'])
+@sort_option(['name'])
 @pass_service
 def list(service, element, **kwargs):
     """List elements.
@@ -82,6 +82,7 @@ def update(service, element, **kwargs):
 @cli.command()
 @click.argument('element')
 @sensor_version_option
+@sensor_sort_option
 @mac_option
 @pass_service
 def sensor(service, element, **kwargs):

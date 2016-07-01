@@ -2,7 +2,8 @@ import click
 import helium
 import dpath.util as dpath
 from . import timeseries as ts
-from .util import tabulate, lookup_resource_id, shorten_json_id, sort_option
+from .util import tabulate, lookup_resource_id, shorten_json_id
+from .util import sort_option as _sort_option
 
 
 pass_service = click.make_pass_decorator(helium.Service)
@@ -12,6 +13,10 @@ def version_option(f):
     return click.option('--versions', type=click.Choice(['none', 'fw', 'all']),
                         default='none',
                         help="display version information")(f)
+
+
+def sort_option(f):
+    return _sort_option(['seen', 'name'])(f)
 
 
 def mac_option(f):
@@ -76,7 +81,7 @@ def _tabulate(result, **kwargs):
               help="the id of a label")
 @version_option
 @mac_option
-@sort_option(['seen', 'name'])
+@sort_option
 @pass_service
 def list(service, sensor, label, **kwargs):
     """List sensors.
