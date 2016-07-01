@@ -3,10 +3,12 @@ import click
 import dpath.util as dpath
 from .timeseries import options as timeseries_options
 from .timeseries import dump as timeseries_dump
-from .sensor import list as _sensor_list
-from .util import tabulate, lookup_resource_id, shorten_json_id
+from .sensor import list as sensor_list, sort_option as sensor_sort_option
+from .util import tabulate, lookup_resource_id, shorten_json_id, sort_option
 
-pass_service=click.make_pass_decorator(helium.Service)
+
+pass_service = click.make_pass_decorator(helium.Service)
+
 
 @click.group()
 def cli():
@@ -14,14 +16,16 @@ def cli():
     """
     pass
 
-def _tabulate(result):
+
+def _tabulate(result, **kwargs):
     def _map_sensor_count(json):
         return len(dpath.get(json, 'relationships/sensor/data'))
     tabulate(result, [
         ('id', shorten_json_id),
         ('sensors', _map_sensor_count),
         ('name', 'attributes/name')
-    ])
+    ], **kwargs)
+
 
 def _update_label_sensors(ctx, label, sensor, set_func):
     service = ctx.find_object(helium.Service)
@@ -34,23 +38,25 @@ def _update_label_sensors(ctx, label, sensor, set_func):
                    for sensor_id in sensor]
     # And perform the set operation and ensure we have a valid list
     sensor_ids = set_func(set(sensor_ids), set(sensor_list))
-    if sensor_ids is None: sensor_ids = []
+    if sensor_ids is None:
+        sensor_ids = []
     service.update_label_sensors(label, sensor_ids)
 
 
 @cli.command()
 @click.argument('label', required=False)
+@sensor_sort_option
 @click.pass_context
-def list(ctx, label):
+def list(ctx, label, **kwargs):
     """Lists information on labels.
 
     Lists information on a given label or all labels in the organization
     """
     if label:
-        ctx.invoke(_sensor_list, label=label)
+        ctx.invoke(sensor_list, label=label, **kwargs)
     else:
         service = ctx.find_object(helium.Service)
-        _tabulate(service.get_labels(include='sensor').get('data'))
+        _tabulate(service.get_labels(include='sensor').get('data'), **kwargs)
 
 
 @cli.command()
@@ -87,12 +93,13 @@ def delete(service, label):
              for label_id in label]
     for entry in label:
         result = service.delete_label(entry)
-        click.echo("Deleted: " +  entry if result.status_code == 204 else result)
+        click.echo("Deleted: " + entry
+                   if result.status_code == 204 else result)
 
 
 @cli.command()
-@click.argument('label',nargs=1)
-@click.argument('sensor',nargs=-1)
+@click.argument('label', nargs=1)
+@click.argument('sensor', nargs=-1)
 @click.pass_context
 def add(ctx, label, sensor):
     """Add sensors to a label.
@@ -100,7 +107,7 @@ def add(ctx, label, sensor):
     Adds a given list of SENSORs to the LABEL with the given id.
     """
     _update_label_sensors(ctx, label, sensor, set.union)
-    ctx.invoke(_sensor_list, label=label)
+    ctx.invoke(sensor_list, label=label)
 
 
 @cli.command()
@@ -113,7 +120,7 @@ def remove(ctx, label, sensor):
     Removes a given list of SENSORs from the LABEL with the given id.
     """
     _update_label_sensors(ctx, label, sensor, set.difference)
-    ctx.invoke(_sensor_list, label=label)
+    ctx.invoke(sensor_list, label=label)
 
 
 @cli.command()
