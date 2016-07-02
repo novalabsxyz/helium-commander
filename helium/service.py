@@ -1,38 +1,24 @@
-from future.standard_library import install_aliases
-install_aliases()
 import requests
 import json
 import io
 import os
 from . import __version__
-from urllib.parse import urlunsplit, urlsplit
-from  datetime import datetime
-
-# Silence warnings since turning verification of against non production urls
-# cause unsightly warning messages. Verification still happens against production
-import requests.packages.urllib3 as urllib3
-urllib3.disable_warnings()
-
-def _url_path_join(*parts):
-    """Normalize url parts and join them with a slash."""
-    def first_of_each(*sequences):
-        return (next((x for x in sequence if x), '') for sequence in sequences)
-    schemes, netlocs, paths, queries, fragments = zip(*(urlsplit(part) for part in parts))
-    scheme, netloc, query, fragment = first_of_each(schemes, netlocs, queries, fragments)
-    path = '/'.join(x.strip('/') for x in paths if x)
-    return urlunsplit((scheme, netloc, path, query, fragment))
+from requests.compat import urljoin, urlsplit
 
 
 class Service:
     production_base_url = "https://api.helium.com/v1"
-    user_agent="Helium/"+__version__
+    user_agent = "Helium/"+__version__
 
     def __init__(self, api_key, base_url=None):
         self.api_key = api_key
         self.base_url = base_url if base_url else self.production_base_url
+        # ensure we can urljoin paths to the base url
+        if not self.base_url.endswith('/'):
+            self.base_url += '/'
         self.session = requests.Session()
 
-    def _params_from_kwargs(self, map, kwargs):
+    def mk_params(self, map, kwargs):
         result = {}
         for kw_key, result_key in map.iteritems():
             value = kwargs.get(kw_key, None)
@@ -40,7 +26,7 @@ class Service:
                 result[result_key] = value
         return result
 
-    def _mk_attributes_body(self, type, id, attributes):
+    def mk_attributes_body(self, type, id, attributes):
         if attributes is None or not type:
             return None
         result = {
@@ -53,23 +39,23 @@ class Service:
             result['data']['id'] = id
         return result
 
-    def _mk_relationships_body(self, type, ids):
+    def mk_relationships_body(self, type, ids):
         if ids is None or not type:
             return None
         return {
             "data": [{"id": id, "type": type} for id in ids]
         }
 
-    def _mk_datapoint_body(self, **kwargs):
-        params = self._params_from_kwargs({
+    def mk_datapoint_body(self, **kwargs):
+        params = self.mk_params({
             'value': 'value',
             'port': 'port',
             'timestamp': 'timestamp',
         }, kwargs)
-        return self._mk_attributes_body("data-point", None, params)
+        return self.mk_attributes_body("data-point", None, params)
 
-    def _timeseries_params_from_kwargs(self, **kwargs):
-        return self._params_from_kwargs({
+    def mk_timeseries_params(self, **kwargs):
+        return self.mk_params({
             "page_id": "page[id]",
             "page_size": "page[size]",
             "port": "filter[port]",
@@ -79,33 +65,15 @@ class Service:
             "agg_type": "agg[type]"
         }, kwargs)
 
-    def _include_params_from_kwargs(self, **kwargs):
-        return self._params_from_kwargs({
+    def mk_include_params(self, **kwargs):
+        return self.mk_params({
             "include": "include"
         }, kwargs)
 
-    def _lua_uploads_from_files(self, files, **kwargs):
-        def basename(f):
-            return os.path.basename(f)
-
-        def lua_file(name):
-            return (basename(name), io.open(name, 'rb'), 'application/x-lua')
-
-        main_file = kwargs.pop('main', None)
-        # construct a dictionary of files that are not the main file
-        files = {basename(name): lua_file(name) for name in files
-                 if name != main_file}
-        # then add the main file if given
-        if main_file:
-            files["user.lua"] = lua_file(main_file)
-        return files
-
-    def _mk_url(self, path, *args):
-        return _url_path_join(self.base_url, str.format(path, *args))
-
-    def _do_url(self, method, url, params=None, json=None, files=None):
-        if url is None:
+    def do(self, method, path, params=None, json=None, files=None):
+        if path is None:
             return None
+        url = path if urlsplit(path).scheme else urljoin(self.base_url, path)
         params = params or {}
         headers = {
             'Authorization': self.api_key,
@@ -137,17 +105,72 @@ class Service:
                 # otherwise raise as a base HTTPError
                 res.raise_for_status()
 
-    def _get_url(self, url,  **kwargs):
-        return self._do_url('GET', url, **kwargs)
+    def get(self, path,  **kwargs):
+        return self.do('GET', path, **kwargs)
 
-    def _post_url(self, url, **kwargs):
-        return self._do_url('POST', url, **kwargs)
+    def post(self, path, **kwargs):
+        return self.do('POST', path, **kwargs)
 
-    def _delete_url(self, url, **kwargs):
-        return self._do_url('DELETE', url, **kwargs)
+    def delete(self, path, **kwargs):
+        return self.do('DELETE', path, **kwargs)
 
-    def _patch_url(self, url, **kwargs):
-        return self._do_url('PATCH', url, **kwargs)
+    def patch(self, path, **kwargs):
+        return self.do('PATCH', path, **kwargs)
+
+    def is_production(self):
+        return self.base_url == self.production_base_url
+
+    def get_user(self):
+        return self.get('user')
+
+    def auth_user(self, user, password):
+        body = {
+            "email": user,
+            "password": password
+        }
+        return self.post('user/auth', json=body)
+
+    def create_sensor(self, **kwargs):
+        body = self.mk_attributes_body("sensor", None, kwargs)
+        return self.post('sensor', json=body)
+
+    def update_sensor(self, sensor_id, **kwargs):
+        body = self.mk_attributes_body("sensor", sensor_id, kwargs)
+        return self.patch('sensor/{}'.format(sensor_id), json=body)
+
+    def delete_sensor(self, sensor_id):
+        return self.delete('sensor/{}'.format(sensor_id))
+
+    def get_sensors(self):
+        return self.get("sensor")
+
+    def get_sensor(self, sensor_id):
+        return self.get('sensor/{}'.format(sensor_id))
+
+    def get_sensor_timeseries(self, sensor_id, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        return self.get('sensor/{}/timeseries'.format(sensor_id),
+                        params=params)
+
+    def post_sensor_timeseries(self, sensor_id, **kwargs):
+        body = self.mk_datapoint_body(**kwargs)
+        return self.post('sensor/{}/timeseries'.format(sensor_id),
+                         json=body)
+
+    def get_org(self):
+        return self.get('organization')
+
+    def update_org(self, **kwargs):
+        body = self.mk_attributes_body("organization", None, kwargs)
+        return self.patch('organization', json=body)
+
+    def get_org_timeseries(self, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        return self.get('organization/timeseries', params=params)
+
+    def post_org_timeseries(self, **kwargs):
+        body = self.mk_datapoint_body(**kwargs)
+        return self.post('organization/timeseries', json=body)
 
     def _get_json_path(self, json, path):
         try:
@@ -155,117 +178,72 @@ class Service:
         except KeyError:
             return None
 
-    def is_production(self):
-        return self.base_url == self.production_base_url
-
-    def get_user(self):
-        return self._get_url(self._mk_url('user'))
-
-    def auth_user(self, user, password):
-        body = {
-            "email": user,
-            "password": password
-        }
-        return self._post_url(self._mk_url('user/auth'), json=body)
-
-    def create_sensor(self, **kwargs):
-        body = self._mk_attributes_body("sensor", None, kwargs)
-        return self._post_url(self._mk_url('sensor'), json=body)
-
-    def update_sensor(self, sensor_id, **kwargs):
-        body = self._mk_attributes_body("sensor", sensor_id, kwargs)
-        return self._patch_url(self._mk_url('sensor/{}', sensor_id), json=body)
-
-    def delete_sensor(self, sensor_id):
-        return self._delete_url(self._mk_url('sensor/{}', sensor_id))
-
-    def get_sensors(self):
-        return self._get_url(self._mk_url("sensor"))
-
-    def get_sensor(self, sensor_id):
-        return self._get_url(self._mk_url('sensor/{}', sensor_id))
-
-    def get_sensor_timeseries(self, sensor_id, **kwargs):
-        params = self._timeseries_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('sensor/{}/timeseries', sensor_id),
-                             params=params)
-
-    def post_sensor_timeseries(self, sensor_id, **kwargs):
-        body = self._mk_datapoint_body(**kwargs)
-        return self._post_url(self._mk_url('sensor/{}/timeseries', sensor_id),
-                              json=body)
-
-    def get_org(self):
-        return self._get_url(self._mk_url('organization'))
-
-    def update_org(self, **kwargs):
-        body = self._mk_attributes_body("organization", None, kwargs)
-        return self._patch_url(self._mk_url('organization'), json=body)
-
-    def get_org_timeseries(self, **kwargs):
-        params = self._timeseries_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('organization/timeseries'),
-                             params=params)
-
-    def post_org_timeseries(self, **kwargs):
-        body = self._mk_datapoint_body(**kwargs)
-        return self._post_url(self._mk_url('organization/timeseries'),
-                              json=body)
-
     def get_prev_page(self, json):
         prev_url = self._get_json_path(json, ["links", "prev"])
-        return self._get_url(prev_url)
+        return self.get(prev_url)
 
     def get_next_page(self, json):
         next_url = self._get_json_path(json, ["links", "next"])
-        return self._get_url(next_url)
+        return self.get(next_url)
 
     def create_label(self, name=None):
-        body = self._mk_attributes_body("label", None, {
+        body = self.mk_attributes_body("label", None, {
             "name": name
         }) if name else None
-        return self._post_url(self._mk_url('label'), json=body)
+        return self.post('label', json=body)
 
     def delete_label(self, label_id):
-        return self._delete_url(self._mk_url('label/{}', label_id))
+        return self.delete('label/{}'.format(label_id))
 
     def get_labels(self, **kwargs):
-        params = self._include_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('label'), params=params)
+        params = self.mk_include_params(**kwargs)
+        return self.get('label', params=params)
 
     def get_label(self, label_id, **kwargs):
-        params = self._include_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('label/{}', label_id), params=params)
+        params = self.mk_include_params(**kwargs)
+        return self.get('label/{}'.format(label_id), params=params)
 
     def get_label_sensors(self, label_id):
-        return self._get_url(self._mk_url('label/{}/relationships/sensor',
-                                          label_id))
+        return self.get('label/{}/relationships/sensor'.format(label_id))
 
     def update_label_sensors(self, label_id, sensor_ids):
-        body = self._mk_relationships_body("sensor", sensor_ids)
-        return self._patch_url(self._mk_url('label/{}/relationships/sensor',
-                                            label_id),
-                               json=body)
+        body = self.mk_relationships_body("sensor", sensor_ids)
+        return self.patch('label/{}/relationships/sensor'.format(label_id),
+                          json=body)
 
     def get_elements(self, **kwargs):
-        params = self._include_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('element'), params=params)
+        params = self.mk_include_params(**kwargs)
+        return self.get('element', params=params)
 
     def get_element(self, element_id, **kwargs):
-        params = self._include_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('element/{}', element_id),
-                             params=params)
+        params = self.mk_include_params(**kwargs)
+        return self.get('element/{}'.format(element_id), params=params)
 
     def update_element(self, element_id, **kwargs):
-        body = self._mk_attributes_body("element", element_id, kwargs)
-        return self._patch_url(self._mk_url('element/{}', element_id),
-                               json=body)
+        body = self.mk_attributes_body("element", element_id, kwargs)
+        return self.patch('element/{}'.format(element_id), json=body)
+
+    def _lua_uploads_from_files(self, files, **kwargs):
+        def basename(f):
+            return os.path.basename(f)
+
+        def lua_file(name):
+            return (basename(name), io.open(name, 'rb'), 'application/x-lua')
+
+        main_file = kwargs.pop('main', None)
+        # construct a dictionary of files that are not the main file
+        files = {basename(name): lua_file(name) for name in files
+                 if name != main_file}
+        # then add the main file if given
+        if main_file:
+            files["user.lua"] = lua_file(main_file)
+        return files
 
     def get_sensor_scripts(self):
-        return self._get_url(self._mk_url('sensor-script'))
+        return self.get('sensor-script')
 
     def get_sensor_script(self, script_id):
-        return self._get_url(self._mk_url('sensor-script/{}', script_id))
+        return self.get('sensor-script/{}'.format(script_id))
 
     def deploy_sensor_script(self, files, **kwargs):
         manifest = {
@@ -278,33 +256,31 @@ class Service:
         uploads['manifest'] = ('manifest.json',
                                json.dumps(manifest),
                                'application/json')
-        return self._post_url(self._mk_url('sensor-script'), files=uploads)
+        return self.post('sensor-script', files=uploads)
 
     def get_cloud_scripts(self):
-        return self._get_url(self._mk_url('cloud-script'))
+        return self.get('cloud-script')
 
     def get_cloud_script(self, script_id):
-        return self._get_url(self._mk_url('cloud-script/{}', script_id))
+        return self.get('cloud-script/{}'.format(script_id))
 
     def get_cloud_script_timeseries(self, script_id, **kwargs):
-        params = self._timeseries_params_from_kwargs(**kwargs)
-        return self._get_url(self._mk_url('cloud-script/{}/timeseries',
-                                          script_id),
-                             params=params)
+        params = self.mk_timeseries_params(**kwargs)
+        return self.get('cloud-script/{}/timeseries'.format(script_id),
+                        params=params)
 
     def delete_cloud_script(self, script_id):
-        return self._delete_url(self._mk_url('cloud-script/{}', script_id))
+        return self.delete('cloud-script/{}'.format(script_id))
 
     def _mk_cloud_script_attributes(self, script_id, **kwargs):
-        return self._mk_attributes_body("cloud-script", script_id, {
+        return self.mk_attributes_body("cloud-script", script_id, {
             "state": kwargs.pop("state", "running"),
             "name": kwargs.pop("name", None)
         })
 
     def update_cloud_script(self, script_id, **kwargs):
         body = self._mk_cloud_script_attributes(script_id, **kwargs)
-        return self._patch_url(self._mk_url('cloud-script/{}', script_id),
-                               json=body)
+        return self.patch('cloud-script/{}'.format(script_id), json=body)
 
     def deploy_cloud_script(self, files, **kwargs):
         uploads = self._lua_uploads_from_files(files, **kwargs)
@@ -312,4 +288,4 @@ class Service:
         uploads['attributes'] = ('attributes.json',
                                  json.dumps(attributes),
                                  'application/json')
-        return self._post_url(self._mk_url('cloud-script'), files=uploads)
+        return self.post('cloud-script', files=uploads)

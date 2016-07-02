@@ -4,7 +4,7 @@ import os
 import click
 import uuid
 from . import writer
-from urllib.parse import urlsplit
+from requests.compat import urlsplit
 from collections import OrderedDict
 from functools import update_wrapper
 from importlib import import_module
