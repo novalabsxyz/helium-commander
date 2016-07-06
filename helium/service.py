@@ -1,9 +1,73 @@
-import requests
-import json
 import io
 import os
 from . import __version__
+from json import loads as load_json, dumps as dump_json
+from requests import Session, HTTPError
 from requests.compat import urljoin, urlsplit
+
+
+class LiveService:
+    """Represents a live SSE endpoint.
+
+    Some of the helium endpoints return a Server Sent Event connection
+    which returns events as they happen in the system. The most common
+    usecase for this are the "live" endpoints.
+
+    Typically you work with this class by calling one of the Service
+    endpoints which returns an instance of this and then iterate over
+    the result of the `events` method.
+
+    """
+    _FIELD_SEPARATOR = ':'
+
+    def __init__(self, source):
+        """Initializes a LiveSession.
+
+        :param source: A requests.Response object
+        """
+        self.source = source
+
+    def _read(self):
+        data = ""
+        for line in self.source.iter_lines(decode_unicode=True):
+            if not line.strip():
+                yield data
+                data = ""
+            data = data + "\n" + line
+
+    def events(self):
+        for chunk in self._read():
+            event_type = None
+            event_data = ""
+            for line in chunk.splitlines():
+                # Ignore empty lines or comments
+                # Comments lines in SSE start with the field separator
+                if not line.strip() or line.startswith(self._FIELD_SEPARATOR):
+                    continue
+
+                data = line.split(self._FIELD_SEPARATOR, 1)
+                field = data[0]
+                data = data[1]
+
+                if field == 'event':
+                    event_type = data
+                elif field == 'data':
+                    event_data += data
+                else:
+                    event_data = data
+
+            if not event_data:
+                # Don't report on events with no data
+                continue
+
+            if event_data.endswith('\n'):
+                event_data = event_data[:-1]
+
+            event_data = load_json(event_data)
+            yield (event_type, event_data)
+
+    def close(self):
+        self.source.close()
 
 
 class Service:
@@ -16,7 +80,7 @@ class Service:
         # ensure we can urljoin paths to the base url
         if not self.base_url.endswith('/'):
             self.base_url += '/'
-        self.session = requests.Session()
+        self.session = Session()
 
     def mk_params(self, map, kwargs):
         result = {}
@@ -70,7 +134,9 @@ class Service:
             "include": "include"
         }, kwargs)
 
-    def do(self, method, path, params=None, json=None, files=None):
+    def do(self, method, path,
+           params=None, json=None,
+           files=None, stream=False):
         if path is None:
             return None
         url = path if urlsplit(path).scheme else urljoin(self.base_url, path)
@@ -80,6 +146,7 @@ class Service:
             'User-agent': self.user_agent
         }
         res = self.session.request(method, url,
+                                   stream=stream,
                                    params=params,
                                    json=json,
                                    files=files,
@@ -87,7 +154,7 @@ class Service:
                                    allow_redirects=True)
         if res.ok:
             try:
-                return res.json()
+                return res.json() if not stream else res
             except ValueError:
                 return res
         else:
@@ -100,7 +167,7 @@ class Service:
                                     err['detail'],
                                     res.url)
                 # and use that as the error
-                raise requests.HTTPError(errmsg, response=res)
+                raise HTTPError(errmsg, response=res)
             except ValueError:
                 # otherwise raise as a base HTTPError
                 res.raise_for_status()
@@ -157,6 +224,12 @@ class Service:
         return self.post('sensor/{}/timeseries'.format(sensor_id),
                          json=body)
 
+    def live_sensor_timeseries(self, sensor_id, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        source = self.get('sensor/{}/timeseries/live'.format(sensor_id),
+                          params=params, stream=True)
+        return LiveService(source)
+
     def get_org(self):
         return self.get('organization')
 
@@ -167,6 +240,11 @@ class Service:
     def get_org_timeseries(self, **kwargs):
         params = self.mk_timeseries_params(**kwargs)
         return self.get('organization/timeseries', params=params)
+
+    def live_org_timeseries(self, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        source = self.get('organization/timeseries/live', params=params)
+        return LiveService(source)
 
     def post_org_timeseries(self, **kwargs):
         body = self.mk_datapoint_body(**kwargs)
@@ -254,7 +332,7 @@ class Service:
         }
         uploads = self._lua_uploads_from_files(files, **kwargs)
         uploads['manifest'] = ('manifest.json',
-                               json.dumps(manifest),
+                               dump_json(manifest),
                                'application/json')
         return self.post('sensor-script', files=uploads)
 
@@ -286,6 +364,6 @@ class Service:
         uploads = self._lua_uploads_from_files(files, **kwargs)
         attributes = self._mk_cloud_script_attributes(None, **kwargs)
         uploads['attributes'] = ('attributes.json',
-                                 json.dumps(attributes),
+                                 dump_json(attributes),
                                  'application/json')
         return self.post('cloud-script', files=uploads)

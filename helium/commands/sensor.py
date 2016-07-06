@@ -167,8 +167,21 @@ def _post_sensor_timeseries(service, sensor, **kwargs):
     return [service.post_sensor_timeseries(sensor, **kwargs).get('data')]
 
 
+@click.argument('sensor')
+@mac_option
+@pass_service
+def _live_sensor_timeseries(service, sensor, **kwargs):
+    """Live readings from a sensor.
+
+    Reports readings from a sensor as they come in.
+    """
+    sensor = _find_sensor_id(service, sensor, **kwargs)
+    return service.live_sensor_timeseries(sensor, **kwargs)
+
+
 cli.add_command(ts.cli(get=_get_sensor_timeseries,
-                       post=_post_sensor_timeseries))
+                       post=_post_sensor_timeseries,
+                       live=_live_sensor_timeseries))
 
 
 @cli.command()

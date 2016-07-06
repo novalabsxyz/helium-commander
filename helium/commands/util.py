@@ -5,7 +5,6 @@ import click
 import uuid
 from . import writer
 from requests.compat import urlsplit
-from collections import OrderedDict
 from functools import update_wrapper
 from importlib import import_module
 
@@ -77,17 +76,13 @@ def shorten_json_id(json, **kwargs):
 
 
 def tabulate(result, map, **kwargs):
-    mapping = OrderedDict(map)
-    if not mapping or not result:
+    if not map or not result:
         return result
 
     file = kwargs.pop('file', click.utils.get_text_stream('stdout'))
-    _writer = writer.for_format(output_format(**kwargs), file,
-                                mapping=mapping, **kwargs)
-
-    _writer.start()
-    _writer.write_entries(result)
-    _writer.finish()
+    with writer.for_format(output_format(**kwargs),
+                           file, mapping=map, **kwargs) as _writer:
+        _writer.write_entries(result)
 
 
 def map_script_filenames(json):
@@ -146,7 +141,8 @@ def cli(version=None, package=None,  commands=None):
     def decorator(f):
         @click.option('--uuid', is_flag=True,
                       help="Whether to display long identifiers")
-        @click.option('--format', type=click.Choice(['csv', 'json', 'tabular']),
+        @click.option('--format',
+                      type=click.Choice(['csv', 'json', 'tabular']),
                       default=None,
                       help="The output format (default 'tabular')")
         @click.version_option(version=version)

@@ -5,25 +5,33 @@ import terminaltables
 import dpath.util as dpath
 from textwrap import wrap
 from operator import itemgetter
+from collections import OrderedDict
+from contextlib import contextmanager
 
 
+@contextmanager
 def for_format(format, file, **kwargs):
     json_opts = kwargs.pop('json', None)
     if format == 'json':
         json_opts = json_opts or {
             "indent": 4
         }
-        return JSONWriter(file, json=json_opts, **kwargs)
+        result = JSONWriter(file, json=json_opts, **kwargs)
     elif format == 'csv':
         json_opts = json_opts or {
             "indent": None
         }
-        return CSVWriter(file, json=json_opts, **kwargs)
+        result = CSVWriter(file, json=json_opts, **kwargs)
     elif format == 'tabular':
         json_opts = json_opts or {
             "indent": 0
         }
-        return TerminalWriter(file, json=json_opts, **kwargs)
+        result = TerminalWriter(file, json=json_opts, **kwargs)
+    try:
+        result.start()
+        yield result
+    finally:
+        result.finish()
 
 
 class BaseWriter:
@@ -31,7 +39,7 @@ class BaseWriter:
 
     def __init__(self, file, **kwargs):
         self.file = file
-        self.mapping = kwargs.pop('mapping', None)
+        self.mapping = OrderedDict(kwargs.pop('mapping'))
         self.json_opts = kwargs.pop('json', None)
         self.sort = kwargs.pop('sort', None)
         self.reverse = kwargs.pop('reverse', False)

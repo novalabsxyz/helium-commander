@@ -1,21 +1,33 @@
 import helium
 import click
 import sys
-import json
+from json import loads as load_json
 from concurrent import futures
-from collections import OrderedDict
 from functools import update_wrapper
 from .util import shorten_json_id, tabulate, output_format
 from .writer import for_format as writer_for_format
+from contextlib import closing
 
 
-def cli(get=None, post=None):
+def cli(get=None, post=None, live=None):
     def tabulating_decorator(f):
         def new_func(*args, **kwargs):
             ctx = click.get_current_context()
             data = ctx.invoke(f, *args, **kwargs)
             _tabulate(data, **kwargs)
             return data
+        return update_wrapper(new_func, f)
+
+    def live_decorator(f):
+        def new_func(*args, **kwargs):
+            ctx = click.get_current_context()
+            with writer_for_format(output_format(default_format='json', **kwargs),
+                                   click.utils.get_text_stream('stdout'),
+                                   mapping=_mapping_for(**kwargs)) as _writer:
+                with closing(ctx.invoke(f, *args, **kwargs)) as live:
+                    for type, data in live.events():
+                        data = data.get('data')
+                        _writer.write_entries([data])
         return update_wrapper(new_func, f)
 
     group = click.Group(name='timeseries',
@@ -42,6 +54,10 @@ def cli(get=None, post=None):
     # and prefix the poster's parameters
     post_command.params = post_params + post_command.params
     group.add_command(post_command)
+
+    # Live
+    live_command = click.command('live')(live_decorator(live))
+    group.add_command(live_command)
 
     return group
 
@@ -148,7 +164,7 @@ class JSONParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         try:
-            return json.loads(value)
+            return load_json(value)
         except ValueError:
             self.fail('{} is not a valid json value'.format(value), param, ctx)
 
@@ -214,8 +230,7 @@ def _process_timeseries(writer, service, sensor_id, **kwargs):
 def _dump_one(service, sensor_id, format, **kwargs):
     filename = (sensor_id+'.'+format).encode('ascii', 'replace')
     with click.open_file(filename, "wb") as file:
-        csv_mapping = OrderedDict(_mapping_for(shorten_json_id=False,
-                                               **kwargs))
+        csv_mapping = _mapping_for(shorten_json_id=False, **kwargs)
         service = helium.Service(service.api_key, service.base_url)
         output = writer_for_format(format, file, mapping=csv_mapping)
         _process_timeseries(output, service, sensor_id, **kwargs)

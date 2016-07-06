@@ -48,9 +48,20 @@ def _post_org_timeseries(service, **kwargs):
     """
     return [service.post_org_timeseries(**kwargs).get('data')]
 
+@pass_service
+def _live_org_timeseries(service, **kwargs):
+    """Live readings from the organization
+
+    Reports readings from the authenticated organization as they come
+    in.
+
+    """
+    return service.live_org_timeseries(**kwargs)
+
 
 cli.add_command(ts.cli(get=_get_org_timeseries,
-                       post=_post_org_timeseries))
+                       post=_post_org_timeseries,
+                       live=_live_org_timeseries))
 
 
 @cli.command()
