@@ -29,12 +29,12 @@ let
 
   helium-commander = buildPythonPackage rec {
     name = "helium-commander-${version}";
-    version = "0.6.9";
+    version = "0.9.0";
 
     src = ./.;
 
     propagatedBuildInputs =
-      [ requests2 futures click dpath terminaltables ];
+      [ requests2 futures future click dpath terminaltables unicodecsv ];
 
     meta = {
       homepage = "http://github.com/helium/helium-commander/";
