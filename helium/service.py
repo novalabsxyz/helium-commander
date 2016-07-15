@@ -301,6 +301,22 @@ class Service:
         body = self.mk_attributes_body("element", element_id, kwargs)
         return self.patch('element/{}'.format(element_id), json=body)
 
+    def get_element_timeseries(self, element_id, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        return self.get('element/{}/timeseries'.format(element_id),
+                        params=params)
+
+    def post_element_timeseries(self, element_id, **kwargs):
+        body = self.mk_datapoint_body(**kwargs)
+        return self.post('element/{}/timeseries'.format(element_id),
+                         json=body)
+
+    def live_element_timeseries(self, element_id, **kwargs):
+        params = self.mk_timeseries_params(**kwargs)
+        source = self.get('element/{}/timeseries/live'.format(element_id),
+                          params=params, stream=True)
+        return LiveService(source)
+
     def _lua_uploads_from_files(self, files, **kwargs):
         def basename(f):
             return os.path.basename(f)

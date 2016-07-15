@@ -1,5 +1,6 @@
 import click
 import helium
+from . import timeseries as ts
 from .sensor import version_option as sensor_version_option
 from .sensor import mac_option, sort_option as sensor_sort_option
 from .sensor import _tabulate as _tabulate_sensors
@@ -98,3 +99,44 @@ def sensor(service, element, **kwargs):
     element = _find_element_id(service, element, **kwargs)
     sensors = service.get_element(element, include='sensor').get('included')
     _tabulate_sensors(sensors, **kwargs)
+
+
+@click.argument('element')
+@mac_option
+@pass_service
+def _get_element_timeseries(service, element, **kwargs):
+    """Get timeseries readings for a element.
+
+    Retrieve timeseries data for a given ELEMENT.
+    """
+    element = _find_element_id(service, element, **kwargs)
+    return service.get_element_timeseries(element, **kwargs).get('data')
+
+
+@click.argument('element')
+@mac_option
+@pass_service
+def _post_element_timeseries(service, element, **kwargs):
+    """Post readings to a element.
+
+    Posts timeseries readings for a given ELEMENT.
+    """
+    element = _find_element_id(service, element, **kwargs)
+    return [service.post_element_timeseries(element, **kwargs).get('data')]
+
+
+@click.argument('element')
+@mac_option
+@pass_service
+def _live_element_timeseries(service, element, **kwargs):
+    """Live readings from a element.
+
+    Reports readings from a given ELEMENT as they come in.
+    """
+    element = _find_element_id(service, element, **kwargs)
+    return service.live_element_timeseries(element, **kwargs)
+
+
+cli.add_command(ts.cli(get=_get_element_timeseries,
+                       post=_post_element_timeseries,
+                       live=_live_element_timeseries))
