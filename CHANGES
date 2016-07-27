@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.9.1
+-------------
+
+Released on July 27 2016
+
+- Adds timeseries support for element resources
+- Fixes a timeseries dump error
+
+
 Version 0.9.0
 -------------
 
