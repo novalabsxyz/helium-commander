@@ -219,12 +219,10 @@ def _process_timeseries(writer, service, sensor_id, **kwargs):
         return json['data'] if json else None
     # Get the first page
     res = service.get_sensor_timeseries(sensor_id, **kwargs)
-    writer.start()
     writer.write_entries(json_data(res))
     while res is not None:
         res = service.get_prev_page(res)
         writer.write_entries(json_data(res))
-        writer.finish()
 
 
 def _dump_one(service, sensor_id, format, **kwargs):
@@ -232,5 +230,5 @@ def _dump_one(service, sensor_id, format, **kwargs):
     with click.open_file(filename, "wb") as file:
         csv_mapping = _mapping_for(shorten_json_id=False, **kwargs)
         service = helium.Service(service.api_key, service.base_url)
-        output = writer_for_format(format, file, mapping=csv_mapping)
-        _process_timeseries(output, service, sensor_id, **kwargs)
+        with writer_for_format(format, file, mapping=csv_mapping) as output:
+            _process_timeseries(output, service, sensor_id, **kwargs)
