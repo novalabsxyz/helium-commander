@@ -5,7 +5,7 @@ import click
 import uuid
 from . import writer
 from requests.compat import urlsplit
-from functools import update_wrapper
+from functools import update_wrapper, reduce
 from importlib import import_module
 
 
@@ -117,6 +117,70 @@ def sort_option(options):
             func = option(func)
         return func
     return wrapper
+
+
+class ResourceParamType(click.ParamType):
+    name = 'resource'
+
+    def __init__(self, nargs=-1, metavar='TEXT'):
+        self.nargs = nargs
+        self.metavar = metavar
+
+    def get_metavar(self, param):
+        metavar = self.metavar
+        if self.nargs == -1:
+            return '{0}[,{0},...]* | @filename'.format(metavar)
+        else:
+            return metavar
+
+    def convert(self, value, param, ctx):
+        def collect_resources(acc, resource_rep):
+            if resource_rep.startswith('@'):
+                for line in click.open_file(resource_rep[1:]):
+                    acc.append(line.strip())
+            else:
+                acc.append(resource_rep)
+            return acc
+        nargs = self.nargs
+        value = value.split(',') if isinstance(value, basestring) else value
+        resources = reduce(collect_resources, value, [])
+        if nargs > 0 and nargs != len(resources):
+            self.fail('Expected {} resources, but got {}'.format(nargs, len(resources)))
+        return resources
+
+    def __repr__(self):
+        'Resource(metavar={}, nargs={})'.fomat(self.metavar, self.nargs)
+
+
+def update_resource_relationship(resources, find_item_id, **kwargs):
+    """Constructs an updated relationship list.
+
+    Takes the items in the relationship and items to be added in
+    'added' or removed in 'remove' and returns a new list with the new
+    list of ids or None if no difference was detected
+    """
+    def _extract_list(items):
+        return items.split(',') if isinstance(items, basestring) else items
+
+    item_ids = dpath.values(resources, "*/id")
+    remove_items = kwargs.pop('remove', None)
+    if remove_items:
+        remove_items = _extract_list(remove_items)
+        remove_items = [find_item_id(item, **kwargs) for item in remove_items]
+        item_ids = set.difference(set(item_ids), set(remove_items))
+
+    add_items = kwargs.pop('add', None)
+    if add_items:
+        add_items = _extract_list(add_items)
+        add_items = [find_item_id(item, **kwargs) for item in add_items]
+        item_ids = set.union(set(item_ids), set(add_items))
+
+    if add_items or remove_items:
+        if item_ids is None:
+            item_ids = []
+        return item_ids
+
+    return None
 
 
 CONTEXT_SETTINGS = dict(

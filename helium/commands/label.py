@@ -3,8 +3,10 @@ import click
 import dpath.util as dpath
 from .timeseries import options as timeseries_options
 from .timeseries import dump as timeseries_dump
-from .sensor import list as sensor_list, sort_option as sensor_sort_option
-from .util import tabulate, lookup_resource_id, shorten_json_id, sort_option
+from .sensor import sort_option as sensor_sort_option
+from .sensor import _tabulate as _tabulate_sensors
+from .util import tabulate, lookup_resource_id, shorten_json_id
+from .util import ResourceParamType, update_resource_relationship
 
 
 pass_service = click.make_pass_decorator(helium.Service)
@@ -45,39 +47,51 @@ def _update_label_sensors(ctx, label, sensor, set_func):
 
 @cli.command()
 @click.argument('label', required=False)
-@sensor_sort_option
-@click.pass_context
-def list(ctx, label, **kwargs):
+@pass_service
+def list(service, label, **kwargs):
     """Lists information on labels.
 
     Lists information on a given label or all labels in the organization
     """
     if label:
-        ctx.invoke(sensor_list, label=label, **kwargs)
+        label = lookup_resource_id(service.get_labels, label, **kwargs)
+        result = [service.get_label(label, include='sensor').get('data')]
     else:
-        service = ctx.find_object(helium.Service)
-        _tabulate(service.get_labels(include='sensor').get('data'), **kwargs)
+        result = service.get_labels(include='sensor').get('data')
+    _tabulate(result, **kwargs)
 
 
 @cli.command()
-@click.argument('name', nargs=1)
-@click.argument('sensor', nargs=-1)
+@click.argument('label')
+@sensor_sort_option
+@pass_service
+def sensor(service, label, **kwargs):
+    """Lists sensors for a label.
+
+    Lists sensors for a given LABEL.
+    """
+    label = lookup_resource_id(service.get_labels, label, **kwargs)
+    sensors = service.get_label(label, include='sensor').get('included')
+    _tabulate_sensors(sensors, **kwargs)
+
+
+@cli.command()
+@click.argument('name')
+@click.option('--add',
+              type=ResourceParamType(metavar='SENSOR'),
+              help="Add sensors to a label")
 @click.pass_context
-def create(ctx, name, sensor):
+def create(ctx, name, **kwargs):
     """Create a label.
 
-    Creates a label with a given NAME and an (optional) list of SENSORs
+    Creates a label with a given NAME and an (optional) list of sensors
     associated with that label.
     """
     service = ctx.find_object(helium.Service)
     label = service.create_label(name).get('data')
-    label_id = label['id']
-    if sensor:
-        sensor_list = service.get_sensors().get('data')
-        sensors = [lookup_resource_id(sensor_list, sensor_id)
-                   for sensor_id in sensor]
-        service.update_label_sensors(label_id, sensors)
-    _tabulate([service.get_label(label_id, include='sensor').get('data')])
+    label = label['id']
+
+    ctx.invoke(update, service, label=label, **kwargs)
 
 
 @cli.command()
@@ -98,29 +112,37 @@ def delete(service, label):
 
 
 @cli.command()
-@click.argument('label', nargs=1)
-@click.argument('sensor', nargs=-1)
-@click.pass_context
-def add(ctx, label, sensor):
-    """Add sensors to a label.
+@click.argument('label')
+@click.option('--add',
+              type=ResourceParamType(metavar='SENSOR'),
+              help="Add sensors to a label")
+@click.option('--remove',
+              type=ResourceParamType(metavar='SENSOR'),
+              help="Remove sensors from a label")
+@click.option('--name',
+              help="the new name for the label")
+@pass_service
+def update(service, label, name, **kwargs):
+    label = lookup_resource_id(service.get_labels, label)
+    org_sensors = service.get_sensors().get('data')
 
-    Adds a given list of SENSORs to the LABEL with the given id.
-    """
-    _update_label_sensors(ctx, label, sensor, set.union)
-    ctx.invoke(sensor_list, label=label)
+    def _label_sensors():
+        return service.get_label(label, include='sensor').get('included')
 
+    def _find_sensor_id(sensor, **kwargs):
+        return lookup_resource_id(org_sensors, sensor, **kwargs)
 
-@cli.command()
-@click.argument('label', nargs=1)
-@click.argument('sensor', nargs=-1)
-@click.pass_context
-def remove(ctx, label, sensor):
-    """Remove sensors from a label.
+    label_sensors = _label_sensors()
+    label_sensor_ids = update_resource_relationship(label_sensors,
+                                                    _find_sensor_id,
+                                                    **kwargs)
+    if name:
+        service.update_label(label, name=name)
+    if label_sensor_ids is not None:
+        service.update_label_sensors(label, label_sensor_ids)
+        label_sensors = _label_sensors()
 
-    Removes a given list of SENSORs from the LABEL with the given id.
-    """
-    _update_label_sensors(ctx, label, sensor, set.difference)
-    ctx.invoke(sensor_list, label=label)
+    _tabulate([service.get_label(label, include='sensor').get('data')])
 
 
 @cli.command()

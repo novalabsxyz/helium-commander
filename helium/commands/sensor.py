@@ -77,22 +77,18 @@ def _tabulate(result, **kwargs):
 
 @cli.command()
 @click.argument('sensor', required=False)
-@click.option('-l', '--label', metavar='LABEL',
-              help="the id of a label")
 @version_option
 @mac_option
 @sort_option
 @pass_service
-def list(service, sensor, label, **kwargs):
+def list(service, sensor, **kwargs):
     """List sensors.
 
-    Lists information for a label of sensors or all sensors in
-    the organization.
+    Lists information for a given SENSOR or all sensors in the
+    organization.
+
     """
-    if label:
-        label = lookup_resource_id(service.get_labels, label)
-        sensors = service.get_label(label, include="sensor").get('included')
-    elif sensor:
+    if sensor:
         sensor = _find_sensor_id(service, sensor, **kwargs)
         sensors = [service.get_sensor(sensor).get('data')]
     else:

@@ -270,6 +270,10 @@ class Service:
         }) if name else None
         return self.post('label', json=body)
 
+    def update_label(self, label_id, **kwargs):
+        body = self.mk_attributes_body('label', label_id, kwargs)
+        return self.patch('label/{}'.format(label_id), json=body)
+
     def delete_label(self, label_id):
         return self.delete('label/{}'.format(label_id))
 

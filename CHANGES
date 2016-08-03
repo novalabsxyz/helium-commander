@@ -3,6 +3,16 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.9.2
+-------------
+
+Released on August 2  2016
+
+- Re-factor label commands to support the more standard "update" command approach
+- Expose a update_resource_relationship utility to update a list of resources based on arguments
+- Expose a ResourceParamType option type that can be used to support files for lists of options
+- Use the file option in the label command approach for --add and --remove 
+
 
 Version 0.9.1
 -------------
