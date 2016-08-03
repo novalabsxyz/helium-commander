@@ -4,6 +4,7 @@ with nixpkgs;
 with pkgs.python27Packages;
 
 let
+   heliumCommander-version = "0.9.2";
 
   dpath = buildPythonPackage {
     name = "dpath-1.4.0";
@@ -29,7 +30,7 @@ let
 
   helium-commander = buildPythonPackage rec {
     name = "helium-commander-${version}";
-    version = "0.9.1";
+    version = heliumCommander-version;
 
     src = ./.;
 
