@@ -67,7 +67,7 @@ cli.add_command(ts.cli(get=_get_org_timeseries,
 @cli.command()
 @ts.options(page_size=5000)
 @pass_service
-def dump(service, format, **kwargs):
+def dump(service, **kwargs):
     """Dumps timeseries data to files.
 
     Dumps the timeseries data for all sensors in the organization.
