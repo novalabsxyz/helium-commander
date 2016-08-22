@@ -43,24 +43,6 @@ def _find_sensor_id(service, sensor, **kwargs):
 
 
 def _tabulate(result, **kwargs):
-    version_map = []
-    version_base = [
-        ('atom', 'meta/versions/atom'),
-        ('firmware', 'meta/versions/sensor'),
-    ]
-    version_option = kwargs.pop('versions', 'none')
-    if version_option == 'fw':
-        version_map = version_base
-    elif version_option == 'all':
-        def _map_script_versions(json):
-            versions = dpath.values(json, 'meta/versions/sensor-script/*/version')
-            return '\n'.join([v for v in versions if not v.startswith('ffffffff')])
-        version_map = version_base + [
-            ('libary', 'meta/versions/sensor-library'),
-            ('config', 'meta/versions/sensor-config'),
-            ('script', _map_script_versions)
-        ]
-
     def _map_card(json):
         key = unicode(dpath.get(json, 'meta/card/id'))
         return card_type(key, key)
@@ -70,7 +52,6 @@ def _tabulate(result, **kwargs):
         ('mac', 'meta/mac'),
         ('type', _map_card),
         ('seen', 'meta/last-seen'),
-    ] + version_map + [
         ('name', 'attributes/name'),
     ], **kwargs)
 
