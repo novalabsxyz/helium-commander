@@ -1,4 +1,4 @@
-# Helium Commader
+# Helium Commander
 
 
 [Helium](https://helium.com) is an integrated platform of smart sensors, communication, edge and cloud compute that enables numerous sensing applications.
