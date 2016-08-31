@@ -51,13 +51,15 @@ def filter_oneof(lookup_filters):
     return id_func
 
 
-def lookup_all_matching(cls, client, id_rep, lookup_filter=filter_uuid):
-    all_resources = cls.all(client)
+def lookup_all_matching(cls, client, id_rep, lookup_filter=filter_uuid,
+                        resources=None):
+    if resources is None:
+        resources = cls.all(client)
     resource_filter = lookup_filter(id_rep)
-    return list(filter(resource_filter, all_resources))
+    return list(filter(resource_filter, resources))
 
 
-def lookup_all_id(cls, client, id_rep, mac=False):
+def lookup_all_id(cls, client, id_rep, mac=False, resources=None):
     if mac:
         filters = [
             filter_mac
@@ -70,11 +72,14 @@ def lookup_all_id(cls, client, id_rep, mac=False):
         ]
     lookup_filter = filter_oneof(filters)
     return lookup_all_matching(cls, client, id_rep,
-                               lookup_filter=lookup_filter)
+                               lookup_filter=lookup_filter,
+                               resources=resources)
 
 
-def lookup_one_id(cls, client, id_rep, mac=False):
-    resources = lookup_all_id(cls, client, id_rep, mac=mac)
+def lookup_one_id(cls, client, id_rep, mac=False, resources=None):
+    resources = lookup_all_id(cls, client, id_rep,
+                              mac=mac,
+                              resources=resources)
     resources_len = len(list(resources)) if resources is not None else 0
     if resources_len == 1:
         return resources[0]

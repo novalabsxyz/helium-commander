@@ -5,7 +5,6 @@ author_email = 'hello@helium.com'
 install_requires = [
     'helium-python',
     'future>=0.15',
-    'requests>=2.9',
     'dpath>=1.4',
     'futures>=3.0',
     'terminaltables>=2.1.0',

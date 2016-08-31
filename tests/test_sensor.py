@@ -9,7 +9,7 @@ def test_lookup(client, sensors):
 
     sensor = sensors[0]
 
-    lookup_sensor = Sensor.lookup(client, sensor.id)
+    lookup_sensor = Sensor.lookup(client, sensor.id, resources=sensors)
     assert sensor == lookup_sensor
 
     lookup_sensor = Sensor.lookup(client, sensor.short_id)
