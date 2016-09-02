@@ -1,17 +1,25 @@
+from __future__ import unicode_literals
+import click
 import unicodecsv as csv
 import json
 import abc
 import terminaltables
-import dpath.util as dpath
 from textwrap import wrap
 from operator import itemgetter
-from collections import OrderedDict
-from contextlib import contextmanager
 
 
-@contextmanager
+def output_format(default_format='tabular', **kwargs):
+    override_format = kwargs.get('format')
+    try:
+        root_context = click.get_current_context().find_root()
+        click_format = root_context.params.get('format')
+    except RuntimeError:
+        click_format = None
+    return override_format or click_format or default_format
+
+
 def for_format(format, file, **kwargs):
-    json_opts = kwargs.pop('json', None)
+    json_opts = kwargs.pop('json_opts', None)
     if format == 'json':
         json_opts = json_opts or {
             "indent": 4
@@ -26,12 +34,9 @@ def for_format(format, file, **kwargs):
         json_opts = json_opts or {
             "indent": 0
         }
-        result = TerminalWriter(file, json_opts=json_opts, **kwargs)
-    try:
-        result.start()
-        yield result
-    finally:
-        result.finish()
+        result = TabularWriter(file, json_opts=json_opts, **kwargs)
+
+    return result
 
 
 class BaseWriter:
@@ -39,51 +44,42 @@ class BaseWriter:
 
     def __init__(self, file, **kwargs):
         self.file = file
-        self.mapping = OrderedDict(kwargs.pop('mapping'))
-        self.json_opts = kwargs.pop('json', None)
+        self.json_opts = kwargs.pop('json_opts')
+
+    def start(self, mapping, **kwargs):
         self.sort = kwargs.pop('sort', None)
         self.reverse = kwargs.pop('reverse', False)
 
-    def start(self):
-        return
-
     @abc.abstractmethod
-    def write_entries(self, entries):
+    def write_resources(self, resources):
         return
 
-    def finish(self):
+    def finish(self, mapping):
         return
 
-    def lookup(self, o, path, **kwargs):
-        try:
-            if hasattr(path, '__call__'):
-                result = path(o)
-            else:
-                result = dpath.get(o, path)
-        except KeyError:
-            return ""
-        json_opts = kwargs.pop('json', None)
-        if isinstance(result, dict) and json_opts:
-            result = json.dumps(result, **json_opts)
+    def lookup(self, o, path):
+        result = path(o)
+        if result is None:
+            return ''
+        if isinstance(result, dict) and self.json_opts:
+            result = json.dumps(result, **self.json_opts)
         else:
             result = result
         return result
 
 
 class CSVWriter(BaseWriter):
-    def __init__(self, file, **kwargs):
-        super(CSVWriter, self).__init__(file, **kwargs)
-        self.writer = csv.DictWriter(file, self.mapping.keys())
 
-    def start(self):
+    def start(self, mapping, **kwargs):
+        self.writer = csv.DictWriter(file, mapping.keys())
         self.writer.writeheader()
 
-    def write_entries(self, entries):
+    def write_resources(self, entries, mapping):
         if entries is None:
             return
         for entry in entries:
-            row = {key: self.lookup(entry, path, json=self.json_opts)
-                   for key, path in self.mapping.iteritems()}
+            row = {key: self.lookup(entry, path)
+                   for key, path in mapping.iteritems()}
             self.writer.writerow(row)
 
 
@@ -91,11 +87,11 @@ class JSONWriter(BaseWriter):
     def __init__(self, file, **kwargs):
         super(JSONWriter, self).__init__(file, **kwargs)
 
-    def start(self):
+    def start(self, mapping, **kwargs):
         self.file.write('[\n')
         self.is_first_entries = True
 
-    def write_entries(self, entries):
+    def write_resources(self, entries, mapping):
         if entries is None:
             return
         for entry in entries:
@@ -104,31 +100,30 @@ class JSONWriter(BaseWriter):
             else:
                 self.file.write(',')
 
-            if self.mapping:
+            if mapping:
                 entry = {key: self.lookup(entry, path)
-                         for key, path in self.mapping.iteritems()}
+                         for key, path in mapping.iteritems()}
 
             json.dump(entry, self.file, **self.json_opts)
 
-    def finish(self):
+    def finish(self, mapping):
         self.file.write('\n]\n')
 
 
-class TerminalWriter(BaseWriter):
+class TabularWriter(BaseWriter):
     def __init__(self, file, **kwargs):
-        super(TerminalWriter, self).__init__(file, **kwargs)
-        self.data = [[key.upper() for key in self.mapping.keys()]]
-        self.json_opts = kwargs.pop('json_opts', None)
+        super(TabularWriter, self).__init__(file, **kwargs)
         self.max_width = kwargs.pop('max_width', None)
 
-    def start(self):
-        pass
+    def start(self, mapping, **kwargs):
+        super(TabularWriter, self).start(mapping, **kwargs)
+        self.data = [[key.upper() for key in mapping.keys()]]
 
-    def order_entries(self, entries):
-        if not self.mapping:
+    def order_entries(self, entries, mapping):
+        if not mapping:
             return entries
         if self.sort:
-            sort_index = self.mapping.keys().index(self.sort)
+            sort_index = mapping.keys().index(self.sort)
             entries = sorted(entries,
                              key=itemgetter(sort_index),
                              reverse=self.reverse)
@@ -136,7 +131,7 @@ class TerminalWriter(BaseWriter):
             entries = reversed(entries)
         return entries
 
-    def write_entries(self, entries):
+    def write_resources(self, resources, mapping):
         def safe_unicode(o, *args):
             try:
                 return unicode(o, *args)
@@ -144,22 +139,24 @@ class TerminalWriter(BaseWriter):
                 return unicode(str(o).encode('string_escape'))
 
         def map_entry(o):
-            return [safe_unicode(self.lookup(o, path, json=self.json_opts))
-                    for _, path in self.mapping.items()]
+            return [safe_unicode(self.lookup(o, path))
+                    for _, path in mapping.items()]
 
-        if entries is None:
+        if resources is None or mapping is None:
             return
-        if self.mapping:
-            entries = [map_entry(o) for o in entries]
 
-        self.data.extend(self.order_entries(entries))
+        entries = [map_entry(o) for o in resources]
+        self.data.extend(self.order_entries(entries, mapping))
 
-    def finish(self):
+    def finish(self, mapping):
+        if not hasattr(self, 'data'):
+            return
+
         table = terminaltables.AsciiTable(self.data)
         # table.inner_column_border=False
         # table.inner_heading_row_border=False
         # table.outer_border=False
-        last_column = len(self.mapping) - 1
+        last_column = len(mapping) - 1
         max_width = self.max_width or table.column_max_width(last_column)
         for entry in table.table_data:
             entry[last_column] = '\n'.join(wrap(entry[last_column], max_width))

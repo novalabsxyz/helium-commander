@@ -8,7 +8,7 @@ dist
 *.eggs
 venv/
 venv*/
-.env
+env/
 .coverage
 .python-version
 .tox
