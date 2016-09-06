@@ -97,3 +97,13 @@ def elements(client):
 def first_element(elements):
     """Return the first of the known elements for the active helium.Client"""
     return elements[0]
+
+
+@pytest.fixture
+def authorized_organization(client):
+    return client.authorized_organization()
+
+
+@pytest.fixture
+def authorized_user(client):
+    return client.authorized_user()

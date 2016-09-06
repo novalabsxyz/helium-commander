@@ -43,7 +43,8 @@ def cli(cls, lookup_options=None):
         mac = kwargs.pop('mac', False)
         resource = cls.lookup(client, id, mac=mac)
         timeseries = resource.timeseries(**kwargs)
-        with cls.display_writer(client) as writer:
+        mapping = cls.display_map(client)
+        with cls.display_writer(mapping, **kwargs) as writer:
             for data_point in timeseries().live():
                 writer.write_resources([data_point])
 

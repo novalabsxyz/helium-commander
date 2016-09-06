@@ -9,8 +9,6 @@ _commands = [
     "element",
     "sensor-script",
     "cloud-script",
-    "organization",
-    "user"
 ]
 
 @click.option('--api-key',

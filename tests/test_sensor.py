@@ -36,10 +36,10 @@ def test_lookup(client, sensors, first_sensor):
         Sensor.lookup(client, 'zzfs', mac=True)
 
 
-def test_display_map(first_sensor, sensors):
+def test_display_map(client, first_sensor, sensors):
     assert first_sensor is not None
 
-    display_map = Sensor.display_map()
+    display_map = Sensor.display_map(client)
     assert display_map is not None
 
     for sensor in sensors:

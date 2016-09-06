@@ -10,7 +10,7 @@ def card_type(card_id, default):
     }.get(card_id, default)
 
 
-def display_map(cls):
+def display_map(cls, client):
     def _type(self):
         try:
             card = str(self.meta.card.get('id'))
@@ -32,7 +32,7 @@ def display_map(cls):
             pass
         return None
 
-    dict = super(Sensor, cls).display_map()
+    dict = super(Sensor, cls).display_map(client)
     dict.update([
         ('mac', _mac),
         ('type', _type),

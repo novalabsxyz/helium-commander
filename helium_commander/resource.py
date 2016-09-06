@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from helium import Resource, ResourceMeta
+import helium_commander.writer as _writer
 import click
 from builtins import filter as _filter
 from collections import OrderedDict
@@ -78,19 +79,22 @@ def filter_id_rep(mac=False):
 
 def resource_filter(cls, client, value,
                     lookup_filter=filter_uuid,
-                    resources=None):
+                    resources=None,
+                    include=None):
     if resources is None:
-        resources = cls.all(client)
+        resources = cls.all(client, include=include)
     resource_filter = lookup_filter(value)
     return list(_filter(resource_filter, resources))
 
 
 def resource_lookup(cls, client, id_rep,
                     mac=False,
-                    resources=None):
+                    resources=None,
+                    include=None):
     resources = resource_filter(cls, client, id_rep,
                                 lookup_filter=filter_id_rep(mac=mac),
-                                resources=resources)
+                                resources=resources,
+                                include=include)
     resources_len = len(list(resources)) if resources is not None else 0
     if resources_len == 1:
         return resources[0]
@@ -107,24 +111,19 @@ Resource.lookup = classmethod(resource_lookup)
 Resource.short_id = property(lambda self: self.id.split('-')[0])
 
 
-def display_map(cls):
-    def _shorten_json_id(self):
-        shorten = False
-        try:
-            root_context = click.get_current_context().find_root()
-            shorten = not root_context.params.get('uuid', False)
-        except RuntimeError:
-            pass
-        return self.short_id if shorten else self.id
+def display_map(cls, client):
+    def _id(self):
+        return self.id if client.uuid else self.short_id
 
     return OrderedDict([
-        ('id', _shorten_json_id),
+        ('id', _id),
     ])
 
 
 @contextmanager
 def display_writer(cls, client, mapping, **kwargs):
-    writer = client.writer
+    file = kwargs.pop('file', click.utils.get_text_stream('stdout'))
+    writer = _writer.for_format(client.format, file, **kwargs)
     writer.start(mapping, **kwargs)
     try:
         yield writer
@@ -133,7 +132,7 @@ def display_writer(cls, client, mapping, **kwargs):
 
 
 def display_resources(cls, client, resources, **kwargs):
-    mapping = cls.display_map()
+    mapping = cls.display_map(client)
     with cls.display_writer(client, mapping, **kwargs) as writer:
         writer.write_resources(resources, mapping)
 

@@ -57,7 +57,11 @@ def main_commands(version=None, package=None,  commands=None):
 
 
 _commands = [
+    "user",
     "sensor",
+    "element",
+    "label",
+    "organization",
 ]
 
 

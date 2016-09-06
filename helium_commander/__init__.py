@@ -5,7 +5,11 @@ from .__about__ import (
 )
 from .resource import Resource, ResourceMeta
 from .sensor import Sensor
+from .element import Element
 from .client import Client
+from .user import User
+from .label import Label
+from .organization import Organization
 from .timeseries import DataPoint
 from .options import (
     device_sort_option,
@@ -15,7 +19,11 @@ from .options import (
 __all__ = (
     Resource, ResourceMeta,
     Sensor,
+    Element,
     Client,
+    User,
+    Organization,
+    Label,
     DataPoint,
     # Options
     device_sort_option,

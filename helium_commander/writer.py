@@ -1,21 +1,10 @@
 from __future__ import unicode_literals
-import click
 import unicodecsv as csv
 import json
 import abc
 import terminaltables
 from textwrap import wrap
 from operator import itemgetter
-
-
-def output_format(default_format='tabular', **kwargs):
-    override_format = kwargs.get('format')
-    try:
-        root_context = click.get_current_context().find_root()
-        click_format = root_context.params.get('format')
-    except RuntimeError:
-        click_format = None
-    return override_format or click_format or default_format
 
 
 def for_format(format, file, **kwargs):
@@ -132,15 +121,8 @@ class TabularWriter(BaseWriter):
         return entries
 
     def write_resources(self, resources, mapping):
-        def safe_unicode(o, *args):
-            try:
-                return unicode(o, *args)
-            except UnicodeDecodeError:
-                return unicode(str(o).encode('string_escape'))
-
         def map_entry(o):
-            return [safe_unicode(self.lookup(o, path))
-                    for _, path in mapping.items()]
+            return [self.lookup(o, path) for _, path in mapping.items()]
 
         if resources is None or mapping is None:
             return
