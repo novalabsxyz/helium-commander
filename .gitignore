@@ -14,4 +14,4 @@ env/
 .tox
 .cache
 /version.txt
-helium/_version.py
+helium_commander/_version.py
