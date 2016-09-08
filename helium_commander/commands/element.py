@@ -46,6 +46,7 @@ def update(client, element, name, mac, **kwargs):
     """
     element = Element.lookup(client, element, mac=mac, include=[Sensor])
     element = element.update(name=name)
+    element = Element.lookup(client, element.id, mac=mac, include=[Sensor])
     Element.display(client, [element])
 
 
