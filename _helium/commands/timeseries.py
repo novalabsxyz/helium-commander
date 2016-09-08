@@ -21,7 +21,7 @@ def cli(get=None, post=None, live=None):
     def live_decorator(f):
         def new_func(*args, **kwargs):
             ctx = click.get_current_context()
-            with writer_for_format(output_format(default_format='json', **kwargs),
+            with writer_for_format(output_format(default_format='json'),
                                    click.utils.get_text_stream('stdout'),
                                    mapping=_mapping_for(**kwargs)) as _writer:
                 with closing(ctx.invoke(f, *args, **kwargs)) as live:

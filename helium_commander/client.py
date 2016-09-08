@@ -10,5 +10,5 @@ class Client(helium.Client):
         url = kwargs.pop('base_url', None)
         super(Client, self).__init__(api_token=token, base_url=url)
 
-        self.uuid = kwargs.pop('uuid', False)
-        self.format = kwargs.pop('format', 'tabular')
+        self.uuid = kwargs.get('uuid', None) or False
+        self.format = kwargs.get("format", None) or 'tabular'

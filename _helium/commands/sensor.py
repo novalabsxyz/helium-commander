@@ -1,7 +1,7 @@
 import click
 import helium
 import dpath.util as dpath
-from . import timeseries as ts
+from helium_commander import timeseries as ts
 from .util import tabulate, lookup_resource_id, shorten_json_id
 from .util import sort_option as _sort_option
 

@@ -1,7 +1,7 @@
 import click
 from helium_commander import Client, Element, Sensor
 from helium_commander import device_mac_option, device_sort_option
-import timeseries
+from helium_commander.commands import timeseries
 
 
 pass_client = click.make_pass_decorator(Client)

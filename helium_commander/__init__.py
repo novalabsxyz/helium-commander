@@ -3,7 +3,7 @@ from .__about__ import (
     __license__, __copyright__, __version__, __revision__,
     __url__,
 )
-from .resource import Resource, ResourceMeta
+from .resource import Resource, ResourceMeta, ResourceParamType
 from .sensor import Sensor
 from .element import Element
 from .client import Client
@@ -17,7 +17,7 @@ from .options import (
 )
 
 __all__ = (
-    Resource, ResourceMeta,
+    Resource, ResourceMeta, ResourceParamType,
     Sensor,
     Element,
     Client,

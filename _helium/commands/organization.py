@@ -2,7 +2,7 @@ import click
 import helium
 import dpath.util as dpath
 from .util import tabulate
-from . import timeseries as ts
+from helium_commander import timeseries as ts
 
 
 pass_service = click.make_pass_decorator(helium.Service)

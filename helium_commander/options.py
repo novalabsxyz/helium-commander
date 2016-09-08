@@ -1,11 +1,11 @@
 import click
 
 
-def sort_option(options):
+def sort_option(choices):
     options = [
         click.option('--reverse', is_flag=True,
                      help='Sort in reverse order'),
-        click.option('--sort', type=click.Choice(options),
+        click.option('--sort', type=click.Choice(choices),
                      help='How to sort the result')
     ]
 

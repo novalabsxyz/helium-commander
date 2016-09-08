@@ -1,6 +1,6 @@
 import click
 from helium_commander import Client, Label, Sensor
-from helium_commander import device_sort_option
+from helium_commander import device_sort_option, ResourceParamType
 
 pass_client = click.make_pass_decorator(Client)
 

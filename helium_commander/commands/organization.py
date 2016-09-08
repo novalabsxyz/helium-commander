@@ -1,7 +1,7 @@
 import click
 from helium_commander import Client, Organization
 from helium_commander import User, Element, Sensor
-import timeseries
+from helium_commander.commands import timeseries
 
 
 pass_client = click.make_pass_decorator(Client)

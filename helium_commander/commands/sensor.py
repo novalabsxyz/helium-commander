@@ -1,7 +1,7 @@
 import click
 from helium_commander import Client, Sensor
 from helium_commander import device_mac_option, device_sort_option
-import timeseries
+from helium_commander.commands import timeseries
 
 
 pass_client = click.make_pass_decorator(Client)
@@ -27,7 +27,7 @@ def list(client, sensor, mac, **kwargs):
 
     """
     if sensor:
-        sensor = [Sensor.lookup(client, sensor, mac=mac)]
+        sensors = [Sensor.lookup(client, sensor, mac=mac)]
     else:
         sensors = Sensor.all(client)
     Sensor.display(client, sensors, **kwargs)
@@ -71,7 +71,7 @@ def delete(client, sensor, mac, **kwargs):
 
     Deletes the SENSOR with the given id.
     """
-    sensor = Sensor.lookup(sensor, mac=mac)
+    sensor = Sensor.lookup(client, sensor, mac=mac)
     result = sensor.delete()
     click.echo("Deleted" if result else result)
 
