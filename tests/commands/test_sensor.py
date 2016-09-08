@@ -1,12 +1,4 @@
-from helium_commander.cli import root
-from click.testing import CliRunner
-
-
-def cli_run(args):
-    runner = CliRunner()
-    result = runner.invoke(root, args)
-    assert result.exit_code == 0
-    return result.output
+from .util import cli_run
 
 
 def test_list(client, first_sensor):
