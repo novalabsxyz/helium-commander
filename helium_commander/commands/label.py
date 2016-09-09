@@ -73,7 +73,7 @@ def delete(client, label):
     label = [Label.lookup(client, id, resources=all_labels) for id in label]
     for entry in label:
         result = entry.delete()
-        click.echo("Deleted: " + entry if result else result)
+        click.echo("Deleted: " + entry.id if result else result)
 
 
 @cli.command()
@@ -93,13 +93,15 @@ def update(client, label, name, **kwargs):
         label.update(name=name)
 
     all_sensors = Sensor.all(client)
+    add_sensors = kwargs.pop('add', None) or []
+    remove_sensors = kwargs.pop('remove', None) or []
     sensors = [Sensor.lookup(client, s, resources=all_sensors)
-               for s in kwargs.pop('add', [])]
+               for s in add_sensors]
     if sensors:
         label.add_sensors(sensors)
 
     sensors = [Sensor.lookup(client, s, resources=all_sensors)
-               for s in kwargs.pop('remove', [])]
+               for s in remove_sensors]
     if sensors:
         label.remove_sensors(sensors)
 

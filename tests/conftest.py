@@ -100,6 +100,18 @@ def first_element(elements):
 
 
 @pytest.fixture
+def labels(client):
+    """Returns the all known labels for the active helium.Client."""
+    return helium_commander.Label.all(client)
+
+
+@pytest.fixture
+def first_label(labels):
+    """Return the first of the known labels for the active helium.Client"""
+    return labels[0]
+
+
+@pytest.fixture
 def authorized_organization(client):
     return client.authorized_organization()
 

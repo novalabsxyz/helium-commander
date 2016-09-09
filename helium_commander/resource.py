@@ -8,6 +8,7 @@ import click
 from builtins import filter as _filter
 from collections import OrderedDict
 from contextlib import contextmanager
+from functools import reduce
 
 
 def filter_mac(id_rep):
@@ -165,7 +166,7 @@ class ResourceParamType(click.ParamType):
                 acc.append(resource_rep)
             return acc
         nargs = self.nargs
-        value = value.split(',') if isinstance(value, basestring) else value
+        value = value.split(',')
         resources = reduce(collect_resources, value, [])
         if nargs > 0 and nargs != len(resources):
             self.fail('Expected {} resources, but got {}'.format(nargs, len(resources)))
