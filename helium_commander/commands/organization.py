@@ -34,39 +34,7 @@ def update(client, name):
 
     Updates the attributes of the currently authorized organization.
     """
-    org = client.authorized_organization()
+    org = Organization.singleton(client)
     org = org.update(name=name)
+    org = Organization.singleton(client, include=[User, Element, Sensor])
     Organization.display(client, [org])
-
-
-@cli.command()
-@pass_client
-def user(client):
-    """Lists users for the organization.
-
-    Lists the users that are part of the authorized organization.
-    """
-    org = Organization.singleton(client, include=[User])
-    User.display(client, org.users(use_included=True))
-
-
-@cli.command()
-@pass_client
-def element(client):
-    """Lists elements for the organization.
-
-    Lists the elements that are part of the authorized organization.
-    """
-    org = Organization.singleton(client, include=[Element])
-    Element.display(client, org.elements(use_included=True))
-
-
-@cli.command()
-@pass_client
-def sensor(client):
-    """Lists senors for the organization.
-
-    Lists the sensors that are part of the authorized organization.
-    """
-    org = Organization.singleton(client, include=[Sensor])
-    Element.display(client, org.sensors(use_included=True))
