@@ -11,11 +11,21 @@ def test_list(client, first_sensor):
 
 def test_create_delete(client):
     output = cli_run(client, ['sensor', 'create',
-                      '--name', 'test_create_sensor'])
+                              '--name', 'test_create_sensor'])
     assert output is not None
 
     output = cli_run(client, ['sensor', 'update', 'test_create_sensor',
-                      '--name', 'updated_name'])
+                              '--name', 'updated_name'])
 
     output = cli_run(client, ['sensor', 'delete', 'updated_name'])
     assert output.startswith('Deleted')
+
+
+def test_timeseries(client, tmp_sensor):
+    output = cli_run(client, ['sensor', 'timeseries',
+                              'list', tmp_sensor.short_id])
+    assert output is not None
+
+    output = cli_run(client, ['sensor', 'timeseries', 'post',
+                              tmp_sensor.short_id, 'test_post', '22'])
+    assert '22' in output

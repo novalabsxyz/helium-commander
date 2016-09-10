@@ -2,6 +2,7 @@ import click
 
 from itertools import islice
 from helium_commander import Client, DataPoint
+from helium_commander import JSONParamType
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -32,7 +33,8 @@ def cli(cls, lookup_options=None):
         mac = kwargs.pop('mac', False)
         resource = cls.lookup(client, id, mac=mac)
         timeseries = resource.timeseries()
-        timeseries.post(**kwargs)
+        point = timeseries.post(**kwargs)
+        DataPoint.display(client, [point], **kwargs)
 
     @group.command('live')
     @click.argument('id', metavar=resource_type)
@@ -44,8 +46,8 @@ def cli(cls, lookup_options=None):
         resource = cls.lookup(client, id, mac=mac)
         timeseries = resource.timeseries(**kwargs)
         mapping = cls.display_map(client)
-        with cls.display_writer(mapping, **kwargs) as writer:
-            for data_point in timeseries().live():
+        with cls.display_writer(client, mapping, **kwargs) as writer:
+            for data_point in timeseries.live():
                 writer.write_resources([data_point])
 
     return group
@@ -146,13 +148,3 @@ def post_options():
             func = option(func)
         return func
     return wrapper
-
-
-class JSONParamType(click.ParamType):
-    name = 'JSON'
-
-    def convert(self, value, param, ctx):
-        try:
-            return load_json(value)
-        except ValueError:
-            self.fail('{} is not a valid json value'.format(value), param, ctx)

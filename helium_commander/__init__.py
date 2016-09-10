@@ -3,7 +3,7 @@ from .__about__ import (
     __license__, __copyright__, __version__, __revision__,
     __url__,
 )
-from .resource import Resource, ResourceMeta, ResourceParamType
+from .resource import Resource, ResourceMeta
 from .sensor import Sensor
 from .element import Element
 from .client import Client
@@ -13,11 +13,13 @@ from .organization import Organization
 from .timeseries import DataPoint
 from .options import (
     device_sort_option,
-    device_mac_option
+    device_mac_option,
+    ResourceParamType,
+    JSONParamType
 )
 
 __all__ = (
-    Resource, ResourceMeta, ResourceParamType,
+    Resource, ResourceMeta,
     Sensor,
     Element,
     Client,
@@ -28,6 +30,8 @@ __all__ = (
     # Options
     device_sort_option,
     device_mac_option,
+    ResourceParamType,
+    JSONParamType,
     # Metadata attributes
     '__package_name__',
     '__title__',
