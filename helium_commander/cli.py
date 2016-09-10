@@ -8,12 +8,14 @@ from . import __version__
 from . import Client
 
 
-def main_wrapper(cmd):
-    def decorator():
+def main_wrapper(cmd, args, **kwargs):
+    if args is None:
         args = sys.argv[1:]
+
+    def decorator():
         try:
-            cmd.main(args=args, prog_name=None)
-        except Exception as e:
+            cmd.main(args=args, **kwargs)
+        except Exception as e:  # pragma: no cover
             if os.environ.get("HELIUM_COMMANDER_DEBUG"):
                 raise
             click.secho(str(e), fg='red')
@@ -26,7 +28,7 @@ CONTEXT_SETTINGS = dict(
 )
 
 
-def main_commands(version=None, package=None,  commands=None):
+def main_commands(version=None, package=None,  commands=None, name='helium'):
     class Loader(click.MultiCommand):
         def list_commands(self, ctx):
             commands.sort()
@@ -36,7 +38,7 @@ def main_commands(version=None, package=None,  commands=None):
             try:
                 command = import_module(package + "." + name)
                 return command.cli
-            except ImportError as e:
+            except ImportError as e:  # pragma: no cover
                 click.secho(str(e), fg='red')
                 return
 
@@ -48,7 +50,7 @@ def main_commands(version=None, package=None,  commands=None):
                       default=None,
                       help="The output format (default 'tabular')")
         @click.version_option(version=version)
-        @click.command(cls=Loader, context_settings=CONTEXT_SETTINGS)
+        @click.command(name, cls=Loader, context_settings=CONTEXT_SETTINGS)
         @click.pass_context
         def new_func(ctx, *args, **kwargs):
             ctx.invoke(f, ctx, *args, **kwargs)
@@ -77,8 +79,8 @@ def root(ctx, api_key, host, **kwargs):
     ctx.obj = Client(api_token=api_key, base_url=host, **kwargs)
 
 
-main = main_wrapper(root)
+main = main_wrapper(root, None)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':      # pragma: no cover
     main()
