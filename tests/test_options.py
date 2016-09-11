@@ -1,16 +1,25 @@
 import click
 from click.testing import CliRunner
+from click import BadParameter
+import json
 from helium_commander.options import (
     device_sort_option,
-    device_mac_option
+    device_mac_option,
+    ResourceParamType,
+    JSONParamType
 )
+import pytest
 
 
 def cli_run(func, args, output):
     runner = CliRunner()
-    result = runner.invoke(func, args)
+    result = runner.invoke(func, args,
+                           catch_exceptions=False,
+                           standalone_mode=False)
     assert result.exit_code == 0
-    assert result.output == output
+    if output is not None:
+        assert result.output == output
+    return result.output
 
 
 def test_sort():
@@ -38,3 +47,34 @@ def test_mac():
             '{}\n'.format('True'))
     cli_run(func, None,
             '{}\n'.format('False'))
+
+
+def test_resource(tmpdir):
+    @click.command()
+    @click.option('--add',
+                  type=ResourceParamType(metavar='SENSOR'))
+    def func(add):
+        click.echo(','.join(add))
+
+    output = cli_run(func, ['--help'], None)
+    assert '--add SENSOR[,SENSOR,...]* | @filename' in output
+
+    output = cli_run(func, ['--add', '234,567'],
+                     '234,567\n')
+
+    file = tmpdir.join('ids.txt')
+    file.write('123\n456\n')
+    output = cli_run(func, ['--add', '@{}'.format(file)],
+                     '123,456\n')
+
+
+def test_json():
+    @click.command()
+    @click.argument('value', type=JSONParamType())
+    def func(value):
+        click.echo(json.dumps(value))
+
+    cli_run(func, ['42'], '42\n')
+
+    with pytest.raises(BadParameter):
+        cli_run(func, ['abc'], 'abc')
