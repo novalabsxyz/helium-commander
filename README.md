@@ -3,7 +3,7 @@
 
 [Helium](https://helium.com) is an integrated platform of smart sensors, communication, edge and cloud compute that enables numerous sensing applications.
 
-Helium Commander makes it easy to talk to the Helium API](https://docs.helium.com). It offers:
+Helium Commander makes it easy to talk to the [Helium API](https://docs.helium.com). It offers:
 
 * A command line interface to interact with the various Helium endpoints
 * A service API that shows how to communicate with the Helium API and interpret the results.
@@ -83,7 +83,7 @@ Commands:
 ##  Helium Documentation and Community Support 
 
 
-* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs/helium.com). 
+* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com). 
 
 * **chat.helium.com** - If you have questions or ideas about how to use this code - or any part of Helium - head over the [chat.helium.com](https://chat.helium.com). We're standing by to help. 
 
