@@ -3,7 +3,7 @@ import ast
 from setuptools import setup
 from helium.version import __version__
 
-with open('README.rst') as file:
+with open('README.md') as file:
     long_description = file.read()
 
 setup(
