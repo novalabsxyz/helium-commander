@@ -35,12 +35,11 @@ def test_timeseries(client, tmp_sensor):
     runner = CliRunner()
     with runner.isolated_filesystem():
         file = path.local('test.csv')
-        cli_run(client, ['--format', 'csv', 'sensor',
-                         'timeseries', 'list', tmp_sensor.short_id,
-                         '--output', str(file)],
+        cli_run(client, ['--format', 'csv', '--output', str(file),
+                         'sensor', 'timeseries', 'list', tmp_sensor.short_id,
+                         '--count', '100'],
                 runner=runner)
 
-        assert path.local('test.csv').check()
         output = file.read()
         assert 'test_post' in output
         assert '22' in output

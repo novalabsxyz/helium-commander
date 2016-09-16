@@ -12,3 +12,4 @@ class Client(helium.Client):
 
         self.uuid = kwargs.get('uuid', None) or False
         self.format = kwargs.get("format", None) or 'tabular'
+        self.output = kwargs.get('output', None)

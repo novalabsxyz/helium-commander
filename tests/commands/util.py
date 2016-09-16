@@ -7,6 +7,11 @@ def cli_run(client, args, runner=None):
                    package='helium_commander.commands',
                    commands=_commands)
     def root_runner(ctx, **kwargs):
+        # Since we need to use the betamax wrapped client, we inject
+        # known global command line options into the curent client
+        client.uuid = kwargs.get('uuid', None) or False
+        client.format = kwargs.get('format', None) or 'tabular'
+        client.output = kwargs.get('output', None)
         ctx.obj = client
 
     runner = runner or CliRunner()

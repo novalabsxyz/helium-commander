@@ -49,6 +49,9 @@ def main_commands(version=None, package=None,  commands=None, name='helium'):
                       type=click.Choice(['csv', 'json', 'tabular']),
                       default=None,
                       help="The output format (default 'tabular')")
+        @click.option('--output',
+                      type=click.File('w'),
+                      help="the destination file for results")
         @click.version_option(version=version)
         @click.command(name, cls=Loader, context_settings=CONTEXT_SETTINGS)
         @click.pass_context
@@ -73,7 +76,7 @@ _commands = [
 @click.option('--host',
               envvar='HELIUM_API_URL',
               default='https://api.helium.com/v1',
-              help= 'The Helium base API URL. Can also be specified using the HELIUM_API_URL environment variable.' )
+              help='The Helium base API URL. Can also be specified using the HELIUM_API_URL environment variable.' )
 @main_commands(version=__version__, package='helium_commander.commands', commands=_commands)
 def root(ctx, api_key, host, **kwargs):
     ctx.obj = Client(api_token=api_key, base_url=host, **kwargs)

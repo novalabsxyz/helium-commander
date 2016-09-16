@@ -122,9 +122,10 @@ def display_map(cls, client):
 
 @contextmanager
 def display_writer(cls, client, mapping, **kwargs):
-    file = kwargs.pop('file', None) or click.utils.get_text_stream('stdout')
+    output = kwargs.get('output', client.output)
+    output = output or click.utils.get_text_stream('stdout')
     output_format = kwargs.get('format', client.format)
-    writer = _writer.for_format(output_format, file)
+    writer = _writer.for_format(output_format, output)
     writer.start(mapping, **kwargs)
     try:
         yield writer

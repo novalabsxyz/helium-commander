@@ -15,20 +15,18 @@ def cli(cls, lookup_options=None):
     @group.command('list')
     @click.argument('id', metavar=resource_type)
     @list_options()
+    @click.option('--count', default=20,
+                  help="the number of readings to fetch. Use -1 for all")
     @pass_client
     def _list(client, id, **kwargs):
         """Get timeseries readings."""
         mac = kwargs.pop('mac', False)
         count = kwargs.pop('count', 20)
-        file = kwargs.pop('output', None)
         resource = cls.lookup(client, id, mac=mac)
         timeseries = resource.timeseries(**kwargs)
         if count >= 0:
             timeseries = islice(timeseries, count)
-        DataPoint.display(client, timeseries,
-                          count=count,
-                          file=file,
-                          **kwargs)
+        DataPoint.display(client, timeseries, **kwargs)
 
     @group.command('post')
     @click.argument('id', metavar=resource_type)
@@ -116,10 +114,6 @@ def list_options(page_size=20):
                      help="the time window of the aggregation"),
         click.option('--agg-type',
                      help="the kinds of aggregations to perform"),
-        click.option('--output', type=click.File('w'),
-                     help="the destination file for results"),
-        click.option('--count', default=page_size,
-                     help="the number of readings to fetch")
     ]
 
     def wrapper(func):
