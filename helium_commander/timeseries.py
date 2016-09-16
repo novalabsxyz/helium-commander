@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from helium import DataPoint
+from helium import DataPoint, Timeseries
 from operator import attrgetter
 
 

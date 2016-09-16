@@ -1,4 +1,6 @@
 from .util import cli_run
+from click.testing import CliRunner
+import py.path as path
 
 
 def test_list(client, first_sensor):
@@ -29,3 +31,16 @@ def test_timeseries(client, tmp_sensor):
     output = cli_run(client, ['sensor', 'timeseries', 'post',
                               tmp_sensor.short_id, 'test_post', '22'])
     assert '22' in output
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        file = path.local('test.csv')
+        cli_run(client, ['--format', 'csv', 'sensor',
+                         'timeseries', 'list', tmp_sensor.short_id,
+                         '--output', str(file)],
+                runner=runner)
+
+        assert path.local('test.csv').check()
+        output = file.read()
+        assert 'test_post' in output
+        assert '22' in output
