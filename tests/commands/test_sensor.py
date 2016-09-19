@@ -24,8 +24,8 @@ def test_create_delete(client):
 
 
 def test_timeseries(client, tmp_sensor):
-    output = cli_run(client, ['sensor', 'timeseries',
-                              'list', tmp_sensor.short_id])
+    output = cli_run(client, ['sensor', 'timeseries', 'list',
+                              tmp_sensor.short_id])
     assert output is not None
 
     output = cli_run(client, ['sensor', 'timeseries', 'post',
@@ -36,10 +36,22 @@ def test_timeseries(client, tmp_sensor):
     with runner.isolated_filesystem():
         file = path.local('test.csv')
         cli_run(client, ['--format', 'csv', '--output', str(file),
-                         'sensor', 'timeseries', 'list', tmp_sensor.short_id,
+                         'sensor', 'timeseries', 'list',
+                         tmp_sensor.short_id,
                          '--count', '100'],
                 runner=runner)
 
         output = file.read()
         assert 'test_post' in output
         assert '22' in output
+
+
+def test_live(client, tmp_sensor):
+    # We're faking the cassette for a live session pretty hard
+    # here. The cassette was manually edited to reflect the
+    # event/text-stream data in a single request to work around
+    # betamax's problems with dealing with live sockets.
+    output = cli_run(client, ['--format', 'csv',
+                              'sensor', 'timeseries', 'live',
+                              tmp_sensor.short_id])
+    assert output.count('test_post') == 2

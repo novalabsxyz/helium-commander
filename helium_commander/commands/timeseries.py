@@ -3,6 +3,7 @@ import click
 from itertools import islice
 from helium_commander import Client, DataPoint
 from helium_commander import JSONParamType
+from contextlib import closing
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -49,10 +50,11 @@ def cli(cls, lookup_options=None):
         mac = kwargs.pop('mac', False)
         resource = cls.lookup(client, id, mac=mac)
         timeseries = resource.timeseries(**kwargs)
-        mapping = cls.display_map(client)
+        mapping = DataPoint.display_map(client)
         with cls.display_writer(client, mapping, **kwargs) as writer:
-            for data_point in timeseries.live():
-                writer.write_resources([data_point])
+            with closing(timeseries.live()) as live:
+                for data_point in live:
+                    writer.write_resources([data_point], mapping)
 
     return group
 

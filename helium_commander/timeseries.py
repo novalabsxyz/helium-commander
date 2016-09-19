@@ -13,3 +13,4 @@ def display_map(cls, client):
     return dict
 
 DataPoint.display_map = classmethod(display_map)
+Timeseries                      # Empty reference to make clear we re-export
