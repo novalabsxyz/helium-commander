@@ -1,6 +1,7 @@
 # Helium Commander
 
 [![Build Status](https://travis-ci.org/helium/helium-commander.svg?branch=master)](https://travis-ci.org/helium/helium-commander)
+[![Build status](https://ci.appveyor.com/api/projects/status/i5bocfry81whgaqx?svg=true)](https://ci.appveyor.com/project/madninja/helium-commander)
 [![Coverage Status](https://coveralls.io/repos/github/helium/helium-commander/badge.svg?branch=master)](https://coveralls.io/github/helium/helium-commander?branch=master)
 [![Code Climate](https://codeclimate.com/github/helium/helium-commander/badges/gpa.svg)](https://codeclimate.com/github/helium/helium-commander)
 
@@ -81,9 +82,9 @@ Commands:
   user           Operations on the user.
 ```
 
-##  Helium Documentation and Community Support 
+##  Helium Documentation and Community Support
 
-* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com). 
+* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com).
 
 ##  Helium Documentation and Community Support
 
