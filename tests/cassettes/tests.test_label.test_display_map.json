@@ -1,0 +1,48 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2016-09-06T02:36:01",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate",
+          "Authorization": "<AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "helium-python/0.0.6"
+        },
+        "method": "GET",
+        "uri": "https://api.helium.com/v1/label?include=sensor"
+      },
+      "response": {
+        "body": {
+          "base64_string": "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",
+          "encoding": null,
+          "string": ""
+        },
+        "headers": {
+          "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+          "Access-Control-Allow-Origin": "*",
+          "Airship-Quip": "RB_GC_GUARD",
+          "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Content-Encoding": "gzip",
+          "Content-Type": "application/json",
+          "Date": "Tue, 06 Sep 2016 02:36:00 GMT",
+          "Server": "Warp/3.2.7",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.helium.com/v1/label?include=sensor"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

@@ -1,2 +1,6 @@
 include LICENCE.txt
 include README.md
+include version.txt
+include CONTRIBUTORS.md
+include CONTRIBUTING.md
+include tox.ini

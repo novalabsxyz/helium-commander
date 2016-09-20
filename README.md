@@ -1,5 +1,9 @@
 # Helium Commander
 
+[![Build Status](https://travis-ci.org/helium/helium-commander.svg?branch=master)](https://travis-ci.org/helium/helium-commander)
+[![Build status](https://ci.appveyor.com/api/projects/status/i5bocfry81whgaqx?svg=true)](https://ci.appveyor.com/project/madninja/helium-commander)
+[![Coverage Status](https://coveralls.io/repos/github/helium/helium-commander/badge.svg?branch=master)](https://coveralls.io/github/helium/helium-commander?branch=master)
+[![Code Climate](https://codeclimate.com/github/helium/helium-commander/badges/gpa.svg)](https://codeclimate.com/github/helium/helium-commander)
 
 [Helium](https://helium.com) is an integrated platform of smart sensors, communication, edge and cloud compute that enables numerous sensing applications.
 
@@ -71,22 +75,20 @@ Options:
   -h, --help                    Show this message and exit.
 
 Commands:
-  cloud-script   Operations on cloud-scripts.
   element        Operations on elements.
   label          Operations on labels of sensors.
   organization   Operations on the authorized organization
   sensor         Operations on physical or virtual sensors.
-  sensor-script  Operations on sensor-scripts.
   user           Operations on the user.
 ```
 
-##  Helium Documentation and Community Support 
+##  Helium Documentation and Community Support
+
+* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com).
+
+##  Helium Documentation and Community Support
 
 
-* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com). 
+* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs/helium.com).
 
-* **chat.helium.com** - If you have questions or ideas about how to use this code - or any part of Helium - head over the [chat.helium.com](https://chat.helium.com). We're standing by to help. 
-
-
-
-
+* **chat.helium.com** - If you have questions or ideas about how to use this code - or any part of Helium - head over the [chat.helium.com](https://chat.helium.com). We're standing by to help.
