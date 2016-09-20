@@ -16,3 +16,8 @@ def test_update(client, authorized_organization):
     output = cli_run(client, ['organization', 'update',
                               '--name', current_name])
     assert current_name in output
+
+
+def test_timeseries(client, authorized_organization):
+    output = cli_run(client, ['organization', 'timeseries', 'list'])
+    assert output is not None

@@ -8,47 +8,53 @@ from contextlib import closing
 pass_client = click.make_pass_decorator(Client)
 
 
-def cli(cls, lookup_options=None):
+def cli(cls, singleton=False):
     group = click.Group(name='timeseries',
                         short_help="Commands on timeseries readings.")
     resource_type = cls._resource_type()
+    id_required = not singleton
+
+    def _fetch_resource(client, id, **kwargs):
+        if singleton:
+            resource = cls.singleton(client)
+        else:
+            mac = kwargs.pop('mac', False)
+            resource = cls.lookup(client, id, mac=mac)
+        return resource
 
     @group.command('list')
-    @click.argument('id', metavar=resource_type)
+    @click.argument('id', metavar=resource_type, required=id_required)
     @list_options()
     @click.option('--count', default=20,
                   help="the number of readings to fetch. Use -1 for all")
     @pass_client
     def _list(client, id, **kwargs):
         """Get timeseries readings."""
-        mac = kwargs.pop('mac', False)
         count = kwargs.pop('count', 20)
-        resource = cls.lookup(client, id, mac=mac)
+        resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries(**kwargs)
         if count >= 0:
             timeseries = islice(timeseries, count)
         DataPoint.display(client, timeseries, **kwargs)
 
     @group.command('post')
-    @click.argument('id', metavar=resource_type)
+    @click.argument('id', metavar=resource_type, required=id_required)
     @post_options()
     @pass_client
     def _post(client, id, **kwargs):
         """Post timeseries readings."""
-        mac = kwargs.pop('mac', False)
-        resource = cls.lookup(client, id, mac=mac)
+        resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries()
         point = timeseries.post(**kwargs)
         DataPoint.display(client, [point], **kwargs)
 
     @group.command('live')
-    @click.argument('id', metavar=resource_type)
+    @click.argument('id', metavar=resource_type, required=id_required)
     @list_options()
     @pass_client
     def _live(client, id, **kwargs):
         """Get live timeseries readings"""
-        mac = kwargs.pop('mac', False)
-        resource = cls.lookup(client, id, mac=mac)
+        resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries(**kwargs)
         mapping = DataPoint.display_map(client)
         with cls.display_writer(client, mapping, **kwargs) as writer:

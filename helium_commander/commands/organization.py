@@ -38,3 +38,6 @@ def update(client, name):
     org = org.update(name=name)
     org = Organization.singleton(client, include=[User, Element, Sensor])
     Organization.display(client, [org])
+
+
+cli.add_command(timeseries.cli(Organization, singleton=True))
