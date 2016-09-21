@@ -1,5 +1,6 @@
 include LICENCE.txt
 include README.rst
+include README.md
 include version.txt
 include CONTRIBUTORS.md
 include CONTRIBUTING.md

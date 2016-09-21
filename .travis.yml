@@ -4,6 +4,9 @@ python:
   - "2.7"
   - "3.5"
 
+before_install:
+  - sudo apt-get install -qq pandoc
+
 install:
   - pip install tox-travis
   - pip install coveralls
