@@ -15,16 +15,6 @@ Helium Commander makes it easy to talk to the [Helium API](https://docs.helium.c
 ## Installation
 
 
-### From Source
-
-Use this if you're actively developing or extending Commander:
-
-```
-$ virtualenv env
-$ source env/bin/activate
-$ pip install -e .
-```
-
 ### From PyPi
 
 From [PyPi](https://pypi.python.org). Use this if you want to use the command line tool on its own.
@@ -39,6 +29,26 @@ Note that on some systems you may have to use `sudo` to install the package syst
 ```
 $ sudo pip install helium-commander
 ```
+
+To upgrade from a previous version:
+
+```
+$ pip install helium-commander --upgrade -I
+```
+
+**Note**: Ensure that you use `-I` to allow clean upgrades of packages
+
+
+### From Source
+
+Use this if you're actively developing or extending Commander:
+
+```
+$ virtualenv env
+$ source env/bin/activate
+$ pip install -e .
+```
+
 
 ### Nix
 
