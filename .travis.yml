@@ -13,8 +13,8 @@ env:
     - TRAVIS="True"
 
 script:
-  - tox
   - pandoc --from=markdown --to=rst --output=README.rst README.md
+  - tox
 
 after_success:
   coveralls

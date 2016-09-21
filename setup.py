@@ -15,7 +15,7 @@ setup_requires = [
     'vcversioner',
 ]
 
-with open('README.md', 'r') as infile:
+with open('README.rst', 'r') as infile:
     long_description = infile.read()
 
 setup(
