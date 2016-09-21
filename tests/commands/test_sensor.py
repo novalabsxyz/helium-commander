@@ -32,6 +32,15 @@ def test_timeseries(client, tmp_sensor):
                               tmp_sensor.short_id, 'test_post', '22'])
     assert '22' in output
 
+    output = cli_run(client, ['sensor', 'timeseries', 'post',
+                              tmp_sensor.short_id, 'test_foo', '42'])
+    assert '42' in output
+
+    output = cli_run(client, ['sensor', 'timeseries', 'list',
+                              tmp_sensor.short_id,
+                              '--port', 'test_post'])
+    assert 'test_foo' not in output
+
     runner = CliRunner()
     with runner.isolated_filesystem():
         file = path.local('test.csv')
@@ -44,6 +53,8 @@ def test_timeseries(client, tmp_sensor):
         output = file.read()
         assert 'test_post' in output
         assert '22' in output
+        assert 'test_foo' in output
+        assert '42' in output
 
 
 def test_live(client, tmp_sensor):
