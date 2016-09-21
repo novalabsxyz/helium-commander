@@ -4,6 +4,9 @@ python:
   - "2.7"
   - "3.5"
 
+before_install:
+  - sudo apt-get install -qq pandoc
+
 install:
   - pip install tox-travis
   - pip install coveralls
@@ -13,8 +16,8 @@ env:
     - TRAVIS="True"
 
 script:
-  - pandoc --from=markdown --to=rst --output=README.rst README.md
   - tox
+  - pandoc --from=markdown --to=rst --output=README.rst README.md
 
 after_success:
   coveralls
