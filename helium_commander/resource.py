@@ -111,9 +111,9 @@ Resource.lookup = classmethod(resource_lookup)
 Resource.short_id = property(lambda self: self.id.split('-')[0])
 
 
-def display_map(cls, client):
+def display_map(cls, client, uuid=False):
     def _id(self):
-        return self.id if client.uuid else self.short_id
+        return self.id if uuid or client.uuid else self.short_id
 
     return OrderedDict([
         ('id', _id),
@@ -141,3 +141,5 @@ def display_resources(cls, client, resources, **kwargs):
 Resource.display_writer = classmethod(display_writer)
 Resource.display_map = classmethod(display_map)
 Resource.display = classmethod(display_resources)
+
+ResourceMeta                    # Avoid unused warning
