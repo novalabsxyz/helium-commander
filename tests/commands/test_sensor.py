@@ -1,7 +1,7 @@
 from .util import cli_run
 from click.testing import CliRunner
 import py.path as path
-
+import pytest
 
 def test_list(client, first_sensor):
     output = cli_run(client, ['sensor', 'list'])
@@ -66,3 +66,7 @@ def test_live(client, tmp_sensor):
                               'sensor', 'timeseries', 'live',
                               tmp_sensor.short_id])
     assert output.count('test_post') == 2
+
+    with pytest.raises(ValueError):
+        cli_run(client, ['sensor', 'timeseries', 'live',
+                         tmp_sensor.short_id])

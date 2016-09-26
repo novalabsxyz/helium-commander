@@ -54,6 +54,11 @@ def cli(cls, singleton=False):
     @pass_client
     def _live(client, id, **kwargs):
         """Get live timeseries readings"""
+        output_format = kwargs.get('format', client.format)
+        if output_format == "tabular":
+            raise ValueError("Tabular format is not supported for live " +
+                             "readings. Try --format csv " +
+                             "as the first argument")
         resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries(**kwargs)
         mapping = DataPoint.display_map(client)
