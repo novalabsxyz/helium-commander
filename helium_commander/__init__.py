@@ -10,7 +10,7 @@ from .client import Client
 from .user import User
 from .label import Label
 from .organization import Organization
-from .timeseries import DataPoint
+from .timeseries import Timeseries, DataPoint
 from .options import (
     device_sort_option,
     device_mac_option,
@@ -26,6 +26,7 @@ __all__ = (
     User,
     Organization,
     Label,
+    Timeseries,
     DataPoint,
     # Options
     device_sort_option,

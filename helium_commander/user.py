@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 from helium import User
-from operator import attrgetter
 
 
 def display_map(cls, client):

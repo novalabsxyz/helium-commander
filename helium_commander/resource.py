@@ -23,31 +23,29 @@ def filter_mac(id_rep):
     return func
 
 
-def filter_uuid(id_rep):
-    def func(resource):
-        return resource.id == id_rep
-    return func
+def filter_attribute(attribute):
+    def _filter(id_rep):
+        def func(resource):
+            return id_rep == getattr(resource, attribute, None)
+        return func
+    return _filter
 
 
-def filter_short_id(id_rep):
-    def func(resource):
-        return id_rep == resource.short_id
-    return func
+def filter_string_attribute(attribute):
+    def _filter_attribute(id_rep):
+        id_rep_lower = None
+        id_rep_len = 0
+        if id_rep is not None:
+            id_rep_lower = id_rep.lower()
+            id_rep_len = len(id_rep_lower)
 
-
-def filter_name(id_rep):
-    id_rep_lower = None
-    id_rep_len = 0
-    if id_rep is not None:
-        id_rep_lower = id_rep.lower()
-        id_rep_len = len(id_rep_lower)
-
-    def func(resource):
-        entry_name = resource.name
-        if entry_name is None:
-            return id_rep_lower is None
-        return entry_name[:id_rep_len].lower() == id_rep_lower
-    return func
+        def func(resource):
+            value = getattr(resource, attribute, None)
+            if value is None:
+                return id_rep_lower is None
+            return value[:id_rep_len].lower() == id_rep_lower
+        return func
+    return _filter_attribute
 
 
 def filter_oneof(lookup_filters):
@@ -70,19 +68,20 @@ def filter_id_rep(mac=False):
         ]
     else:
         filters = [
-            filter_uuid,
-            filter_short_id,
-            filter_name
+            filter_attribute('id'),
+            filter_attribute('short_id'),
+            filter_string_attribute('name')
         ]
     return filter_oneof(filters)
 
 
 def resource_filter(cls, client, value,
-                    lookup_filter=filter_uuid,
+                    lookup_filter=None,
                     resources=None,
                     include=None):
     if resources is None:
         resources = cls.all(client, include=include)
+    lookup_filter = lookup_filter or filter_attribute('id')
     resource_filter = lookup_filter(value)
     return list(_filter(resource_filter, resources))
 
@@ -90,9 +89,11 @@ def resource_filter(cls, client, value,
 def resource_lookup(cls, client, id_rep,
                     mac=False,
                     resources=None,
+                    lookup_filter=None,
                     include=None):
+    lookup_filter = lookup_filter or filter_id_rep(mac=mac)
     resources = resource_filter(cls, client, id_rep,
-                                lookup_filter=filter_id_rep(mac=mac),
+                                lookup_filter=lookup_filter,
                                 resources=resources,
                                 include=include)
     resources_len = len(list(resources)) if resources is not None else 0

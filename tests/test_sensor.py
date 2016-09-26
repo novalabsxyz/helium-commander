@@ -25,7 +25,8 @@ def test_lookup(client, sensors, first_sensor):
     lookup_sensor = Sensor.lookup(client, first_sensor.name,
                                   resources=sensors)
     assert first_sensor == lookup_sensor
-    lookup_sensor = Sensor.filter(client, None, resource.filter_name,
+    lookup_sensor = Sensor.filter(client, None,
+                                  resource.filter_string_attribute('name'),
                                   resources=sensors)
     assert len(lookup_sensor) > 0
 
