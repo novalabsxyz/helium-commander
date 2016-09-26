@@ -21,3 +21,16 @@ def list(client):
     """
     user = User.singleton(client)
     User.display(client, [user])
+
+
+@cli.command()
+@click.argument('email')
+@click.argument('password')
+@pass_client
+def auth(client, email, password):     # pragma: no cover
+    """Authenticate a user.
+
+    Authenticates the given EMAIL and PASSWORD and displays the api key.
+    """
+    user = User.authenticate(client, email, password)
+    click.echo(user.meta.api_token)
