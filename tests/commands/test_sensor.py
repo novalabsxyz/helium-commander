@@ -3,6 +3,7 @@ from click.testing import CliRunner
 import py.path as path
 import pytest
 
+
 def test_list(client, first_sensor):
     output = cli_run(client, ['sensor', 'list'])
     assert first_sensor.short_id in output
@@ -40,6 +41,14 @@ def test_timeseries(client, tmp_sensor):
                               tmp_sensor.short_id,
                               '--port', 'test_post'])
     assert 'test_foo' not in output
+
+    output = cli_run(client, ['sensor', 'timeseries', 'list',
+                              tmp_sensor.short_id,
+                              '--agg-type', 'min,max',
+                              '--agg-size', '5m',
+                              '--port', 'test_post'])
+    assert 'agg(test_post)' in output
+    assert 'agg(min=' in output
 
     runner = CliRunner()
     with runner.isolated_filesystem():
