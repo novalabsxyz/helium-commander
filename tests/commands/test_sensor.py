@@ -29,11 +29,11 @@ def test_timeseries(client, tmp_sensor):
                               tmp_sensor.short_id])
     assert output is not None
 
-    output = cli_run(client, ['sensor', 'timeseries', 'post',
+    output = cli_run(client, ['sensor', 'timeseries', 'create',
                               tmp_sensor.short_id, 'test_post', '22'])
     assert '22' in output
 
-    output = cli_run(client, ['sensor', 'timeseries', 'post',
+    output = cli_run(client, ['sensor', 'timeseries', 'create',
                               tmp_sensor.short_id, 'test_foo', '42'])
     assert '42' in output
 

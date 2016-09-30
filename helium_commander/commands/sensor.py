@@ -72,7 +72,8 @@ def delete(client, sensor, mac, **kwargs):
     Deletes the SENSOR with the given id.
     """
     sensor = Sensor.lookup(client, sensor, mac=mac)
-    result = sensor.delete()
-    click.echo("Deleted" if result else result)
+    sensor.delete()
+    click.echo("Deleted {}".format(sensor.id))
+
 
 cli.add_command(timeseries.cli(Sensor))

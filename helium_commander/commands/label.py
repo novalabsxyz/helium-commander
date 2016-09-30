@@ -72,8 +72,8 @@ def delete(client, label):
     all_labels = Label.all(client)
     label = [Label.lookup(client, id, resources=all_labels) for id in label]
     for entry in label:
-        result = entry.delete()
-        click.echo("Deleted: " + entry.id if result else result)
+        entry.delete()
+        click.echo("Deleted {} ".format(entry.id))
 
 
 @cli.command()

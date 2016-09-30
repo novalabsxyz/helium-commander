@@ -37,7 +37,7 @@ def cli(cls, singleton=False):
             timeseries = islice(timeseries, count)
         DataPoint.display(client, timeseries, **kwargs)
 
-    @group.command('post')
+    @group.command('create')
     @click.argument('id', metavar=resource_type, required=id_required)
     @post_options()
     @pass_client
@@ -45,7 +45,7 @@ def cli(cls, singleton=False):
         """Post timeseries readings."""
         resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries()
-        point = timeseries.post(**kwargs)
+        point = timeseries.create(**kwargs)
         DataPoint.display(client, [point], **kwargs)
 
     @group.command('live')
