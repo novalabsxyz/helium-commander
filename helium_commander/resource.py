@@ -135,7 +135,9 @@ def display_writer(cls, client, mapping, **kwargs):
 
 
 def display_resources(cls, client, resources, **kwargs):
-    mapping = cls.display_map(client)
+    mapping = kwargs.get('display_map', None)
+    if mapping is None:
+        mapping = cls.display_map(client)
     with cls.display_writer(client, mapping, **kwargs) as writer:
         writer.write_resources(resources, mapping)
 
