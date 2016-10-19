@@ -3,7 +3,7 @@ from helium import User
 from helium import response_json
 
 
-def display_map(cls, client):
+def display_map(cls, client, include=None):
     def _name(self):
         return getattr(self, 'name', None)
 
@@ -15,7 +15,7 @@ def display_map(cls, client):
         """
         return getattr(self, 'email', getattr(self, 'id'))
 
-    dict = super(User, cls).display_map(client, uuid=False)
+    dict = super(User, cls).display_map(client, uuid=False, include=include)
     dict.update([
         ('email', _email),
         ('name', _name),

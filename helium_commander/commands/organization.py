@@ -21,8 +21,9 @@ def list(client):
 
     Displays basic attributes of the authorized organization.
     """
-    org = Organization.singleton(client, include=[User, Element, Sensor])
-    Organization.display(client, [org])
+    include = [User, Element, Sensor]
+    org = Organization.singleton(client, include=include)
+    Organization.display(client, [org], include=include)
 
 
 @cli.command()
@@ -36,8 +37,9 @@ def update(client, name):
     """
     org = Organization.singleton(client)
     org = org.update(name=name)
-    org = Organization.singleton(client, include=[User, Element, Sensor])
-    Organization.display(client, [org])
+    include = [User, Element, Sensor]
+    org = Organization.singleton(client, include=include)
+    Organization.display(client, [org], include=include)
 
 
 cli.add_command(timeseries.cli(Organization, singleton=True))

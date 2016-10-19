@@ -112,7 +112,7 @@ Resource.lookup = classmethod(resource_lookup)
 Resource.short_id = property(lambda self: self.id.split('-')[0])
 
 
-def display_map(cls, client, uuid=False):
+def display_map(cls, client, uuid=False, include=None):
     def _id(self):
         return self.id if uuid or client.uuid else self.short_id
 
@@ -137,7 +137,7 @@ def display_writer(cls, client, mapping, **kwargs):
 def display_resources(cls, client, resources, **kwargs):
     mapping = kwargs.get('display_map', None)
     if mapping is None:
-        mapping = cls.display_map(client)
+        mapping = cls.display_map(client, include=kwargs.get('include', None))
     with cls.display_writer(client, mapping, **kwargs) as writer:
         writer.write_resources(resources, mapping)
 

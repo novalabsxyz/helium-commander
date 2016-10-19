@@ -3,8 +3,8 @@ from helium import DataPoint, Timeseries
 from operator import attrgetter
 
 
-def display_map(cls, client):
-    dict = super(DataPoint, cls).display_map(client)
+def display_map(cls, client, include=None):
+    dict = super(DataPoint, cls).display_map(client, include=include)
     dict.update([
         ('timestamp', attrgetter('timestamp')),
         ('port', attrgetter('port')),

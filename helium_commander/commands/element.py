@@ -26,11 +26,12 @@ def list(client, element, mac, **kwargs):
     organization.
 
     """
+    include = [Sensor]
     if element:
-        elements = [Element.lookup(client, element, mac=mac, include=[Sensor])]
+        elements = [Element.lookup(client, element, mac=mac, include=include)]
     else:
-        elements = Element.all(client, include=[Sensor])
-    Element.display(client, elements, **kwargs)
+        elements = Element.all(client, include=include)
+    Element.display(client, elements, include=include)
 
 
 @cli.command()
@@ -44,10 +45,11 @@ def update(client, element, name, mac, **kwargs):
 
     Updates the attributes of a given ELEMENT.
     """
-    element = Element.lookup(client, element, mac=mac, include=[Sensor])
+    element = Element.lookup(client, element, mac=mac)
     element = element.update(name=name)
-    element = Element.lookup(client, element.id, mac=mac, include=[Sensor])
-    Element.display(client, [element])
+    include = [Sensor]
+    element = Element.lookup(client, element.id, mac=mac, include=include)
+    Element.display(client, [element], include=include)
 
 
 cli.add_command(timeseries.cli(Element))

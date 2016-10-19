@@ -22,11 +22,12 @@ def list(client, label, **kwargs):
     organization.
 
     """
+    include = [Sensor]
     if label:
-        labels = [Label.lookup(client, label, include=[Sensor])]
+        labels = [Label.lookup(client, label, include=include)]
     else:
-        labels = Label.all(client, include=[Sensor])
-    Label.display(client, labels, **kwargs)
+        labels = Label.all(client, include=include)
+    Label.display(client, labels, include=include)
 
 
 @cli.command()
@@ -105,5 +106,6 @@ def update(client, label, name, **kwargs):
     if sensors:
         label.remove_sensors(sensors)
 
-    label = Label.find(client, label.id, include=[Sensor])
-    Label.display(client, [label])
+    include = [Sensor]
+    label = Label.find(client, label.id, include=include)
+    Label.display(client, [label], include=include)
