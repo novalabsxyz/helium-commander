@@ -9,6 +9,11 @@ def test_list(client, first_element):
     assert first_element.short_id in output
 
 
+def test_sensor(client, first_element):
+    output = cli_run(client, ['element', 'sensor', first_element.short_id])
+    assert output
+
+
 def test_update(client, first_element):
     current_name = first_element.name
     output = cli_run(client, ['element', 'update', first_element.short_id,

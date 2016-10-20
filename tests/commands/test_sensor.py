@@ -24,6 +24,11 @@ def test_create_delete(client):
     assert output.startswith('Deleted')
 
 
+def test_element(client, first_sensor):
+    output = cli_run(client, ['sensor', 'element', first_sensor.short_id])
+    assert output
+
+
 def test_timeseries(client, tmp_sensor):
     output = cli_run(client, ['sensor', 'timeseries', 'list',
                               tmp_sensor.short_id])

@@ -1,5 +1,5 @@
 import click
-from helium_commander import Client, Sensor
+from helium_commander import Client, Sensor, Element
 from helium_commander import device_mac_option, device_sort_option
 from helium_commander.commands import timeseries
 
@@ -77,3 +77,17 @@ def delete(client, sensor, mac, **kwargs):
 
 
 cli.add_command(timeseries.cli(Sensor))
+
+
+@cli.command()
+@click.argument('sensor')
+@device_mac_option
+@pass_client
+def element(client, sensor, mac):
+    """Get the element for a sensor.
+
+    Gets the element a given SENSOR was last seen connected to.
+    """
+    sensor = Sensor.lookup(client, sensor, mac=mac, include=[Element])
+    element = sensor.element(use_included=True)
+    Element.display(client, [element] if element else [])

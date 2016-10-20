@@ -53,3 +53,19 @@ def update(client, element, name, mac, **kwargs):
 
 
 cli.add_command(timeseries.cli(Element))
+
+
+@cli.command()
+@click.argument('element')
+@device_mac_option
+@device_sort_option
+@pass_client
+def sensor(client, element, mac, **kwargs):
+    """Get the sensors for an element.
+
+    Gets the sensors last known to be connected to a given ELEMENT.
+
+    """
+    element = Element.lookup(client, element, mac=mac, include=[Sensor])
+    sensors = element.sensors(use_included=True)
+    Sensor.display(client, sensors, **kwargs)
