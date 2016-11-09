@@ -40,8 +40,9 @@ def helium_recorder(request):
     cassette_name += request.function.__name__
 
     session = helium_commander.Client(base_url=API_URL)
-    session.token_auth(API_TOKEN)
-    recorder = Betamax(session)
+    session.api_token = API_TOKEN
+    recorder = Betamax(session.adapter)
+    recorder.client = session
 
     recorder.use_cassette(cassette_name)
     recorder.start()
@@ -52,7 +53,7 @@ def helium_recorder(request):
 @pytest.fixture
 def client(helium_recorder):
     """Return the helium.Client object used by the current recorder."""
-    return helium_recorder.session
+    return helium_recorder.client
 
 
 @pytest.fixture
