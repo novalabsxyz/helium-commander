@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
-from helium import User
-from helium import response_json
+from helium import CB, User
 
 
 def display_map(cls, client, include=None):
@@ -29,8 +28,8 @@ def authenticate(cls, client, email, password):   # pragma: no cover
         'email': email,
         'password': password
     }
-    json = response_json(client.post(url, json=json), 200, extract=None)
-    return cls._mk_one(client, json)
+    process = cls._mk_one(client)
+    return client.post(url, CB.json(200, process), json=json)
 
 User.display_map = classmethod(display_map)
 User.authenticate = classmethod(authenticate)
