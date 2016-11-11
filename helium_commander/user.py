@@ -14,9 +14,13 @@ def display_map(cls, client, include=None):
         """
         return getattr(self, 'email', getattr(self, 'id'))
 
+    def _pending(self):
+        return 'yes' if self.meta.pending_invite else 'no'
+
     dict = super(User, cls).display_map(client, uuid=False, include=include)
     dict.update([
         ('email', _email),
+        ('pending', _pending),
         ('name', _name),
     ])
     return dict
