@@ -22,6 +22,7 @@ def display_map(cls, client, include=None):
     on_include(dict, User, 'users', _count_user)
     on_include(dict, Element, 'elements', _count_element)
     on_include(dict, Sensor, 'sensors', _count_sensor)
+    dict['timezone'] = attrgetter('timezone')
     dict['name'] = attrgetter('name')
     return dict
 
