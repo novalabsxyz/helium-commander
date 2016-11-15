@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2016-09-03T00:57:54",
+      "recorded_at": "2016-11-14T22:49:29",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -14,27 +14,28 @@
           "Authorization": "<AUTH_TOKEN>",
           "Connection": "keep-alive",
           "Content-Type": "application/json",
-          "User-Agent": "helium-python/0.0.3"
+          "User-Agent": "helium-python/0.3.4"
         },
         "method": "GET",
         "uri": "https://api.helium.com/v1/user"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAEA32OQQqDMBBFr1JmbSSJWjSrFlz0AK7cTeNAA0ZFJ0IR715T6bbLz3883gYdMoLZAJln9wxMS1wDegIDD+pd8DWtd2vHMPClJj/CnoDrjrejVeB5LLfXF03tCAl4Op3k0fX/QDsTMkWXlioXSgpdNVqZrDSFbg9TmI6+H3AVshSqalRpZGG0TLNc5VnVxiB+TzE4LDTDvn8A6qj969cAAAA=",
+          "base64_string": "H4sIAAAAAAAEA32Pyw6CMBBFf4XMmpK2PMSuNHHhB7BiYyqM2oQWQlsSQ/h3W4lblzNz5+TcFXrpJIgVpHOzunuHNk5GagQBVxyU18kFl+TcdaM3DrYUVB9OPS5E7jt7en1zWTdCChp3IGqphn/BbkbpMLI4ZQVhlPBjw5nIa1HyNpAmNL0yz5syi3JB5yEHiyn4KTj//irCGKFFw3NR5oLxjFZlfSja6OneUyzhLc6wbR//LsyU6wAAAA==",
           "encoding": null,
           "string": ""
         },
         "headers": {
           "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
           "Access-Control-Allow-Origin": "*",
-          "Airship-Quip": "$300,000 worth of cows",
+          "Airship-Quip": "RB_GC_GUARD",
           "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Connection": "keep-alive",
           "Content-Encoding": "gzip",
+          "Content-Length": "187",
           "Content-Type": "application/json",
-          "Date": "Sat, 03 Sep 2016 00:57:54 GMT",
-          "Server": "Warp/3.2.7",
-          "Transfer-Encoding": "chunked"
+          "Date": "Mon, 14 Nov 2016 22:49:29 GMT",
+          "Server": "Warp/3.2.7"
         },
         "status": {
           "code": 200,
