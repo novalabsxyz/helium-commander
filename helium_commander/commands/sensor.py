@@ -42,7 +42,9 @@ def create(client, name):
 
     Create a virtual sensor with a name.
     """
-    sensor = Sensor.create(client, name=name)
+    sensor = Sensor.create(client, attributes={
+        'name': name
+    })
     Sensor.display(client, [sensor])
 
 
@@ -58,7 +60,9 @@ def update(client, sensor, name, mac, **kwargs):
     Updates the attributes of a given SENSOR.
     """
     sensor = Sensor.lookup(client, sensor, mac=mac)
-    sensor = sensor.update(name=name)
+    sensor = sensor.update(attributes={
+        'name': name
+    })
     Sensor.display(client, [sensor])
 
 

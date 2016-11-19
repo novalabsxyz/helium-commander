@@ -46,7 +46,9 @@ def update(client, element, name, mac, **kwargs):
     Updates the attributes of a given ELEMENT.
     """
     element = Element.lookup(client, element, mac=mac)
-    element = element.update(name=name)
+    element = element.update(attributes={
+        'name': name
+    })
     include = [Sensor]
     element = Element.lookup(client, element.id, mac=mac, include=include)
     Element.display(client, [element], include=include)

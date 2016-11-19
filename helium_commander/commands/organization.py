@@ -31,12 +31,14 @@ def list(client):
               help="the new name for the organization")
 @pass_client
 def update(client, name):
-    """Updates the attributes of the organization.
+    """Update the attributes of the organization.
 
     Updates the attributes of the currently authorized organization.
     """
     org = Organization.singleton(client)
-    org = org.update(name=name)
+    org = org.update(attributes={
+        'name': name
+    })
     include = [User, Element, Sensor]
     org = Organization.singleton(client, include=include)
     Organization.display(client, [org], include=include)

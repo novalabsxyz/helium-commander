@@ -57,7 +57,9 @@ def create(ctx, name, **kwargs):
     associated with that label.
     """
     client = ctx.find_object(Client)
-    label = Label.create(client, name=name)
+    label = Label.create(client, attributes={
+        'name': name
+    })
 
     ctx.invoke(update, client, label=label.id, **kwargs)
 
@@ -91,7 +93,9 @@ def delete(client, label):
 def update(client, label, name, **kwargs):
     label = Label.lookup(client, label)
     if name:
-        label.update(name=name)
+        label.update(attributes={
+            'name': name
+        })
 
     all_sensors = Sensor.all(client)
     add_sensors = kwargs.pop('add', None) or []

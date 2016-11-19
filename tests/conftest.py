@@ -70,7 +70,9 @@ def first_sensor(sensors):
 
 @pytest.yield_fixture
 def tmp_sensor(client):
-    sensor = helium_commander.Sensor.create(client, name='test')
+    sensor = helium_commander.Sensor.create(client, attributes={
+        'name': 'test'
+    })
     yield sensor
     sensor.delete()
 
@@ -82,8 +84,9 @@ def tmp_label(client):
     The label is deleted after the test completes.
     """
     label = helium_commander.Label.create(client,
-                                          name='temp-label',
-                                          sensors=[])
+                                          attributes={
+                                              'name': 'temp-label'
+                                          }, sensors=[])
     yield label
     label.delete()
 
