@@ -2,7 +2,7 @@ import click
 from helium_commander import Client, Organization
 from helium_commander import User, Element, Sensor
 from helium_commander.commands import timeseries
-
+from collections import OrderedDict
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -26,19 +26,35 @@ def list(client):
     Organization.display(client, [org], include=include)
 
 
+supported_timezones = [
+    'UTC',
+    'US/Pacific',
+    'US/Eastern',
+    'US/Central',
+    'US/Mountain',
+    'US/Pacific',
+    'Europe/London'
+]
+
+
 @cli.command()
 @click.option('--name',
               help="the new name for the organization")
+@click.option('--timezone', type=click.Choice(supported_timezones),
+              help="the timezone for the organization")
 @pass_client
-def update(client, name):
+def update(client, name, timezone):
     """Update the attributes of the organization.
 
     Updates the attributes of the currently authorized organization.
     """
     org = Organization.singleton(client)
-    org = org.update(attributes={
-        'name': name
-    })
+    attributes = OrderedDict()
+    if name:
+        attributes['name'] = name
+    if timezone:
+        attributes['timezone'] = timezone
+    org = org.update(attributes=attributes)
     include = [User, Element, Sensor]
     org = Organization.singleton(client, include=include)
     Organization.display(client, [org], include=include)
