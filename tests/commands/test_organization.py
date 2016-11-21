@@ -8,14 +8,19 @@ def test_list(client, authorized_organization):
 
 def test_update(client, authorized_organization):
     current_name = authorized_organization.name
+    current_tz = authorized_organization.timezone
 
     output = cli_run(client, ['organization', 'update',
-                              '--name', 'test_update_name'])
+                              '--name', 'test_update_name',
+                              '--timezone', 'UTC'])
     assert 'test_update_name' in output
+    assert 'UTC' in output
 
     output = cli_run(client, ['organization', 'update',
-                              '--name', current_name])
+                              '--name', current_name,
+                              '--timezone', current_tz])
     assert current_name in output
+    assert current_tz in output
 
 
 def test_timeseries(client, authorized_organization):
