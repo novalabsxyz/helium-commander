@@ -2,6 +2,7 @@ import click
 from helium_commander import Client, Organization
 from helium_commander import User, Element, Sensor
 from helium_commander.commands import timeseries
+from helium_commander.commands import metadata
 from collections import OrderedDict
 
 pass_client = click.make_pass_decorator(Client)
@@ -61,3 +62,4 @@ def update(client, name, timezone):
 
 
 cli.add_command(timeseries.cli(Organization, singleton=True))
+cli.add_command(metadata.cli(Organization, singleton=True))

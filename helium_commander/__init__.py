@@ -11,6 +11,7 @@ from .user import User
 from .label import Label
 from .organization import Organization
 from .timeseries import Timeseries, DataPoint
+from .metadata import Metadata
 from .options import (
     device_sort_option,
     device_mac_option,
@@ -28,6 +29,7 @@ __all__ = (
     Label,
     Timeseries,
     DataPoint,
+    Metadata,
     # Options
     device_sort_option,
     device_mac_option,

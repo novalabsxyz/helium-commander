@@ -12,7 +12,6 @@ def cli(cls, singleton=False):
     group = click.Group(name='timeseries',
                         short_help="Commands on timeseries readings.")
     resource_type = cls._resource_type()
-    id_required = not singleton
 
     def _fetch_resource(client, id, **kwargs):
         if singleton:
@@ -22,13 +21,20 @@ def cli(cls, singleton=False):
             resource = cls.lookup(client, id, mac=mac)
         return resource
 
+    def _id_argument():
+        def wrapper(func):
+            if not singleton:
+                return click.argument('id', metavar=resource_type)(func)
+            return func
+        return wrapper
+
     @group.command('list')
-    @click.argument('id', metavar=resource_type, required=id_required)
+    @_id_argument()
     @list_options()
     @click.option('--count', default=20,
                   help="the number of readings to fetch. Use -1 for all")
     @pass_client
-    def _list(client, id, **kwargs):
+    def _list(client, id=None, **kwargs):
         """Get timeseries readings."""
         count = kwargs.pop('count', 20)
         resource = _fetch_resource(client, id, **kwargs)
@@ -38,10 +44,10 @@ def cli(cls, singleton=False):
         DataPoint.display(client, timeseries, **kwargs)
 
     @group.command('create')
-    @click.argument('id', metavar=resource_type, required=id_required)
+    @_id_argument()
     @post_options()
     @pass_client
-    def _post(client, id, **kwargs):
+    def _post(client, id=None, **kwargs):
         """Post timeseries readings."""
         resource = _fetch_resource(client, id, **kwargs)
         timeseries = resource.timeseries()
@@ -49,10 +55,10 @@ def cli(cls, singleton=False):
         DataPoint.display(client, [point], **kwargs)
 
     @group.command('live')
-    @click.argument('id', metavar=resource_type, required=id_required)
+    @_id_argument()
     @list_options()
     @pass_client
-    def _live(client, id, **kwargs):
+    def _live(client, id=None, **kwargs):
         """Get live timeseries readings"""
         output_format = kwargs.get('format', client.format)
         if output_format == "tabular":
