@@ -23,3 +23,19 @@ def test_update(client, first_element):
     output = cli_run(client, ['element', 'update', first_element.short_id,
                       '--name', current_name])
     assert current_name in output
+
+
+def test_metadata(client, first_element):
+    output = cli_run(client, ['element', 'metadata', 'list',
+                              first_element.short_id])
+    assert output is not None
+
+    output = cli_run(client, ['element', 'metadata', 'update',
+                              first_element.short_id,
+                              '{"test": 42}'])
+    assert "42" in output
+
+    output = cli_run(client, ['element', 'metadata', 'replace',
+                              first_element.short_id,
+                              '{}'])
+    assert "42" not in output

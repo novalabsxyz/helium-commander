@@ -29,6 +29,22 @@ def test_element(client, first_sensor):
     assert output
 
 
+def test_metadata(client, tmp_sensor):
+    output = cli_run(client, ['sensor', 'metadata', 'list',
+                              tmp_sensor.short_id])
+    assert output is not None
+
+    output = cli_run(client, ['sensor', 'metadata', 'update',
+                              tmp_sensor.short_id,
+                              '{"test": 42}'])
+    assert "42" in output
+
+    output = cli_run(client, ['sensor', 'metadata', 'replace',
+                              tmp_sensor.short_id,
+                              '{}'])
+    assert "42" not in output
+
+
 def test_timeseries(client, tmp_sensor):
     output = cli_run(client, ['sensor', 'timeseries', 'list',
                               tmp_sensor.short_id])

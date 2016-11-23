@@ -2,7 +2,7 @@ import click
 from helium_commander import Client, Element, Sensor
 from helium_commander import device_mac_option, device_sort_option
 from helium_commander.commands import timeseries
-
+from helium_commander.commands import metadata
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -55,6 +55,7 @@ def update(client, element, name, mac, **kwargs):
 
 
 cli.add_command(timeseries.cli(Element))
+cli.add_command(metadata.cli(Element))
 
 
 @cli.command()
