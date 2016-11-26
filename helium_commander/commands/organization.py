@@ -1,6 +1,6 @@
 import click
 from helium_commander import Client, Organization
-from helium_commander import User, Element, Sensor
+from helium_commander import User, Element, Sensor, Label
 from helium_commander.commands import timeseries
 from helium_commander.commands import metadata
 from collections import OrderedDict
@@ -92,6 +92,17 @@ def user(client):
     """
     org = Organization.singleton(client)
     User.display(client, org.users())
+
+
+@cli.command()
+@pass_client
+def label(client):
+    """List labels for the organization.
+
+    Lists all labels for the authorized organization.
+    """
+    org = Organization.singleton(client)
+    Label.display(client, org.labels())
 
 
 cli.add_command(timeseries.cli(Organization, singleton=True))

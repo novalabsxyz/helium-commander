@@ -38,6 +38,11 @@ def test_user(client, authorized_organization):
     assert output is not None
 
 
+def test_label(client, authorized_organization):
+    output = cli_run(client, ['organization', 'label'])
+    assert output is not None
+
+
 def test_metadata(client, authorized_organization):
     output = cli_run(client, ['organization', 'metadata', 'list'])
     assert output is not None
