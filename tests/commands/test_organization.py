@@ -23,6 +23,21 @@ def test_update(client, authorized_organization):
     assert current_tz in output
 
 
+def test_sensor(client, authorized_organization):
+    output = cli_run(client, ['organization', 'sensor'])
+    assert output is not None
+
+
+def test_element(client, authorized_organization):
+    output = cli_run(client, ['organization', 'element'])
+    assert output is not None
+
+
+def test_user(client, authorized_organization):
+    output = cli_run(client, ['organization', 'user'])
+    assert output is not None
+
+
 def test_metadata(client, authorized_organization):
     output = cli_run(client, ['organization', 'metadata', 'list'])
     assert output is not None

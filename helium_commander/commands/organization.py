@@ -61,5 +61,38 @@ def update(client, name, timezone):
     Organization.display(client, [org], include=include)
 
 
+@cli.command()
+@pass_client
+def sensor(client):
+    """List sensors for the organization.
+
+    Lists all sensors for the authorized organization.
+    """
+    org = Organization.singleton(client)
+    Sensor.display(client, org.sensors())
+
+
+@cli.command()
+@pass_client
+def element(client):
+    """List elements for the organization.
+
+    Lists all elements for the authorized organization.
+    """
+    org = Organization.singleton(client)
+    Element.display(client, org.elements())
+
+
+@cli.command()
+@pass_client
+def user(client):
+    """List users for the organization.
+
+    Lists all users for the authorized organization.
+    """
+    org = Organization.singleton(client)
+    User.display(client, org.users())
+
+
 cli.add_command(timeseries.cli(Organization, singleton=True))
 cli.add_command(metadata.cli(Organization, singleton=True))
