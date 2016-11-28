@@ -35,6 +35,8 @@ def main_commands(version=None, package=None,  commands=None, name='helium'):
             return commands
 
         def get_command(self, ctx, name):
+            if name not in commands:
+                return
             try:
                 command = import_module(package + "." + name)
                 return command.cli
