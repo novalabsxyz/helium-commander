@@ -29,6 +29,11 @@ def test_element(client, first_sensor):
     assert output
 
 
+def test_label(client, first_sensor):
+    output = cli_run(client, ['sensor', 'label', first_sensor.short_id])
+    assert output
+
+
 def test_metadata(client, tmp_sensor):
     output = cli_run(client, ['sensor', 'metadata', 'list',
                               tmp_sensor.short_id])

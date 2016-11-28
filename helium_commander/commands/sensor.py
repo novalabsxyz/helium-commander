@@ -97,3 +97,16 @@ def element(client, sensor, mac):
     sensor = Sensor.lookup(client, sensor, mac=mac, include=[Element])
     element = sensor.element(use_included=True)
     Element.display(client, [element] if element else [])
+
+
+@cli.command()
+@click.argument('sensor')
+@device_mac_option
+@pass_client
+def label(client, sensor, mac):
+    """Get the labels for a sensor.
+
+    Gets all the labels that a given SENSOR is part of.
+    """
+    sensor = Sensor.lookup(client, sensor, mac=mac)
+    Sensor.display(client, sensor.labels())
