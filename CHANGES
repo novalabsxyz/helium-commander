@@ -4,6 +4,18 @@ Helium Commander Changelog
 Here you'll find the major differences between each release.
 
 
+Version 0.12.0
+--------------------
+
+Released on November 28
+
+ - Adds update command for user
+ - Add organization sensor, element, label, user listings
+ - Add sensor label command
+ - Add replace and clear for label sensor updates
+ - Fixes an unknown command error
+
+
 Version 0.11.0
 -------------
 
