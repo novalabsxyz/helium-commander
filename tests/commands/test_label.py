@@ -16,16 +16,27 @@ def test_sensors(client, first_label):
 
 def test_create_delete(client, first_sensor):
     output = cli_run(client, ['label', 'create', 'test_label',
-                      '--add', first_sensor.short_id])
+                              '--add', first_sensor.short_id])
     assert 'test_label' in output
 
     output = cli_run(client, ['label', 'sensor', 'test_label'])
     assert first_sensor.short_id in output
 
-    output = cli_run(client, ['label', 'update', 'test_label',
-                      '--remove', first_sensor.short_id,
-                      '--name', 'renamed_label'])
+    output = cli_run(client, ['label', 'update',
+                              'test_label',
+                              '--remove', first_sensor.short_id,
+                              '--name', 'renamed_label'])
     assert 'renamed_label' in output
+
+    output = cli_run(client, ['label', 'update',
+                              'renamed_label',
+                              '--replace', first_sensor.short_id])
+    assert 'renamed_label' in output
+
+    output = cli_run(client, ['label', 'update',
+                              'renamed_label',
+                              '--clear'])
+    assert output
 
     output = cli_run(client, ['label', 'delete', 'renamed_label'])
     assert output.startswith('Deleted')

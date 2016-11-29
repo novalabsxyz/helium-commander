@@ -1,6 +1,12 @@
 import click
-from helium_commander import Client, Label, Sensor
-from helium_commander import device_sort_option, ResourceParamType
+from helium_commander import (
+    Client,
+    Label,
+    Sensor,
+    device_sort_option,
+    ResourceParamType
+)
+from helium_commander.commands import metadata
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -87,10 +93,20 @@ def delete(client, label):
 @click.option('--remove',
               type=ResourceParamType(metavar='SENSOR'),
               help="Remove sensors from a label")
+@click.option('--replace',
+              type=ResourceParamType(metavar='SENSOR'),
+              help="Replace all sensors in a label")
+@click.option('--clear', is_flag=True, default=False,
+              help="Remove all sensors from a label")
 @click.option('--name',
               help="the new name for the label")
 @pass_client
 def update(client, label, name, **kwargs):
+    """Update sensors in a label.
+
+    Adds, removes, replaces or clears all sensors in the given LABEL.
+
+    """
     label = Label.lookup(client, label)
     if name:
         label.update(attributes={
@@ -100,6 +116,7 @@ def update(client, label, name, **kwargs):
     all_sensors = Sensor.all(client)
     add_sensors = kwargs.pop('add', None) or []
     remove_sensors = kwargs.pop('remove', None) or []
+    clear_sensors = kwargs.pop('clear', False)
     sensors = [Sensor.lookup(client, s, resources=all_sensors)
                for s in add_sensors]
     if sensors:
@@ -110,6 +127,11 @@ def update(client, label, name, **kwargs):
     if sensors:
         label.remove_sensors(sensors)
 
+    if clear_sensors:
+        label.update_sensors([])
+
     include = [Sensor]
     label = Label.find(client, label.id, include=include)
     Label.display(client, [label], include=include)
+
+cli.add_command(metadata.cli(Label))

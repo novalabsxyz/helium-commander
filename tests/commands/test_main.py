@@ -1,4 +1,7 @@
+import pytest
+from click import UsageError
 from helium_commander.cli import root, _commands, main_wrapper
+from .util import cli_run
 
 
 def main_run(args):
@@ -14,10 +17,11 @@ def test_main(capsys):
     out, err = capsys.readouterr()
     assert len(err) == 0
     for cmd in _commands:
-        assert cmd in out
-
-    for cmd in _commands:
         main_run([cmd, '--help'])
-        out, err = capsys.readouterr()
         assert len(err) == 0
         assert len(out) > 0
+
+
+def test_unknown_command(client):
+    with pytest.raises(UsageError):
+        cli_run(client, ['foo', '--help'])
