@@ -33,6 +33,8 @@ def test_sort():
             '{} {}\n'.format('name', 'True'))
     cli_run(func, ['--sort', 'seen'],
             '{} {}\n'.format('seen', 'False'))
+    cli_run(func, ['--sort', 'created'],
+            '{} {}\n'.format('created', 'False'))
     cli_run(func, ['--reverse'],
             '{} {}\n'.format('None', 'True'))
 

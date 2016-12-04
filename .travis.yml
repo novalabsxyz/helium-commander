@@ -14,6 +14,7 @@ install:
 env:
   global:
     - TRAVIS="True"
+    - COLUMNS=80
 
 script:
   - tox

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import sys
+import os
 import json
 import abc
 import terminaltables
@@ -123,7 +124,11 @@ class TabularWriter(BaseWriter):
     def start(self, mapping, **kwargs):
         super(TabularWriter, self).start(mapping, **kwargs)
         self.data = [[key.upper() for key in mapping.keys()]]
-        self.max_width = kwargs.get('max_width', None)
+        max_width = kwargs.get('max_width', os.getenv('COLUMNS', None))
+        if max_width:
+            max_width = int(max_width)
+        self.max_width = max_width
+
 
     def write_resources(self, resources, mapping):
         def map_entry(o):
