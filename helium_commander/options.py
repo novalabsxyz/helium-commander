@@ -19,7 +19,7 @@ def sort_option(choices):
 
 
 def device_sort_option(f):
-    return sort_option(['seen', 'name'])(f)
+    return sort_option(['seen', 'name', 'created'])(f)
 
 
 def device_mac_option(f):

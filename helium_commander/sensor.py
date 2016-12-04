@@ -18,25 +18,17 @@ def display_map(cls, client, include=None):
         except AttributeError:
             return None
 
-    def _seen(self):
-        try:
-            return self.meta.last_seen
-        except AttributeError:
-            pass
-        return None
-
-    def _mac(self):
-        try:
-            return self.meta.mac
-        except AttributeError:
-            pass
-        return None
+    def _meta(attr):
+        def func(self):
+            return getattr(self.meta, attr, None)
+        return func
 
     dict = super(Sensor, cls).display_map(client, include=include)
     dict.update([
-        ('mac', _mac),
+        ('mac', _meta('mac')),
         ('type', _type),
-        ('seen', _seen),
+        ('created', _meta('created')),
+        ('seen', _meta('last_seen')),
         ('name', attrgetter('name'))
     ])
     return dict
