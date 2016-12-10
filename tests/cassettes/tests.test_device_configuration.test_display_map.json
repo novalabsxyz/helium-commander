@@ -1,0 +1,49 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2016-12-10T12:54:33",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate",
+          "Authorization": "<AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "helium-python/0.5.0.post1"
+        },
+        "method": "GET",
+        "uri": "https://api.helium.com/v1/device-configuration?include=device%2Cconfiguration"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAEA51UyW7bMBD9FYOXtoApcBmuxx56K3qoTwmCgpTIRI0sGZLcoDD87x05tuslQJ1eBIrSbG+ZDanCGIi/35Awjn0d12MaiN9s56RPTRjrrh2e6tV0Rar0qy7T7rSL2ZC6Ip6EGKRhMVErTUUhAqcxJUW11ZEx7SprgMzJ+HuFsWRI7dD1ZIsFyq7N9eO631W5SlulaJQsDS1NzhQEE9SC0DRYDRXEymlxkvY813ZKv2vOOCGzwgSZZ0EhAyYoZcZUOpbMVikHjs0t0wTChjRdqBIO1a6bBhvsUxinVyIY15RzKviCG8+ZV6bgzBgj7giW2s/2ChC96GX+/9AqrbllzlLFQVEAVdKgq0gtUylkicCoqft9+dSkZWrHG7AFzSNP0lKdS0RFyEidgUBD0lkxKEHuUNnnvZjniK1VwcWYHWU5GwraWBqZ4ZRJCSJq5M29B1tuF0J6bj3IQhntBP83tg9Ic1s26x1plxomfXhOP1DPI/Fjv05zEmYotqfUz5rQP6ZZu17G1BPvrBRgpOVCuumhwXLUjcSjdXq6BXsQ1I2yPAjqWkLcLRjz0nopCuGUcup0zAusL7VD2rCcXPT9y+xbzujG2ee+Lp/57GPXzr6GvvwwzKo0PH+aVPkedx77Df1R/stQYinNLM8u55wYY2As6u1iKCapZAuBphBe6EJy4Mrd4X9NGEY6pNSeO4gJz8ALU0hmhNLTn6uuH3HH3COf6xVupDPToTAQMYwCDFEgwZ4idlgoV1ANHbphzzDJXYdlXupcr8IwvEyeRl5BoWgdfvgZ+lT9VcoBvBt9cgTval8wtxAcBe2ZLMCgieG09feSfST1xr1w7Ktr21TuQM2hGdAIb1ArXEIgLqkFKswCPcmdZ7pQAsWAej2j9nVXvk0b90x5CYV2EnfW6ezHZfWw/QOW/QuxhAYAAA==",
+          "encoding": "utf8",
+          "string": ""
+        },
+        "headers": {
+          "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+          "Access-Control-Allow-Origin": "*",
+          "Airship-Quip": "$300,000 worth of cows",
+          "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Length": "709",
+          "Content-Type": "application/json;charset=utf8",
+          "Date": "Sat, 10 Dec 2016 12:54:33 GMT",
+          "Server": "Warp/3.2.7"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.helium.com/v1/device-configuration?include=device%2Cconfiguration"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

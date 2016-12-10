@@ -12,6 +12,9 @@ from .label import Label
 from .organization import Organization
 from .timeseries import Timeseries, DataPoint
 from .metadata import Metadata
+from .configuration import Configuration
+from .device import Device
+from .device_configuration import DeviceConfiguration
 from .options import (
     device_sort_option,
     device_mac_option,
@@ -23,6 +26,9 @@ __all__ = (
     Resource, ResourceMeta,
     Sensor,
     Element,
+    Configuration,
+    Device,
+    DeviceConfiguration,
     Client,
     User,
     Organization,

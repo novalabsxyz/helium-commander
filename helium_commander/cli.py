@@ -67,6 +67,7 @@ _commands = [
     "user",
     "sensor",
     "element",
+    "configuration",
     "label",
     "organization",
 ]

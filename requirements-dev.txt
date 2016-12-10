@@ -1,0 +1,9 @@
+# This is an implicit value, here for clarity
+-r requirements.txt
+pytest
+pytest-cov
+betamax
+betamax_serializers
+betamax_matchers
+flake8
+flake8_docstrings

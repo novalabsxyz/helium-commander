@@ -116,6 +116,28 @@ def first_label(labels):
 
 
 @pytest.fixture
+def configurations(client):
+    """Returns the all known configurations for the active helium.Client."""
+    return helium_commander.Configuration.all(client)
+
+
+@pytest.fixture
+def first_configuration(configurations):
+    """Returns the first of the known configurations for the active Client."""
+    return configurations[0]
+
+
+@pytest.yield_fixture
+def tmp_configuration(client, configurations):
+    """A temporary configuration for the active Client."""
+    config = helium_commander.Configuration.create(client, attributes={
+        'test_id': 'helium.tmp_configuration'
+    })
+    yield config
+    config.delete()
+
+
+@pytest.fixture
 def authorized_organization(client):
     return client.authorized_organization()
 

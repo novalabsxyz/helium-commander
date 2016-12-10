@@ -24,7 +24,7 @@ def device_sort_option(f):
 
 def device_mac_option(f):
     return click.option('--mac', is_flag=True,
-                        help="Whether the given id is a mac address")(f)
+                        help="Whether the given id(s) are a mac address")(f)
 
 
 class ResourceParamType(click.ParamType):

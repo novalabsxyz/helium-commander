@@ -1,0 +1,137 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2016-12-10T13:22:39",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate",
+          "Authorization": "<AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "helium-python/0.5.0.post1"
+        },
+        "method": "GET",
+        "uri": "https://api.helium.com/v1/configuration"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAEA81Z225byRH8FeM8a4jpnp6Z7vMdfspisZirl4lsGRS9RiDob/In+bHUkSxvDCSkuNoo4oNAkDyXOt1VXdW6W3o5lmX96W4px+NhX78cx+2y3i3XN60c9zeflnW5mXPfxnK14KvjsgpfLeW3sr8u9Xos6/HwZdxfLYdx/fD721/3nx9O0MdvOMq1m09z/+HL4dvJ7p6u9/M9Dtp3nN7L8K3RdHjTnKiyqzLZicyaa/CxcMfFP47tPu+WdhjlOLYD2VNyxM6H955XryuFncRE2f6y4OTHv3/G7S0/3sD91f8PKFEt3bJ3MXp1kqw4sy4uVT+aWOVU6zmgZGvQNfAuShLjS4De3nwcn758rOOAp/LPf+BKX/dz/7nc3n7dniZxwMPLavjir+Uw+mO1X1xeis0CqbmYI8o7OQF1ia52NqPR1MYp1OS8vWdaRVahnRcKSS5B/Xp9TJVqVQnO55ZR3hlcjWO42YwbDUrS4rnyoo8prKS7FMy/1T7mocNz985kBCfmqyvZk0vUo2f2seupij4RFq0seWcmntMlFf33PibvPV0tDx+Nr7fjeNx/+oBmnjc3mwT8cVEKBUBC7856MyeMOlbP6N8WS+kxsRc+UUxypO/Zr57WmHYxcHwBVzcw/1Oy3j0KscZitU5zfs6tgbMCcwYBQxCuqeVphBv5pqv/Ud/vf5d1SSDECOrSbBBzDtVZluLKSDN6aRLKdrb/JuvfeR9WD1nPJPEi3j/Nqhd1QewWR+fseoFYSyDIVkzdzTktliTqg5zA8NjptAa/ctj5CN2/CMPraVdKfdrI1QWfqhPvu6vMQJumRkiRkIWzQDGDDR2/s5Qo0SWUfkWgNkRYveNC0K5ZNpGuyYUwqQTTnknPAd14DayoqGqIF2nXKwIdlBki5jr3gdaFiqlqcXFGabWaMp1v3cdpZDufkn+7QIt5wvipCUQVTVCtKs0VHoVyl9rGfEZF4ap83AW8LlPq16totoYx24IDLowkazBSm1qzeM0tEdT7rE9G64a0ASVWfbNAByYst+aYO4C2Kg6jqbrBGqvOMbOd5ehmpOAvFLM3kMW3KUbKLJO0YUSad1K5Oq2R3RxkZbZk2fK51v2efFTF5I2qruYILSJyuSOyCUWP8RLJtYJXmina+fGyta6tkXacjeii5PN6HNU2i3ENjjECUVEfXSlwDQixQhRii+fHCzyj0OrTznI21rfZuuYH+1rYKSs56QmhPXl2QXzyUkJFCj/bunBGcQ2yy7Tp7iVAf8gACADPSbKzXN++bFNhMfRUdECOYJAQCjBTKxyEWYSnnR6RrZ0A/d3SMhzhLiEq+nwJ6NdrY6hPqLGTiyXCJSlsu8YtuMdZIL5JZy8ngD4lvEc7GMksvVWgPXXEuuRmLVBgD6oqpexCHqHPPhpm7TmgECZKqwREWU580e7pTwkpqJX2It7NZHHz7tlZQlf6oKWzTwWu9hwGaE6ApY3AgGl5keb8QEX/PCq+eKlUt1huYCLhmYOJpbsSBqZKCWmMEmOVU7uWRyb6NYZtoJAm0ovk5/WY2GB5fGiCfQLUVcgHDBQvSOdt5hZDmXRKch6YiAbFAi0y8gqoeFGDHsrfxi+/LwKx+H2HTe6v4/Duuhw+jHdP+0TTwJKDYolo2x9EY1QG1ouDWto+Ff0DSfzbYgJjMEBfp5u07YWnJFdamE4l1ea1j/nA0mcuJvqoOQas6LDQmOgdPFcVdFHRJIgL3RKfSkZY7dh7DzPysIZli/Eye/mncH6A1qD9dBV2GFmgqDPfsFkeJEEzFLun53DebxY5M1t6oxYZLphSI3UkHekOLeWwfDTXouK/BZGm9rPpbjNUAGo7jfGkn/r5/l8fAjBIDxkAAA==",
+          "encoding": "utf8",
+          "string": ""
+        },
+        "headers": {
+          "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+          "Access-Control-Allow-Origin": "*",
+          "Airship-Quip": "never breaks eye contact",
+          "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Length": "1411",
+          "Content-Type": "application/json;charset=utf8",
+          "Date": "Sat, 10 Dec 2016 13:22:39 GMT",
+          "Server": "Warp/3.2.7"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.helium.com/v1/configuration"
+      }
+    },
+    {
+      "recorded_at": "2016-12-10T13:22:39",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate",
+          "Authorization": "<AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "helium-python/0.5.0.post1"
+        },
+        "method": "GET",
+        "uri": "https://api.helium.com/v1/configuration?include=device-configuration"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAEA81ZW24bRxC8irHfGmK6p+fRew59JTCCedpMaMmgKBuBoNvkJrlYaiXLjhyHD8tRpA9BIMXl1HZ1dVXvzdTyLk/zzzdT3u2263K961fTfDNtLmverS8vpnm6HGNd+3Q24a3dNAufTflDXm9y2fRp3m2v++3ZtO2bu/+/ert+f3eB1j/gU6ZeXoz1m+vtp4vdPHzf61t8aN1weSvd1krD4I9qJCU2RQYbkVFicdZnbvjyd305581Utz3v+vJBthQMsbHu3PJs00xuJT5Q1J8mXHz3+3scb3p8gNuz/w8oUclNozXe22QkaDaqTUwotlfRwqGUQ0BJZ5dmxysvQZRPAXp1+a5fXL8rfYu78ucf+KaP67F+n6+uPi53k9jh5sWkeOPXvO3tvtpPLi/5qo6SGh89yjs4AHX2pjRWpV6T9n2oyVg9Z5pFZqGVFXJBTkH9fDymQqUkccbGGlHe4UzxvZtRlSt1ClL9ofKCx+RmSqvg1L5UHnNP3XKzRqU7I2qLydGSCdS8Zba+pX0VfWhYUFniSlUsh1Mq+ncek7WWzqa7l/rHq77brS/egMzj8nKRgO8XJZcBxLVmtFU1wqhjsQz+Vp9z84Gt8J5ikqF0zna2NPuw8o79E3p1AfOfNuvNvRAnn7WUocaOsRA4JmCOaEDnhEuocSjhIJ909Zv6fvtF1iWgIbpLJowKMWdXjEbJJvcwvJUqLi9X+zdZ/9z3braQ9UjiT+r7h1n1JBb4pr43jqZliLU4gmz50MwYQ30OkqyTPRjumU6zszO7lfXQ/ZMwPJ92hdCG9liMs6EYsbaZwgy0YSQPKRJSdxAoZrCC8SsNgQKd0tLPCFS7CCdrOBO0a+RFpEswzg3KTlOLlA4BXfoaWFHRlJw/SbueEWinyBAx07h1UBcqllLKxg8vtRRNTIepez+NdGVDsC8XaFZLGD8loFElBahWkWoy90yxSal9HFFRuCrrVw4/pyn181U0asWYrc4AF0aSVhipRa1ZbIo1ENT7oE8GdV1YgBKn9GKBdkxYrtUwNwCtRQxGUzGdky9p9BH1YI8uRgr+ImH2OlL/MsUoMcugVDEi1RopXEwqns3opHnUoFHjIep+Tj4picoLVd0UPbSIyMSGyCbkLcaLJ1MzfsIIXg+Pl4W6OntacVSik5LP8/VoqiMrF2cYIxAVtd7kDNeAECtEzld/eLzAMwrNNqw0RuX0MqmrtrMtmU3iREZaQGgPlo0TG6xkV5DCD1IXzsjPTlaRFt09BeijDIAAcEySHXlz9bRNhXrXQk4dcgSDhFCAmVrgIFQ9PO2wiGx1D+jPlpbhCFcBUdHGU0A/H42hPq74RsZnD5eUYNuTX4K7HxniG9JoeQ/Qh4R3bwc9qYaXCrSFhlgXzCgZCmzRqolCNC5210brFbP2EFAIE4VZHKIsBz5p9/RDQgpqlVoWa0ZQv3j3aDSAldal3NiGDFd7CAM0x8HSemDAtDxJcx61oj2uFZ+8VCpLLFd0IuGeoxNzM9l1TJXsQu/Z+yL7di33nWhn75aBQilQOkl+nq8TKyyPdVWwT4C6ClmHgWIF6byOWL3Lg/ZJzl0ngqBYoHlGXkErnkTQbf6t//JlEYjF7ytsct/27atN3r7prx72iZocS3QJS0RdfiEaozKwXuyShuVVSd+RxD8tJjAGHfR1mEHLXnhIMLm6YZKEUm1qfdx16ZGLidZL9A4rOiw0BriD+5oELMopCOJC08D7khFWO3puYUbu1rCs3p9mL39Iz3e0Ndp+mAI7jCyQk1FbsVnuJC5FKHYLx/S8XSxyZNbwQi0yXDCFSsmQNKQ7UMpg+aim+oSnBZ5GagfT3WKoAFRXyfu9fuo1nkhc1M11Wx4vfP1EBPS9e1xxJBkf9lqby3x3uYvrzebsHw8vyDCdU5wJWhRXZGOMj5ztt5dsXz/DeDjakQu8Y4+2rDCXZfQy23wMyo/SxbeP9vr2LwvgNNhSGgAA",
+          "encoding": "utf8",
+          "string": ""
+        },
+        "headers": {
+          "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+          "Access-Control-Allow-Origin": "*",
+          "Airship-Quip": "evacuation not done in time",
+          "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Length": "1494",
+          "Content-Type": "application/json;charset=utf8",
+          "Date": "Sat, 10 Dec 2016 13:22:39 GMT",
+          "Server": "Warp/3.2.7"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.helium.com/v1/configuration?include=device-configuration"
+      }
+    },
+    {
+      "recorded_at": "2016-12-10T13:22:40",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate",
+          "Authorization": "<AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "helium-python/0.5.0.post1"
+        },
+        "method": "GET",
+        "uri": "https://api.helium.com/v1/configuration?include=device-configuration"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAEA81ZW24bRxC8irHfGmK6p+fRew59JTCCedpMaMmgKBuBoNvkJrlYaiXLjhyHD8tRpA9BIMXl1HZ1dVXvzdTyLk/zzzdT3u2263K961fTfDNtLmverS8vpnm6HGNd+3Q24a3dNAufTflDXm9y2fRp3m2v++3ZtO2bu/+/ert+f3eB1j/gU6ZeXoz1m+vtp4vdPHzf61t8aN1weSvd1krD4I9qJCU2RQYbkVFicdZnbvjyd305581Utz3v+vJBthQMsbHu3PJs00xuJT5Q1J8mXHz3+3scb3p8gNuz/w8oUclNozXe22QkaDaqTUwotlfRwqGUQ0BJZ5dmxysvQZRPAXp1+a5fXL8rfYu78ucf+KaP67F+n6+uPi53k9jh5sWkeOPXvO3tvtpPLi/5qo6SGh89yjs4AHX2pjRWpV6T9n2oyVg9Z5pFZqGVFXJBTkH9fDymQqUkccbGGlHe4UzxvZtRlSt1ClL9ofKCx+RmSqvg1L5UHnNP3XKzRqU7I2qLydGSCdS8Zba+pX0VfWhYUFniSlUsh1Mq+ncek7WWzqa7l/rHq77brS/egMzj8nKRgO8XJZcBxLVmtFU1wqhjsQz+Vp9z84Gt8J5ikqF0zna2NPuw8o79E3p1AfOfNuvNvRAnn7WUocaOsRA4JmCOaEDnhEuocSjhIJ909Zv6fvtF1iWgIbpLJowKMWdXjEbJJvcwvJUqLi9X+zdZ/9z3braQ9UjiT+r7h1n1JBb4pr43jqZliLU4gmz50MwYQ30OkqyTPRjumU6zszO7lfXQ/ZMwPJ92hdCG9liMs6EYsbaZwgy0YSQPKRJSdxAoZrCC8SsNgQKd0tLPCFS7CCdrOBO0a+RFpEswzg3KTlOLlA4BXfoaWFHRlJw/SbueEWinyBAx07h1UBcqllLKxg8vtRRNTIepez+NdGVDsC8XaFZLGD8loFElBahWkWoy90yxSal9HFFRuCrrVw4/pyn181U0asWYrc4AF0aSVhipRa1ZbIo1ENT7oE8GdV1YgBKn9GKBdkxYrtUwNwCtRQxGUzGdky9p9BH1YI8uRgr+ImH2OlL/MsUoMcugVDEi1RopXEwqns3opHnUoFHjIep+Tj4picoLVd0UPbSIyMSGyCbkLcaLJ1MzfsIIXg+Pl4W6OntacVSik5LP8/VoqiMrF2cYIxAVtd7kDNeAECtEzld/eLzAMwrNNqw0RuX0MqmrtrMtmU3iREZaQGgPlo0TG6xkV5DCD1IXzsjPTlaRFt09BeijDIAAcEySHXlz9bRNhXrXQk4dcgSDhFCAmVrgIFQ9PO2wiGx1D+jPlpbhCFcBUdHGU0A/H42hPq74RsZnD5eUYNuTX4K7HxniG9JoeQ/Qh4R3bwc9qYaXCrSFhlgXzCgZCmzRqolCNC5210brFbP2EFAIE4VZHKIsBz5p9/RDQgpqlVoWa0ZQv3j3aDSAldal3NiGDFd7CAM0x8HSemDAtDxJcx61oj2uFZ+8VCpLLFd0IuGeoxNzM9l1TJXsQu/Z+yL7di33nWhn75aBQilQOkl+nq8TKyyPdVWwT4C6ClmHgWIF6byOWL3Lg/ZJzl0ngqBYoHlGXkErnkTQbf6t//JlEYjF7ytsct/27atN3r7prx72iZocS3QJS0RdfiEaozKwXuyShuVVSd+RxD8tJjAGHfR1mEHLXnhIMLm6YZKEUm1qfdx16ZGLidZL9A4rOiw0BriD+5oELMopCOJC08D7khFWO3puYUbu1rCs3p9mL39Iz3e0Ndp+mAI7jCyQk1FbsVnuJC5FKHYLx/S8XSxyZNbwQi0yXDCFSsmQNKQ7UMpg+aim+oSnBZ5GagfT3WKoAFRXyfu9fuo1nkhc1M11Wx4vfP1EBPS9e1xxJBkf9lqby3x3uYvrzebsHw8vyDCdU5wJWhRXZGOMj5ztt5dsXz/DeDjakQu8Y4+2rDCXZfQy23wMyo/SxbeP9vr2LwvgNNhSGgAA",
+          "encoding": "utf8",
+          "string": ""
+        },
+        "headers": {
+          "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+          "Access-Control-Allow-Origin": "*",
+          "Airship-Quip": "shut it down",
+          "Airship-Trace": "b13,b12,b11,b10,b09,b08,b07,b06,b05,b04,b03,c03,c04,d04,e05,e06,f06,f07,g07,g08,h10,i12,l13,m16,n16,o16,o17,o18",
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Length": "1494",
+          "Content-Type": "application/json;charset=utf8",
+          "Date": "Sat, 10 Dec 2016 13:22:39 GMT",
+          "Server": "Warp/3.2.7"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.helium.com/v1/configuration?include=device-configuration"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
