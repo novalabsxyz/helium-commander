@@ -1,4 +1,5 @@
 environment:
+  COLUMNS: 80
 
   matrix:
 
@@ -8,6 +9,7 @@ environment:
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python35-x64"
+
 
 install:
   - "%PYTHON%\\python.exe -m pip install --disable-pip-version-check --upgrade pip"
