@@ -26,14 +26,4 @@ def display_map(cls, client, include=None):
     return dict
 
 
-def authenticate(cls, client, email, password):   # pragma: no cover
-    url = client._build_url('user', 'auth')
-    json = {
-        'email': email,
-        'password': password
-    }
-    process = cls._mk_one(client)
-    return client.post(url, CB.json(200, process), json=json)
-
 User.display_map = classmethod(display_map)
-User.authenticate = classmethod(authenticate)
