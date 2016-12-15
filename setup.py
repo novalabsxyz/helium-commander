@@ -3,7 +3,7 @@ from setuptools import setup
 author = 'Helium'
 author_email = 'hello@helium.com'
 install_requires = [
-    'helium-python>=0.6.0',
+    'helium-python>=0.6.3',
     'future>=0.15',
     'futures>=3.0',
     'terminaltables>=2.1.0',

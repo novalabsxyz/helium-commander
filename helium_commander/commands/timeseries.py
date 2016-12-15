@@ -8,7 +8,7 @@ from contextlib import closing
 pass_client = click.make_pass_decorator(Client)
 
 
-def cli(cls, singleton=False):
+def cli(cls, singleton=False, history=True, writable=True, live=True):
     group = click.Group(name='timeseries',
                         short_help="Commands on timeseries readings.")
     resource_type = cls._resource_type()
@@ -28,50 +28,53 @@ def cli(cls, singleton=False):
             return func
         return wrapper
 
-    @group.command('list')
-    @_id_argument()
-    @list_options()
-    @click.option('--count', default=20,
-                  help="the number of readings to fetch. Use -1 for all")
-    @pass_client
-    def _list(client, id=None, **kwargs):
-        """Get timeseries readings."""
-        count = kwargs.pop('count', 20)
-        resource = _fetch_resource(client, id, **kwargs)
-        timeseries = resource.timeseries(**kwargs)
-        if count >= 0:
-            timeseries = islice(timeseries, count)
-        DataPoint.display(client, timeseries, **kwargs)
+    if history:
+        @group.command('list')
+        @_id_argument()
+        @list_options()
+        @click.option('--count', default=20,
+                      help="the number of readings to fetch. Use -1 for all")
+        @pass_client
+        def _list(client, id=None, **kwargs):
+            """Get timeseries readings."""
+            count = kwargs.pop('count', 20)
+            resource = _fetch_resource(client, id, **kwargs)
+            timeseries = resource.timeseries(**kwargs)
+            if count >= 0:
+                timeseries = islice(timeseries, count)
+            DataPoint.display(client, timeseries, **kwargs)
 
-    @group.command('create')
-    @_id_argument()
-    @post_options()
-    @pass_client
-    def _post(client, id=None, **kwargs):
-        """Post timeseries readings."""
-        resource = _fetch_resource(client, id, **kwargs)
-        timeseries = resource.timeseries()
-        point = timeseries.create(**kwargs)
-        DataPoint.display(client, [point], **kwargs)
+    if writable:
+        @group.command('create')
+        @_id_argument()
+        @post_options()
+        @pass_client
+        def _post(client, id=None, **kwargs):
+            """Post timeseries readings."""
+            resource = _fetch_resource(client, id, **kwargs)
+            timeseries = resource.timeseries()
+            point = timeseries.create(**kwargs)
+            DataPoint.display(client, [point], **kwargs)
 
-    @group.command('live')
-    @_id_argument()
-    @list_options()
-    @pass_client
-    def _live(client, id=None, **kwargs):
-        """Get live timeseries readings"""
-        output_format = kwargs.get('format', client.format)
-        if output_format == "tabular":
-            raise ValueError("Tabular format is not supported for live " +
-                             "readings. Try --format csv " +
-                             "as the first argument")
-        resource = _fetch_resource(client, id, **kwargs)
-        timeseries = resource.timeseries(**kwargs)
-        mapping = DataPoint.display_map(client)
-        with cls.display_writer(client, mapping, **kwargs) as writer:
-            with closing(timeseries.live()) as live:
-                for data_point in live:
-                    writer.write_resources([data_point], mapping)
+    if live:
+        @group.command('live')
+        @_id_argument()
+        @list_options()
+        @pass_client
+        def _live(client, id=None, **kwargs):
+            """Get live timeseries readings."""
+            output_format = kwargs.get('format', client.format)
+            if output_format == "tabular":
+                raise ValueError("Tabular format is not supported for live " +
+                                 "readings. Try --format csv " +
+                                 "as the first argument")
+            resource = _fetch_resource(client, id, **kwargs)
+            timeseries = resource.timeseries(**kwargs)
+            mapping = DataPoint.display_map(client)
+            with cls.display_writer(client, mapping, **kwargs) as writer:
+                with closing(timeseries.live()) as live:
+                    for data_point in live:
+                        writer.write_resources([data_point], mapping)
 
     return group
 

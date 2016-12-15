@@ -7,6 +7,8 @@ from helium_commander import (
     ResourceParamType
 )
 from helium_commander.commands import metadata
+from helium_commander.commands import timeseries
+
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -34,6 +36,9 @@ def list(client, label, **kwargs):
     else:
         labels = Label.all(client, include=include)
     Label.display(client, labels, include=include)
+
+
+cli.add_command(timeseries.cli(Label, history=False, writable=False))
 
 
 @cli.command()
