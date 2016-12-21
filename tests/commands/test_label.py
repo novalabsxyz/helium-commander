@@ -57,6 +57,6 @@ def test_metadata(client, tmp_label):
     assert tmp_label.short_id in output
 
     output = cli_run(client, ['label', 'metadata', 'replace',
-                              label_sensor.short_id,
+                              tmp_label.short_id,
                               '{}'])
     assert "42" not in output
