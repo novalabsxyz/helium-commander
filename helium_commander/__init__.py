@@ -18,6 +18,7 @@ from .device_configuration import DeviceConfiguration
 from .options import (
     device_sort_option,
     device_mac_option,
+    metadata_filter_option,
     ResourceParamType,
     JSONParamType
 )
@@ -39,6 +40,7 @@ __all__ = (
     # Options
     device_sort_option,
     device_mac_option,
+    metadata_filter_option,
     ResourceParamType,
     JSONParamType,
     # Metadata attributes

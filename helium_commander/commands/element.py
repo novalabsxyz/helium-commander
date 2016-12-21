@@ -1,8 +1,13 @@
 import click
-from helium_commander import Client, Element, Sensor
-from helium_commander import device_mac_option, device_sort_option
-from helium_commander.commands import timeseries
-from helium_commander.commands import metadata
+from helium_commander import (
+    Client,
+    Element,
+    Sensor,
+    device_mac_option,
+    device_sort_option,
+    metadata_filter_option
+)
+from helium_commander.commands import timeseries, metadata
 
 pass_client = click.make_pass_decorator(Client)
 
@@ -18,6 +23,7 @@ def cli():
 @click.argument('element', required=False)
 @device_mac_option
 @device_sort_option
+@metadata_filter_option
 @pass_client
 def list(client, element, mac, **kwargs):
     """List elements.
@@ -30,7 +36,8 @@ def list(client, element, mac, **kwargs):
     if element:
         elements = [Element.lookup(client, element, mac=mac, include=include)]
     else:
-        elements = Element.all(client, include=include)
+        metadata = kwargs.get('metadata') or None
+        elements = Element.where(client, include=include, metadata=metadata)
     Element.display(client, elements, include=include)
 
 

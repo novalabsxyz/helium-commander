@@ -35,6 +35,10 @@ def test_metadata(client, first_element):
                               '{"test": 42}'])
     assert "42" in output
 
+    output = cli_run(client, ['element', 'list',
+                              '--metadata', '{"test": 42}'])
+    assert first_element.short_id in output
+
     output = cli_run(client, ['element', 'metadata', 'replace',
                               first_element.short_id,
                               '{}'])

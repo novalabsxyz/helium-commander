@@ -40,3 +40,23 @@ def test_create_delete(client, first_sensor):
 
     output = cli_run(client, ['label', 'delete', 'renamed_label'])
     assert output.startswith('Deleted')
+
+
+def test_metadata(client, tmp_label):
+    output = cli_run(client, ['label', 'metadata', 'list',
+                              tmp_label.short_id])
+    assert output is not None
+
+    output = cli_run(client, ['label', 'metadata', 'update',
+                              tmp_label.short_id,
+                              '{"test": 42}'])
+    assert "42" in output
+
+    output = cli_run(client, ['label', 'list',
+                              '--metadata', '{"test": 42}'])
+    assert tmp_label.short_id in output
+
+    output = cli_run(client, ['label', 'metadata', 'replace',
+                              label_sensor.short_id,
+                              '{}'])
+    assert "42" not in output
