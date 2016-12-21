@@ -27,6 +27,12 @@ def device_mac_option(f):
                         help="Whether the given id(s) are a mac address")(f)
 
 
+def metadata_filter_option(f):
+    return click.option('--metadata', metavar='FILTER',
+                        type=JSONParamType(),
+                        help="A metadata filter to use")(f)
+
+
 class ResourceParamType(click.ParamType):
     name = 'resource'
 

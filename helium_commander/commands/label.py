@@ -4,10 +4,10 @@ from helium_commander import (
     Label,
     Sensor,
     device_sort_option,
+    metadata_filter_option,
     ResourceParamType
 )
-from helium_commander.commands import metadata
-from helium_commander.commands import timeseries
+from helium_commander.commands import metadata, timeseries
 
 
 pass_client = click.make_pass_decorator(Client)
@@ -22,6 +22,7 @@ def cli():
 
 @cli.command()
 @click.argument('label', required=False)
+@metadata_filter_option
 @pass_client
 def list(client, label, **kwargs):
     """List labels.
@@ -34,7 +35,8 @@ def list(client, label, **kwargs):
     if label:
         labels = [Label.lookup(client, label, include=include)]
     else:
-        labels = Label.all(client, include=include)
+        metadata = kwargs.get('metadata') or None
+        labels = Label.where(client, include=include, metadata=metadata)
     Label.display(client, labels, include=include)
 
 

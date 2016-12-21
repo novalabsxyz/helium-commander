@@ -1,8 +1,13 @@
 import click
-from helium_commander import Client, Sensor, Element
-from helium_commander import device_mac_option, device_sort_option
-from helium_commander.commands import timeseries
-from helium_commander.commands import metadata
+from helium_commander import (
+    Client,
+    Sensor,
+    Element,
+    device_mac_option,
+    device_sort_option,
+    metadata_filter_option
+)
+from helium_commander.commands import timeseries, metadata
 
 
 pass_client = click.make_pass_decorator(Client)
@@ -10,7 +15,7 @@ pass_client = click.make_pass_decorator(Client)
 
 @click.group()
 def cli():
-    """Operations on physical or virtual sensors.
+    """Operate on physical or virtual sensors.
     """
     pass
 
@@ -19,6 +24,7 @@ def cli():
 @click.argument('sensor', required=False)
 @device_mac_option
 @device_sort_option
+@metadata_filter_option
 @pass_client
 def list(client, sensor, mac, **kwargs):
     """List sensors.
@@ -30,7 +36,8 @@ def list(client, sensor, mac, **kwargs):
     if sensor:
         sensors = [Sensor.lookup(client, sensor, mac=mac)]
     else:
-        sensors = Sensor.all(client)
+        metadata = kwargs.get('metadata') or None
+        sensors = Sensor.where(client, metadata=metadata)
     Sensor.display(client, sensors, **kwargs)
 
 

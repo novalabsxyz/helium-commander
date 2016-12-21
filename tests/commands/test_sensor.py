@@ -44,6 +44,10 @@ def test_metadata(client, tmp_sensor):
                               '{"test": 42}'])
     assert "42" in output
 
+    output = cli_run(client, ['sensor', 'list',
+                              '--metadata', '{"test": 42}'])
+    assert tmp_sensor.short_id in output
+
     output = cli_run(client, ['sensor', 'metadata', 'replace',
                               tmp_sensor.short_id,
                               '{}'])
