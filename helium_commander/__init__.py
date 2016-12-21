@@ -16,6 +16,7 @@ from .configuration import Configuration
 from .device import Device
 from .device_configuration import DeviceConfiguration
 from .options import (
+    sort_option,
     device_sort_option,
     device_mac_option,
     metadata_filter_option,
@@ -38,6 +39,7 @@ __all__ = (
     DataPoint,
     Metadata,
     # Options
+    sort_option,
     device_sort_option,
     device_mac_option,
     metadata_filter_option,
