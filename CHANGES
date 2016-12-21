@@ -3,6 +3,13 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+Version 0.14.0
+--------------------
+
+Released on December 20
+
+ - Adds metadata filtering support for element, label and sensor
+
 
 Version 0.13.1
 --------------------
