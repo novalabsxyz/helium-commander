@@ -17,11 +17,11 @@ def test_sensor(client, first_element):
 def test_update(client, first_element):
     current_name = first_element.name
     output = cli_run(client, ['element', 'update', first_element.short_id,
-                      '--name', 'test_update_name'])
+                              '--name', 'test_update_name'])
     assert 'test_update_name' in output
 
     output = cli_run(client, ['element', 'update', first_element.short_id,
-                      '--name', current_name])
+                              '--name', current_name])
     assert current_name in output
 
 
@@ -39,7 +39,5 @@ def test_metadata(client, first_element):
                               '--metadata', '{"test": 42}'])
     assert first_element.short_id in output
 
-    output = cli_run(client, ['element', 'metadata', 'replace',
-                              first_element.short_id,
-                              '{}'])
-    assert "42" not in output
+    # We don't replace metadata since the element may already have
+    # some set
