@@ -141,6 +141,7 @@ def display_resources(cls, client, resources, **kwargs):
     with cls.display_writer(client, mapping, **kwargs) as writer:
         writer.write_resources(resources, mapping)
 
+
 Resource.display_writer = classmethod(display_writer)
 Resource.display_map = classmethod(display_map)
 Resource.display = classmethod(display_resources)

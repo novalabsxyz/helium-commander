@@ -54,20 +54,3 @@ def test_metadata(client, authorized_organization):
     output = cli_run(client, ['organization', 'metadata', 'replace',
                               '{}'])
     assert "42" not in output
-
-
-def test_timeseries(client, authorized_organization):
-    output = cli_run(client, ['organization', 'timeseries', 'list'])
-    assert output is not None
-
-    output = cli_run(client, ['organization', 'timeseries', 'create',
-                              'test_post', '22'])
-    assert '22' in output
-
-    output = cli_run(client, ['organization', 'timeseries', 'create',
-                              'test_foo', '42'])
-    assert '42' in output
-
-    output = cli_run(client, ['organization', 'timeseries', 'list',
-                              '--port', 'test_post'])
-    assert 'test_foo' not in output

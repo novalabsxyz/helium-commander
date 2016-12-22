@@ -105,5 +105,6 @@ def label(client):
     Label.display(client, org.labels())
 
 
-cli.add_command(timeseries.cli(Organization, singleton=True))
+cli.add_command(timeseries.cli(Organization, singleton=True,
+                               history=False, writable=False))
 cli.add_command(metadata.cli(Organization, singleton=True))
