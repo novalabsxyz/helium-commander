@@ -14,7 +14,7 @@ pass_client = click.make_pass_decorator(Client)
 
 @click.group()
 def cli():
-    """Operations on physical or virtual sensors.
+    """Operations on Access Points.
     """
     pass
 
