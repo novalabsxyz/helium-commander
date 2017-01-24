@@ -9,34 +9,58 @@ def test_list(client, first_label):
     assert first_label.short_id in output
 
 
-def test_sensors(client, first_label):
-    output = cli_run(client, ['label', 'sensor', first_label.id])
+def test_sensors(client, tmp_label, tmp_sensor):
+    output = cli_run(client, ['label', 'sensor', tmp_label.id])
     assert output is not None
 
+    output = cli_run(client, ['label', 'sensor', tmp_label.id,
+                              '--add', tmp_sensor.short_id])
+    assert tmp_sensor.short_id in output
 
-def test_create_delete(client, first_sensor):
+    output = cli_run(client, ['label', 'sensor', tmp_label.id,
+                              '--remove', tmp_sensor.short_id])
+    assert tmp_sensor.short_id not in output
+
+    output = cli_run(client, ['label', 'sensor', tmp_label.id,
+                              '--replace', tmp_sensor.short_id])
+    assert tmp_sensor.short_id in output
+
+    output = cli_run(client, ['label', 'sensor', tmp_label.id,
+                              '--replace', 'none'])
+    assert tmp_sensor.short_id not in output
+
+
+def test_elements(client, tmp_label, first_element):
+    output = cli_run(client, ['label', 'element', tmp_label.id])
+    assert output is not None
+
+    output = cli_run(client, ['label', 'element', tmp_label.id,
+                              '--add', first_element.short_id])
+    assert first_element.short_id in output
+
+    output = cli_run(client, ['label', 'element', tmp_label.id,
+                              '--remove', first_element.short_id])
+    assert first_element.short_id not in output
+
+    output = cli_run(client, ['label', 'element', tmp_label.id,
+                              '--replace', first_element.short_id])
+    assert first_element.short_id in output
+
+    output = cli_run(client, ['label', 'element', tmp_label.id,
+                              '--replace', 'none'])
+    assert first_element.short_id not in output
+
+
+def test_create_delete(client, first_sensor, first_element):
     output = cli_run(client, ['label', 'create', 'test_label',
-                              '--add', first_sensor.short_id])
+                              '--sensors', first_sensor.short_id,
+                              '--elements', first_element.short_id])
     assert 'test_label' in output
-
-    output = cli_run(client, ['label', 'sensor', 'test_label'])
-    assert first_sensor.short_id in output
 
     output = cli_run(client, ['label', 'update',
                               'test_label',
-                              '--remove', first_sensor.short_id,
                               '--name', 'renamed_label'])
     assert 'renamed_label' in output
-
-    output = cli_run(client, ['label', 'update',
-                              'renamed_label',
-                              '--replace', first_sensor.short_id])
-    assert 'renamed_label' in output
-
-    output = cli_run(client, ['label', 'update',
-                              'renamed_label',
-                              '--clear'])
-    assert output
 
     output = cli_run(client, ['label', 'delete', 'renamed_label'])
     assert output.startswith('Deleted')
