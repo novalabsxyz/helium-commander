@@ -98,7 +98,13 @@ def create(ctx, name, sensors, elements):
 
     label = Label.create(client, attributes={
         'name': name
-    }, sensors=sensors, elements=elements)
+    })
+
+    if sensors:
+        label.update_sensors(sensors)
+
+    if elements:
+        label.update_elements(elements)
 
     label = Label.find(client, label.id, include=label_includes)
     Label.display(client, [label], include=label_includes)
