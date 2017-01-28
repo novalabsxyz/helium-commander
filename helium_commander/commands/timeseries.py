@@ -1,14 +1,18 @@
 import click
 
 from itertools import islice
-from helium_commander import Client, DataPoint
-from helium_commander import JSONParamType
 from contextlib import closing
+from helium_commander import (
+    Client,
+    DataPoint,
+    JSONParamType,
+    device_mac_option
+)
 
 pass_client = click.make_pass_decorator(Client)
 
 
-def cli(cls, singleton=False, history=True, writable=True, live=True):
+def cli(cls, singleton=False, history=True, writable=True, live=True, device=True):
     group = click.Group(name='timeseries',
                         short_help="Commands on timeseries readings.")
     resource_type = cls._resource_type()
@@ -28,17 +32,25 @@ def cli(cls, singleton=False, history=True, writable=True, live=True):
             return func
         return wrapper
 
+    def _mac_option():
+        def wrapper(func):
+            if device:
+                return device_mac_option(func)
+            return func
+        return wrapper
+
     if history:
         @group.command('list')
         @_id_argument()
+        @_mac_option()
         @list_options()
         @click.option('--count', default=20,
                       help="the number of readings to fetch. Use -1 for all")
         @pass_client
-        def _list(client, id=None, **kwargs):
+        def _list(client, id=None, mac=False, **kwargs):
             """Get timeseries readings."""
             count = kwargs.pop('count', 20)
-            resource = _fetch_resource(client, id, **kwargs)
+            resource = _fetch_resource(client, id, mac=mac)
             timeseries = resource.timeseries(**kwargs)
             if count >= 0:
                 timeseries = islice(timeseries, count)
@@ -47,11 +59,12 @@ def cli(cls, singleton=False, history=True, writable=True, live=True):
     if writable:
         @group.command('create')
         @_id_argument()
+        @_mac_option()
         @post_options()
         @pass_client
-        def _post(client, id=None, **kwargs):
+        def _post(client, id=None, mac=False, **kwargs):
             """Post timeseries readings."""
-            resource = _fetch_resource(client, id, **kwargs)
+            resource = _fetch_resource(client, id, mac=mac)
             timeseries = resource.timeseries()
             point = timeseries.create(**kwargs)
             DataPoint.display(client, [point], **kwargs)
@@ -59,16 +72,17 @@ def cli(cls, singleton=False, history=True, writable=True, live=True):
     if live:
         @group.command('live')
         @_id_argument()
+        @_mac_option()
         @list_options()
         @pass_client
-        def _live(client, id=None, **kwargs):
+        def _live(client, id=None, mac=False, **kwargs):
             """Get live timeseries readings."""
             output_format = kwargs.get('format', client.format)
             if output_format == "tabular":
                 raise ValueError("Tabular format is not supported for live " +
                                  "readings. Try --format csv " +
                                  "as the first argument")
-            resource = _fetch_resource(client, id, **kwargs)
+            resource = _fetch_resource(client, id, mac=mac)
             timeseries = resource.timeseries(**kwargs)
             mapping = DataPoint.display_map(client)
             with cls.display_writer(client, mapping, **kwargs) as writer:

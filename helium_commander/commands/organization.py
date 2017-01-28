@@ -106,5 +106,6 @@ def label(client):
 
 
 cli.add_command(timeseries.cli(Organization, singleton=True,
-                               history=False, writable=False))
+                               history=False, writable=False,
+                               device=False))
 cli.add_command(metadata.cli(Organization, singleton=True))

@@ -63,7 +63,8 @@ def list(client, label, **kwargs):
     Label.display(client, labels, include=label_includes)
 
 
-cli.add_command(timeseries.cli(Label, history=False, writable=False))
+cli.add_command(timeseries.cli(Label, history=False,
+                               writable=False, device=False))
 
 
 @cli.command()
