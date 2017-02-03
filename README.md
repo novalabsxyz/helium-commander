@@ -5,15 +5,31 @@
 [![Coverage Status](https://coveralls.io/repos/github/helium/helium-commander/badge.svg?branch=master)](https://coveralls.io/github/helium/helium-commander?branch=master)
 [![Code Climate](https://codeclimate.com/github/helium/helium-commander/badges/gpa.svg)](https://codeclimate.com/github/helium/helium-commander)
 
-[Helium](https://helium.com) is an integrated platform of smart sensors, communication, edge and cloud compute that enables numerous sensing applications.
+[Helium](https://helium.com) is an integrated platform of smart sensors, communication, edge and cloud compute that makes building IoT applications easy.
 
 Helium Commander makes it easy to talk to the [Helium API](https://docs.helium.com). It offers:
 
 * A command line interface to interact with the various Helium endpoints
 * A service API that shows how to communicate with the Helium API and interpret the results.
 
+
+## Docs, Usage, and Community
+
+* In addition to this README, full usage documentation Helium Commander can be found on [dev.helium.com](https://docs.helium.com/guides/helium_commander.html). 
+* You can also watch an in-depth Helium Commander tutorial [here](https://www.youtube.com/watch?v=EGDzfMQD6EI)
+
 ## Installation
 
+
+### Using Homebrew
+
+If you use [Homebrew](http://brew.sh/) for package management, Helium Commander can be installed like this:
+
+
+```
+$ brew tap helium/tools
+$ brew install helium-commander
+```
 
 ### From PyPi
 
@@ -85,6 +101,7 @@ Options:
   -h, --help                    Show this message and exit.
 
 Commands:
+  configuration  Operations on configurations.	
   element        Operations on elements.
   label          Operations on labels of sensors.
   organization   Operations on the authorized organization
@@ -92,13 +109,4 @@ Commands:
   user           Operations on the user.
 ```
 
-##  Helium Documentation and Community Support
 
-* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs.helium.com).
-
-##  Helium Documentation and Community Support
-
-
-* **Docs** Complete documenation for all parts of Helium can be found at [docs.helium.com](https://docs/helium.com).
-
-* **chat.helium.com** - If you have questions or ideas about how to use this code - or any part of Helium - head over the [chat.helium.com](http://chat.helium.com). We're standing by to help.
