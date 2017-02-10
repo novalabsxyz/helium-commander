@@ -3,8 +3,11 @@ from helium import Element, Sensor
 
 
 def display_map(cls, client, include=None):
+    def _type(self):
+        return getattr(self.meta, "device_type", None)
+
     def _mac(self):
-        return self.meta.mac
+        return getattr(self.meta, "mac", None)
 
     def _count_sensor(self):
         return len(self.sensors(use_included=True))
@@ -21,7 +24,8 @@ def display_map(cls, client, include=None):
 
     dict = super(Element, cls).display_map(client, include=include)
     dict.update([
-        ('mac', _mac)
+        ('mac', _mac),
+        ('type', _type)
     ])
 
     if include and Sensor in include:

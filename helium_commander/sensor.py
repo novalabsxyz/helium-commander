@@ -3,21 +3,7 @@ from helium import Sensor
 from operator import attrgetter
 
 
-def card_type(card_id, default):
-    return {
-        '2': 'blue',
-        '5': 'green',
-    }.get(card_id, default)
-
-
 def display_map(cls, client, include=None):
-    def _type(self):
-        try:
-            card = str(self.meta.card.get('id'))
-            return card_type(card, card)
-        except AttributeError:
-            return None
-
     def _meta(attr):
         def func(self):
             return getattr(self.meta, attr, None)
@@ -26,7 +12,7 @@ def display_map(cls, client, include=None):
     dict = super(Sensor, cls).display_map(client, include=include)
     dict.update([
         ('mac', _meta('mac')),
-        ('type', _type),
+        ('type', _meta('device_type')),
         ('created', _meta('created')),
         ('seen', _meta('last_seen')),
         ('name', attrgetter('name'))
