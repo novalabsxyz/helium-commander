@@ -3,6 +3,36 @@ Helium Commander Changelog
 
 Here you'll find the major differences between each release.
 
+
+Version 0.15.4
+--------------------
+
+Released on February 13
+
+ - Use device-type meta attribute in sensor/element
+
+
+Version 0.15.3
+--------------------
+
+Released on January 27
+
+ - Bump helium-python dependency
+
+Version 0.15.2
+--------------------
+
+Released on January 27
+
+ - Enable --mac option for timeseries commands
+
+Version 0.15.1
+--------------------
+
+Released on January 26
+
+ - Fixes label creation
+
 Version 0.15.0
 --------------------
 
