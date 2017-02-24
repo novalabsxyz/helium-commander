@@ -4,6 +4,15 @@ Helium Commander Changelog
 Here you'll find the major differences between each release.
 
 
+
+Version 0.15.5
+--------------------
+
+Released on February 23
+
+ - Fix CLI timeseries create timestamp
+
+
 Version 0.15.4
 --------------------
 
