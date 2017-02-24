@@ -2,6 +2,7 @@ import click
 
 from itertools import islice
 from contextlib import closing
+from helium import from_iso_date
 from helium_commander import (
     Client,
     DataPoint,
@@ -66,6 +67,10 @@ def cli(cls, singleton=False, history=True, writable=True, live=True, device=Tru
             """Post timeseries readings."""
             resource = _fetch_resource(client, id, mac=mac)
             timeseries = resource.timeseries()
+            timestamp = kwargs.get('timestamp', None)
+            if timestamp:
+                timestamp = from_iso_date(timestamp)
+                kwargs['timestamp'] = timestamp
             point = timeseries.create(**kwargs)
             DataPoint.display(client, [point], **kwargs)
 
@@ -167,7 +172,6 @@ _post_options_docs = """
     the reading and can be given in ISO8601 form:
 
     \b
-    * YYYY-MM-DD - Example: 2016-05-05
     * YYYY-MM-DDTHH:MM:SSZ - Example: 2016-04-07T19:12:06Z
 """
 

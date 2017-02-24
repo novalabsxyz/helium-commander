@@ -67,6 +67,12 @@ def test_timeseries(client, tmp_sensor):
                               tmp_sensor.short_id, 'test_foo', '42'])
     assert '42' in output
 
+    output = cli_run(client, ['sensor', 'timeseries', 'create',
+                              tmp_sensor.short_id, 'test_foo', '42',
+                              '--timestamp', '2016-05-05T00:00:00Z'])
+    assert '2016-05-05' in output
+
+
     output = cli_run(client, ['sensor', 'timeseries', 'list',
                               tmp_sensor.short_id,
                               '--port', 'test_post'])
