@@ -71,13 +71,12 @@ def delete(client, config):
 _dev_config_includes = [Device, Configuration]
 
 def _dev_configs(client, config):
+    def _filter_configs(dc):
+        return dc.configuration(use_included=True) == config
     include = _dev_config_includes
-    dev_configs = DeviceConfiguration.all(client, include=include)
-    return filter(lambda dc:
-                  dc.configuration(use_included=True) == config,
-                  dev_configs)
-
-
+    return DeviceConfiguration.where(client,
+                                     include=include,
+                                     filter=_filter_configs)
 
 
 @cli.command()
