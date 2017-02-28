@@ -14,11 +14,9 @@ def filter_mac(id_rep):
     id_rep_lower = id_rep.lower()
 
     def func(resource):
-        try:
-            resource_mac = resource.meta.mac
+        resource_mac = getattr(resource.meta, 'mac', None)
+        if resource_mac:
             return resource_mac[-len(id_rep):].lower() == id_rep_lower
-        except AttributeError:
-            pass
         return False
     return func
 
